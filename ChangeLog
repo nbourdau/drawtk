@@ -1,0 +1,4 @@
+09-09-25  Michele Tavella <michele.tavella@epfl.ch>
+- Towards final implementation
+- Apart from the missinge error codes and sprintf, the lib is at its final
+  stage!
