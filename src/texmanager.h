@@ -2,13 +2,13 @@
 #define TEXMANAGER_H
 
 #include <SDL/SDL_opengl.h>
-#include "feedback.h"
+#include "drawtk.h"
 
-struct fb_texture_manager;
+struct dtk_texture_manager;
 
-GLuint get_texture_id(const struct fb_texture* tex);
-void fb_delete_textures(void);
-struct fb_texture_manager* create_texture_manager(void);
-void destroy_texture_manager(struct fb_texture_manager* texman);
+GLuint get_texture_id(const struct dtk_texture* tex);
+void dtk_delete_textures(void);
+struct dtk_texture_manager* create_texture_manager(void);
+void destroy_texture_manager(struct dtk_texture_manager* texman);
 
 #endif

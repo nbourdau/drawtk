@@ -6,9 +6,9 @@ noinst_PROGRAMS = colortest \
 
 
 develtest_SOURCES = colortest.c
-develtest_LDADD = $(top_builddir)/src/libfeedback.la
+develtest_LDADD = $(top_builddir)/src/libdrawtk.la
 
 colortest_SOURCES = colortest.c
-colortest_LDADD = $(top_builddir)/src/libfeedback.la
+colortest_LDADD = $(top_builddir)/src/libdrawtk.la
 
-LDADD = $(top_builddir)/src/libfeedback.la
+LDADD = $(top_builddir)/src/libdrawtk.la

@@ -1,15 +1,16 @@
-lib_LTLIBRARIES = libfeedback.la
+lib_LTLIBRARIES = libdrawtk.la
 
-libfeedback_includedir = $(includedir)/libfeedback
-libfeedback_include_HEADERS = feedback.h palette.h fb_event.h
+#libdrawtk_includedir = $(includedir)/drawtk
+#libdrawtk_include_HEADERS = drawtk.h palette.h dtk_event.h
+include_HEADERS = drawtk.h palette.h dtk_event.h
 
-libfeedback_la_SOURCES = feedback.h fb_event.h\
-						 shapes.c\
-						 texmanager.h texmanager.c\
-						 window.h window.c\
-						 palette.h palette.c
+libdrawtk_la_SOURCES = drawtk.h dtk_event.h\
+			 shapes.c\
+			 texmanager.h texmanager.c\
+			 window.h window.c\
+			 palette.h palette.c
 
-libfeedback_la_LDFLAGS = $(AM_CFLAGS) \
-						 -version-info $(CURRENT):$(REVISION):$(AGE) \
-						 -release $(RELEASE) 
-libfeedback_la_LIBADD = -lm -lGL
+#libdrawtk_la_LDFLAGS = $(AM_CFLAGS) \
+#			 -version-info $(CURRENT):$(REVISION):$(AGE) \
+#			 -release $(RELEASE) 
+libdrawtk_la_LIBADD = -lm -lGL

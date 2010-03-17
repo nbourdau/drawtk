@@ -1,5 +1,5 @@
-#ifndef FB_EVENT_H
-#define FB_EVENT_H
+#ifndef DTK_EVENT_H
+#define DTK_EVENT_H
 
 #include <SDL/SDL_keysym.h>
 
@@ -8,13 +8,13 @@ extern "C" {
 #endif
 
 enum {
-	FB_EVT_REDRAW	= 0,
-	FB_EVT_QUIT,
-	FB_EVT_KEYUP,
-	FB_EVT_KEYBOARD,
-	FB_EVT_MOUSE,
-	FB_EVT_MOUSEMOTION,
-	NUM_FB_EVT
+	DTK_EVT_REDRAW	= 0,
+	DTK_EVT_QUIT,
+	DTK_EVT_KEYUP,
+	DTK_EVT_KEYBOARD,
+	DTK_EVT_MOUSE,
+	DTK_EVT_MOUSEMOTION,
+	NUM_DTK_EVT
 };
 
 /* 2010-01-27  Michele Tavella <michele.tavella@epfl.ch>
@@ -23,11 +23,11 @@ enum {
  *  ../../examples/feedbackevents.cpp: In member function ‘virtual void FeedbackTest::HandleMouse(HbFeedbackEvents*, HbFeedbackMouse)’:
 ../../examples/feedbackevents.cpp:85: error: ‘SDL_PRESSED’ was not declared in this scope
 */
-#define FB_KEY_PRESSED	1//SDL_PRESSED
-#define FB_KEY_RELEASED	0//SDL_RELEASED
+#define DTK_KEY_PRESSED	1//SDL_PRESSED
+#define DTK_KEY_RELEASED	0//SDL_RELEASED
 
 
-struct fb_keyevent
+struct dtk_keyevent
 {
 	unsigned int state;
 	unsigned int sym;
@@ -35,7 +35,7 @@ struct fb_keyevent
 };
 
 
-struct fb_mouseevent
+struct dtk_mouseevent
 {
 	unsigned int button;
 	unsigned int state;
@@ -48,4 +48,4 @@ struct fb_mouseevent
 }
 #endif
 
-#endif /* FB_EVENT_H */
+#endif /* DTK_EVENT_H */

@@ -1,15 +1,15 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
-#include "feedback.h"
+#include "drawtk.h"
 #include "texmanager.h"
 #include "window.h" 
-#include "fb_event.h"
+#include "dtk_event.h"
 
 
-struct fb_window* current_window = NULL;
+struct dtk_window* current_window = NULL;
 
 // Settings of the feedback window
-struct fb_window
+struct dtk_window
 {
 	// Dimensions (pixels)
 	unsigned int width;
@@ -29,7 +29,7 @@ struct fb_window
 	SDL_Surface* window;
 
 	// Texture manager
-	struct fb_texture_manager* texman;	
+	struct dtk_texture_manager* texman;	
 	EventHandlerProc evthandler;
 };
 
@@ -40,7 +40,7 @@ struct fb_window
  *                                                                       *
  *************************************************************************/
 
-int init_opengl_state(struct fb_window* wnd)
+int init_opengl_state(struct dtk_window* wnd)
 {
 	float ratio, iw, ih;
 	GLenum err;
@@ -79,7 +79,7 @@ int init_opengl_state(struct fb_window* wnd)
 	return 0;
 }
 
-int resize_window(struct fb_window* wnd, int width, int height, int fs)
+int resize_window(struct dtk_window* wnd, int width, int height, int fs)
 {
 	int flags = SDL_OPENGL | SDL_RESIZABLE | SDL_ANYFORMAT;
 	const SDL_VideoInfo* info = NULL;
@@ -112,11 +112,11 @@ int resize_window(struct fb_window* wnd, int width, int height, int fs)
 	return 0;
 }
 
-fb_hwnd fb_create_window(unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int bpp, const char* caption)
+dtk_hwnd dtk_create_window(unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int bpp, const char* caption)
 {
 	int is_init = 0, fs = 0;
 	char* wndstr = malloc(strlen(caption)+1);
-	struct fb_window* wnd = malloc(sizeof(struct fb_window));
+	struct dtk_window* wnd = malloc(sizeof(struct dtk_window));
 	
 	if (!wndstr || !wnd) {
 		fprintf(stderr, "Memory alloc problems in window creation: No window created\n");
@@ -174,13 +174,13 @@ error:
 	return NULL;
 }                         
 
-void fb_clear_screen(fb_hwnd wnd)
+void dtk_clear_screen(dtk_hwnd wnd)
 {
 	(void)wnd;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void fb_update_screen(fb_hwnd wnd)  
+void dtk_update_screen(dtk_hwnd wnd)  
 {                         
 	(void)wnd;
 	                
@@ -188,7 +188,7 @@ void fb_update_screen(fb_hwnd wnd)
 	SDL_GL_SwapBuffers();			
 }
 
-void fb_close(fb_hwnd wnd)
+void dtk_close(dtk_hwnd wnd)
 {
 	if (!wnd) 
 		return;
@@ -206,29 +206,29 @@ void fb_close(fb_hwnd wnd)
 	//FreeImage_DeInitialise();	
 }
 
-struct fb_texture_manager* get_texmanager(struct fb_window* wnd)
+struct dtk_texture_manager* get_texmanager(struct dtk_window* wnd)
 {
 	return wnd->texman;
 }
 
-void fb_make_current_window(fb_hwnd wnd)
+void dtk_make_current_window(dtk_hwnd wnd)
 {
 	current_window = wnd;	
 }
 
-void fb_bgcolor(float* bgcolor)
+void dtk_bgcolor(float* bgcolor)
 {
 	glClearColor(bgcolor[0], bgcolor[1], bgcolor[2], bgcolor[3]);	
 }
 
-void fb_set_event_handler(fb_hwnd wnd, EventHandlerProc handler)
+void dtk_set_event_handler(dtk_hwnd wnd, EventHandlerProc handler)
 {
 	wnd->evthandler = handler;
 }
 
 
-int fb_poll_event(struct fb_window* wnd, unsigned int* type,
-		struct fb_keyevent* keyevt, struct fb_mouseevent* mouseevt) 
+int dtk_poll_event(struct dtk_window* wnd, unsigned int* type,
+		struct dtk_keyevent* keyevt, struct dtk_mouseevent* mouseevt) 
 {
 	SDL_Event evt;
 	if(!SDL_PollEvent(&evt))
@@ -236,10 +236,10 @@ int fb_poll_event(struct fb_window* wnd, unsigned int* type,
 
 	switch (evt.type) {
 		case SDL_QUIT:
-			*type = FB_EVT_QUIT;
+			*type = DTK_EVT_QUIT;
 			break;
 		case SDL_VIDEOEXPOSE:
-			*type = FB_EVT_REDRAW;
+			*type = DTK_EVT_REDRAW;
 			break;
 		case SDL_VIDEORESIZE:
 			resize_window(wnd, evt.resize.w, evt.resize.h, 0);
@@ -247,7 +247,7 @@ int fb_poll_event(struct fb_window* wnd, unsigned int* type,
 			break;
 		case SDL_KEYDOWN:
 		case SDL_KEYUP:
-			*type = FB_EVT_KEYBOARD;
+			*type = DTK_EVT_KEYBOARD;
 			keyevt->state = evt.key.state;
 			keyevt->sym = evt.key.keysym.sym;
 			keyevt->mod = evt.key.keysym.mod;
@@ -257,7 +257,7 @@ int fb_poll_event(struct fb_window* wnd, unsigned int* type,
 		 * will kill you (indian style).
 		 */
 		case SDL_MOUSEMOTION:
-			*type = FB_EVT_MOUSEMOTION;
+			*type = DTK_EVT_MOUSEMOTION;
 			mouseevt->button = evt.button.button;
 			mouseevt->state = evt.button.state;
 			mouseevt->x = evt.button.x;
@@ -265,7 +265,7 @@ int fb_poll_event(struct fb_window* wnd, unsigned int* type,
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
-			*type = FB_EVT_MOUSE;
+			*type = DTK_EVT_MOUSE;
 			mouseevt->button = evt.button.button;
 			mouseevt->state = evt.button.state;
 			mouseevt->x = evt.button.x;
@@ -277,7 +277,7 @@ int fb_poll_event(struct fb_window* wnd, unsigned int* type,
 	return 1;
 }
 
-int fb_process_events(struct fb_window* wnd)
+int dtk_process_events(struct dtk_window* wnd)
 {
 	EventHandlerProc handler = wnd->evthandler;
 	SDL_Event evt;
@@ -287,12 +287,12 @@ int fb_process_events(struct fb_window* wnd)
 		switch (evt.type) {
 		case SDL_QUIT:
 			if (handler) 
-				ret = handler(wnd, FB_EVT_QUIT, NULL);
+				ret = handler(wnd, DTK_EVT_QUIT, NULL);
 			break;
 
 		case SDL_VIDEOEXPOSE:
 			if (handler)
-				ret = handler(wnd, FB_EVT_REDRAW, NULL);
+				ret = handler(wnd, DTK_EVT_REDRAW, NULL);
 			break;
 
 		case SDL_VIDEORESIZE:
@@ -303,23 +303,23 @@ int fb_process_events(struct fb_window* wnd)
 		case SDL_KEYUP:
 		case SDL_KEYDOWN:
 			if (handler) {
-				struct fb_keyevent keyevt = {
+				struct dtk_keyevent keyevt = {
 					.state = evt.key.state,
 					.sym = evt.key.keysym.sym,
 					.mod = evt.key.keysym.mod
 				};
-				ret = handler(wnd, FB_EVT_KEYBOARD, &keyevt);
+				ret = handler(wnd, DTK_EVT_KEYBOARD, &keyevt);
 			}
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			if(handler) {
-				struct fb_mouseevent mouseevt = {
+				struct dtk_mouseevent mouseevt = {
 					.button = evt.button.button,
 					.state = evt.button.state,
 					.x = evt.button.x,
 					.y = evt.button.y
 				};
-				ret = handler(wnd,FB_EVT_MOUSE,&mouseevt);
+				ret = handler(wnd,DTK_EVT_MOUSE,&mouseevt);
 			}
 		}
 		if (!ret)

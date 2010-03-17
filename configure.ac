@@ -17,7 +17,7 @@ m4_define([lib_age],0)
 
 # Setup Automake
 # AC_PREREQ([2.63])
-AC_INIT(libfeedback,[lib_release.lib_current.lib_age.lib_revision],serafeim.perdikis@epfl.ch)
+AC_INIT(drawtk,[lib_release.lib_current.lib_age.lib_revision],serafeim.perdikis@epfl.ch)
 AC_CONFIG_SRCDIR([src/shapes.c])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
@@ -33,7 +33,7 @@ DX_RTF_FEATURE(OFF)
 DX_XML_FEATURE(OFF)
 DX_PDF_FEATURE(OFF)
 DX_PS_FEATURE(OFF)
-DX_INIT_DOXYGEN(libfeedback, doc/doxygen.cfg, doc/)
+DX_INIT_DOXYGEN(drawtk, doc/doxygen.cfg, doc/)
 
 # Initialize Automake
 AM_INIT_AUTOMAKE

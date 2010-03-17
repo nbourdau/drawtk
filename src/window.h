@@ -3,9 +3,9 @@
 
 #include "texmanager.h"
 
-struct fb_window;
-struct fb_texture_manager* get_texmanager(struct fb_window* wnd);
+struct dtk_window;
+struct dtk_texture_manager* get_texmanager(struct dtk_window* wnd);
 
-extern struct fb_window* current_window;
+extern struct dtk_window* current_window;
 
 #endif

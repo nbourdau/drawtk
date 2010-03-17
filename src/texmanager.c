@@ -16,7 +16,7 @@
 #endif 
 
 // Structure for textures
-struct fb_texture
+struct dtk_texture
 {
 	unsigned int width, height;
 	GLuint id;
@@ -24,17 +24,17 @@ struct fb_texture
 	char string_id[256];
 	
 	// To be used in a linked list
-	struct fb_texture* next_tex;
+	struct dtk_texture* next_tex;
 };
 
 // Structure for texture manager
-struct fb_texture_manager
+struct dtk_texture_manager
 {
-	struct fb_texture* root;
+	struct dtk_texture* root;
 };
 
 // Global texture manager
-static struct fb_texture_manager texman = {
+static struct dtk_texture_manager texman = {
 	.root = NULL
 };
 
@@ -86,7 +86,7 @@ static int find_dib_color_settings(FIBITMAP *dib, GLint* intfmt, GLenum* fmt, GL
 	return 0;
 }
 
-static void load_gl_texture(struct fb_texture* tex, void* data[], unsigned int maxlevel, GLenum format, GLenum internalformat, GLenum type)
+static void load_gl_texture(struct dtk_texture* tex, void* data[], unsigned int maxlevel, GLenum format, GLenum internalformat, GLenum type)
 {
 	unsigned int lvl; 
 	GLuint w = tex->width, h = tex->height;
@@ -111,7 +111,7 @@ static void load_gl_texture(struct fb_texture* tex, void* data[], unsigned int m
 }
 
 
-static struct fb_texture* create_texture_from_file(const char* filename, unsigned int mipmap_maxlevel)
+static struct dtk_texture* create_texture_from_file(const char* filename, unsigned int mipmap_maxlevel)
 {
 	GLenum format, type;
 	GLint intformat;
@@ -120,7 +120,7 @@ static struct fb_texture* create_texture_from_file(const char* filename, unsigne
 	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 	FIBITMAP *dib[MAX_MIPMAP+1] = {NULL};
 	void* data[MAX_MIPMAP+1] = {NULL};
-	struct fb_texture* tex = NULL; 
+	struct dtk_texture* tex = NULL; 
 
 	// Limit Mipmap generation to level MAX_MIPMAP
 	maxlevel = mipmap_maxlevel <= MAX_MIPMAP ? mipmap_maxlevel : MAX_MIPMAP;
@@ -140,7 +140,7 @@ static struct fb_texture* create_texture_from_file(const char* filename, unsigne
 	data[0] = FreeImage_GetBits(dib[0]);
 
 	// Allocate and set texture structure
-	tex = calloc(1,sizeof(struct fb_texture)); 
+	tex = calloc(1,sizeof(struct dtk_texture)); 
 	if (!tex)
 		goto out;
 	strncpy(tex->string_id, filename, sizeof(tex->string_id)-1);
@@ -169,9 +169,9 @@ out:
 }
 
 
-struct fb_texture* fb_load_image(const char* filename, unsigned int mipmap_maxlevel)
+struct dtk_texture* dtk_load_image(const char* filename, unsigned int mipmap_maxlevel)
 {
-	struct fb_texture **last;
+	struct dtk_texture **last;
 
 	// Go through the linked list of textures to search
 	// for existing entry
@@ -187,7 +187,7 @@ struct fb_texture* fb_load_image(const char* filename, unsigned int mipmap_maxle
 }
 
 
-GLuint get_texture_id(const struct fb_texture* tex)
+GLuint get_texture_id(const struct dtk_texture* tex)
 {
 	GLuint texid = 0;
 
@@ -198,9 +198,9 @@ GLuint get_texture_id(const struct fb_texture* tex)
 }
 
 
-void fb_delete_textures(void)
+void dtk_delete_textures(void)
 {
-	struct fb_texture *curr_tex, *next_text;
+	struct dtk_texture *curr_tex, *next_text;
 	
 	if (texman.root != NULL) {
 		curr_tex = texman.root;
@@ -215,13 +215,13 @@ void fb_delete_textures(void)
 }
 
 
-struct fb_texture_manager* create_texture_manager(void)
+struct dtk_texture_manager* create_texture_manager(void)
 {
 	return &texman;
 }
 
-void destroy_texture_manager(struct fb_texture_manager* texman)
+void destroy_texture_manager(struct dtk_texture_manager* texman)
 {
 	(void)texman;
-	fb_delete_textures();
+	dtk_delete_textures();
 }

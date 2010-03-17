@@ -13,7 +13,7 @@ extern const float pal_tango[][4];
 // Collection of colors for each palette
 // See http://tango.freedesktop.org/Tango_Icon_Theme_Guidelines
 // for the definition of the TANGO colors
-enum libfb_tango{
+enum libdtk_tango{
 	butter_light, butter_med, butter_dark,
 	orange_light, orange_med, orange_dark,
 	chocolate_light, chocolate_med, chocolate_dark,
@@ -26,7 +26,7 @@ enum libfb_tango{
 	NUM_TANGO_COLORS
 };
 
-enum libfb_basic
+enum libdtk_basic
 {
 	white, black, yellow, orange, blue, green, red, magenta, cyan,
 	NUM_BASIC_COLORS

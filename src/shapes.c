@@ -4,7 +4,7 @@
 #include <string.h>
 #include <assert.h>
 #include <time.h>
-#include "feedback.h"
+#include "drawtk.h"
 #include "window.h"
 #include "texmanager.h"
 
@@ -13,10 +13,10 @@
 /*************************
  * Internal declarations *
  *************************/
-typedef void (*DrawShapeFn)(const struct fb_shape* shp);
-typedef void (*DestroyShapeFn)(struct fb_shape* shp);
+typedef void (*DrawShapeFn)(const struct dtk_shape* shp);
+typedef void (*DestroyShapeFn)(struct dtk_shape* shp);
 
-struct fb_shape
+struct dtk_shape
 {
 	// Generic attributes
 	float pos[2];
@@ -48,16 +48,16 @@ struct single_shape
 	GLfloat color[4];
 	GLuint texid;
 	GLenum primtype;
-	struct fb_window* wnd;
+	struct dtk_window* wnd;
 };
 
-static void draw_single_shape(const struct fb_shape* shp);
-static void destroy_single_shape(struct fb_shape* shp);
-static struct fb_shape* alloc_generic_shape(struct fb_shape* shp,
+static void draw_single_shape(const struct dtk_shape* shp);
+static void destroy_single_shape(struct dtk_shape* shp);
+static struct dtk_shape* alloc_generic_shape(struct dtk_shape* shp,
                                            unsigned int numvert,
 					   unsigned int numind,
 					   unsigned int usetex);
-static struct fb_shape* create_generic_shape(struct fb_shape* shp,
+static struct dtk_shape* create_generic_shape(struct dtk_shape* shp,
                                                  unsigned int numvert,
                                                  const GLfloat* vertices, 
 						 const GLfloat* texcoords,
@@ -65,11 +65,11 @@ static struct fb_shape* create_generic_shape(struct fb_shape* shp,
                                                  const GLuint* indices,
 						 GLenum primtype,
 						 const GLfloat* color,
-						 const struct fb_texture* tex);
+						 const struct dtk_texture* tex);
 /*******************
  * Implementations *
  *******************/
-static void draw_single_shape(const struct fb_shape* shp)
+static void draw_single_shape(const struct dtk_shape* shp)
 {
 	struct single_shape* sinshp = shp->data;
 
@@ -90,7 +90,7 @@ static void draw_single_shape(const struct fb_shape* shp)
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-static void destroy_single_shape(struct fb_shape* shp)
+static void destroy_single_shape(struct dtk_shape* shp)
 {
 	struct single_shape* sinshp = shp->data;
 
@@ -102,7 +102,7 @@ static void destroy_single_shape(struct fb_shape* shp)
 	}
 }
 
-static struct fb_shape* alloc_generic_shape(struct fb_shape* shp,
+static struct dtk_shape* alloc_generic_shape(struct dtk_shape* shp,
                                            unsigned int numvert,
 					   unsigned int numind,
 					   unsigned int usetex)
@@ -113,7 +113,7 @@ static struct fb_shape* alloc_generic_shape(struct fb_shape* shp,
 
 	// Destroy if composite shape
 	if (shp && (shp->drawproc != draw_single_shape)) {
-		fb_destroy_shape(shp);
+		dtk_destroy_shape(shp);
 		shp = NULL;
 	}
 	
@@ -170,7 +170,7 @@ error:
 }
 
 
-static struct fb_shape* create_generic_shape(struct fb_shape* shp,
+static struct dtk_shape* create_generic_shape(struct dtk_shape* shp,
                                                  unsigned int numvert,
                                                  const GLfloat* vertices, 
 						 const GLfloat* texcoords,
@@ -178,10 +178,10 @@ static struct fb_shape* create_generic_shape(struct fb_shape* shp,
                                                  const GLuint* indices,
 						 GLenum primtype,
 						 const GLfloat* color,
-						 const struct fb_texture* tex)
+						 const struct dtk_texture* tex)
 {
 	struct single_shape* sinshp;
-	struct fb_window* wnd;
+	struct dtk_window* wnd;
 
 	// Check that there is a usable window
 	wnd = current_window;
@@ -218,7 +218,7 @@ static struct fb_shape* create_generic_shape(struct fb_shape* shp,
 }
                           
 #define TWO_PI ((float)(2.0*M_PI))
-fb_hshape fb_create_circle(struct fb_shape* shp, float cx, float cy, float r, int isfull, const float* color, unsigned int numpoints)
+dtk_hshape dtk_create_circle(struct dtk_shape* shp, float cx, float cy, float r, int isfull, const float* color, unsigned int numpoints)
 {	                  
 	unsigned int i,j;
 	struct single_shape* sinshp;
@@ -252,7 +252,7 @@ fb_hshape fb_create_circle(struct fb_shape* shp, float cx, float cy, float r, in
 	return shp;
 } 
 
-fb_hshape fb_create_cross(struct fb_shape* shp, float cx, float cy, float width, const float* color) 
+dtk_hshape dtk_create_cross(struct dtk_shape* shp, float cx, float cy, float width, const float* color) 
 {
 	GLfloat vertices[8];
 	GLuint indices[4] = {0, 2, 1, 3};
@@ -280,7 +280,7 @@ fb_hshape fb_create_cross(struct fb_shape* shp, float cx, float cy, float width,
 	return shp;
 }
 
-fb_hshape fb_create_rectangle_2p(struct fb_shape* shp, float p1_x, float p1_y, float p2_x, float p2_y, int isfull, const float* color)
+dtk_hshape dtk_create_rectangle_2p(struct dtk_shape* shp, float p1_x, float p1_y, float p2_x, float p2_y, int isfull, const float* color)
 {
 	float vertices[8];
 	GLuint indices[4] = {0, 1, 2, 3};
@@ -304,7 +304,7 @@ fb_hshape fb_create_rectangle_2p(struct fb_shape* shp, float p1_x, float p1_y, f
 }
 
 
-fb_hshape fb_create_rectangle_hw(struct fb_shape* shp, float cx, float cy, float width, float height, int isfull, const float* color)
+dtk_hshape dtk_create_rectangle_hw(struct dtk_shape* shp, float cx, float cy, float width, float height, int isfull, const float* color)
 {
 	float vertices[8];
 	GLuint indices[4] = {0, 1, 2, 3};
@@ -328,7 +328,7 @@ fb_hshape fb_create_rectangle_hw(struct fb_shape* shp, float cx, float cy, float
 }
 
 
-fb_hshape fb_create_arrow(struct fb_shape* shp, float cx, float cy, float width, float height, int isfull, const float* color)
+dtk_hshape dtk_create_arrow(struct dtk_shape* shp, float cx, float cy, float width, float height, int isfull, const float* color)
 {
 	float vertices[14];
 	GLuint indices[7] = {0, 1, 2, 3, 4, 5, 6};
@@ -369,7 +369,7 @@ fb_hshape fb_create_arrow(struct fb_shape* shp, float cx, float cy, float width,
 }
 
 
-fb_hshape fb_create_triangle(struct fb_shape* shp, float x1, float y1, float x2, float y2, float x3, float y3, int isfull, const float* color)
+dtk_hshape dtk_create_triangle(struct dtk_shape* shp, float x1, float y1, float x2, float y2, float x3, float y3, int isfull, const float* color)
 {
 	GLfloat vertices[] = {x1, y1, x2, y2, x3, y3};
 	GLuint indices[] = {0, 1, 2};
@@ -379,7 +379,7 @@ fb_hshape fb_create_triangle(struct fb_shape* shp, float x1, float y1, float x2,
 }
 
 
-fb_hshape fb_create_line(struct fb_shape* shp, float x1, float y1, float x2, float y2, const float* color)
+dtk_hshape dtk_create_line(struct dtk_shape* shp, float x1, float y1, float x2, float y2, const float* color)
 {
 	GLfloat vertices[] = {x1, y1, x2, y2};
 	GLuint indices[] = {0, 1};
@@ -388,7 +388,7 @@ fb_hshape fb_create_line(struct fb_shape* shp, float x1, float y1, float x2, flo
 }
 
 
-fb_hshape fb_create_shape(struct fb_shape* shp, unsigned int numvert, const float* vertex_array, int isfull, const float* color)
+dtk_hshape dtk_create_shape(struct dtk_shape* shp, unsigned int numvert, const float* vertex_array, int isfull, const float* color)
 {
 	unsigned int i;
 	struct single_shape* sinshp; 
@@ -404,7 +404,7 @@ fb_hshape fb_create_shape(struct fb_shape* shp, unsigned int numvert, const floa
 	return shp;
 }
 
-fb_hshape fb_create_image(struct fb_shape* shp, float x, float y, float width, float height, const float* color, fb_htex image)
+dtk_hshape dtk_create_image(struct dtk_shape* shp, float x, float y, float width, float height, const float* color, dtk_htex image)
 {
 	GLfloat vertices[8];
 	GLfloat textcoords[8];
@@ -446,7 +446,7 @@ fb_hshape fb_create_image(struct fb_shape* shp, float x, float y, float width, f
 }
 
 
-fb_hshape fb_create_string(struct fb_shape* shp, const char* str_text, float size, float x, float y, const float* color, const char* filepath)
+dtk_hshape dtk_create_string(struct dtk_shape* shp, const char* str_text, float size, float x, float y, const float* color, const char* filepath)
 {
 	GLfloat primv[8] = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f};
 	float tex_w, tex_h, tx, ty;
@@ -459,7 +459,7 @@ fb_hshape fb_create_string(struct fb_shape* shp, const char* str_text, float siz
 
 	len = str_text ? strlen(str_text) : 0;
 
-	shp = create_generic_shape(shp, 4*len, NULL, NULL, 6*len, NULL, primtype, color, fb_load_image(filepath, 3));
+	shp = create_generic_shape(shp, 4*len, NULL, NULL, 6*len, NULL, primtype, color, dtk_load_image(filepath, 3));
 	if (!shp)
 		return NULL;
 	
@@ -508,45 +508,45 @@ fb_hshape fb_create_string(struct fb_shape* shp, const char* str_text, float siz
 
 struct composite_shape
 {
-	struct fb_shape** array;
+	struct dtk_shape** array;
 	unsigned int num;
 };
 
 
-static void draw_composite_shape(const struct fb_shape* shp);
-static void destroy_composite_shape(struct fb_shape* shp);
+static void draw_composite_shape(const struct dtk_shape* shp);
+static void destroy_composite_shape(struct dtk_shape* shp);
 
 
 /*******************
  * implementations *
  *******************/
-static void draw_composite_shape(const struct fb_shape* shp)
+static void draw_composite_shape(const struct dtk_shape* shp)
 {
 	unsigned int i;
 	struct composite_shape* compshp = shp->data;
 
 	for(i=0; i<compshp->num; i++)
-		fb_draw_shape(compshp->array[i]);
+		dtk_draw_shape(compshp->array[i]);
 }
 
-static void destroy_composite_shape(struct fb_shape* shp)
+static void destroy_composite_shape(struct dtk_shape* shp)
 {
 	unsigned int i;
 	struct composite_shape* compshp = shp->data;
 
 	for (i=0; i<compshp->num; i++)
-		fb_destroy_shape(compshp->array[i]);
+		dtk_destroy_shape(compshp->array[i]);
 
 	free(compshp->array);
 	free(compshp);
 }
  //
 
-fb_hshape fb_create_composite_shape(const fb_hshape* shp_array, unsigned int num_shp)
+dtk_hshape dtk_create_composite_shape(const dtk_hshape* shp_array, unsigned int num_shp)
 {
 	struct composite_shape* compshp = NULL;;
-	struct fb_shape* shp = NULL;
-	struct fb_shape** shp_buff = NULL;
+	struct dtk_shape* shp = NULL;
+	struct dtk_shape** shp_buff = NULL;
 
 	// check arguments
 	if (num_shp && !shp_array)
@@ -583,7 +583,7 @@ fb_hshape fb_create_composite_shape(const fb_hshape* shp_array, unsigned int num
  *                                                                       *
  *************************************************************************/
 
-void fb_draw_shape(struct fb_shape* shp)
+void dtk_draw_shape(struct dtk_shape* shp)
 {
 	assert(shp != NULL);
 
@@ -603,7 +603,7 @@ void fb_draw_shape(struct fb_shape* shp)
  * It breaks the basic principles behind the library, but it 
  * makes my life so easy... :-)
  */
-void fb_bind_shape_to_window(struct fb_shape* shp, const fb_hwnd window) {
+void dtk_bind_shape_to_window(struct dtk_shape* shp, const dtk_hwnd window) {
 	/* 2009-10-15  Michele Tavella <michele.tavella@epfl.ch>
 	 * Yes, I use assert()!
 	 */
@@ -618,33 +618,33 @@ void fb_bind_shape_to_window(struct fb_shape* shp, const fb_hwnd window) {
 	data->wnd = window;
 }
 
-void fb_move_shape(fb_hshape shp, float x, float y)
+void dtk_move_shape(dtk_hshape shp, float x, float y)
 {
 	assert(shp != NULL);
 	shp->pos[0] = x;
 	shp->pos[1] = y;
 } 
 
-void fb_relmove_shape(fb_hshape shp, float dx, float dy)
+void dtk_relmove_shape(dtk_hshape shp, float dx, float dy)
 {
 	assert(shp != NULL);
 	shp->pos[0] += dx;
 	shp->pos[1] += dy;
 }
 
-void fb_rotate_shape(fb_hshape shp, float deg)
+void dtk_rotate_shape(dtk_hshape shp, float deg)
 {
 	assert(shp != NULL);
 	shp->Rot = deg;
 }
 
-void fb_relrotate_shape(fb_hshape shp, float ddeg)
+void dtk_relrotate_shape(dtk_hshape shp, float ddeg)
 {
 	assert(shp != NULL);
 	shp->Rot += ddeg;
 }
 
-void fb_destroy_shape(fb_hshape shp)
+void dtk_destroy_shape(dtk_hshape shp)
 {
 	if (!shp) 
 		return;
