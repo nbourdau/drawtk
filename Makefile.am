@@ -2,7 +2,7 @@
 #AUTOMAKE_OPTIONS = check-news gnu subdir-objects
 
 ACLOCAL_AMFLAGS=-I m4
-SUBDIRS = src tests examples doc
+SUBDIRS = src tests
  
 
 

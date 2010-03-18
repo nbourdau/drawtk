@@ -13,4 +13,3 @@ libdrawtk_la_SOURCES = drawtk.h dtk_event.h\
 #libdrawtk_la_LDFLAGS = $(AM_CFLAGS) \
 #			 -version-info $(CURRENT):$(REVISION):$(AGE) \
 #			 -release $(RELEASE) 
-libdrawtk_la_LIBADD = -lm -lGL
