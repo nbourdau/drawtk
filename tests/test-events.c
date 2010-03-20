@@ -45,7 +45,7 @@ void redraw(dtk_hwnd wnd)
 int event_handler(dtk_hwnd wnd, unsigned int type, const void* data)
 {
 	int retcode = 1;
-	struct dtk_keyevent* keyevt = data;
+	const struct dtk_keyevent* keyevt = data;
 
 	switch (type) {
 	case DTK_EVT_QUIT:
@@ -71,8 +71,11 @@ int event_handler(dtk_hwnd wnd, unsigned int type, const void* data)
 	return retcode;
 }
 
-int main(int argc, char* args[])
+int main(int argc, char* argv[])
 {
+	(void)argc;
+	(void)argv;
+
 	sprintf(imgfilename, "%s/navy.png", getenv("srcdir"));
 	sprintf(fontfilename, "%s/font.png", getenv("srcdir"));
 

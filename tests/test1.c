@@ -34,9 +34,11 @@ static void setup_shapes(void)
 	comp = dtk_create_composite_shape(shplist, sizeof(shplist)/sizeof(shplist[0]));
 }
 
-int main(int argc, char* args[])
+int main(int argc, char* argv[])
 {
-	
+	(void)argc;
+	(void)argv;
+
 	sprintf(imgfilename, "%s/navy.png", getenv("srcdir"));
 	sprintf(fontfilename, "%s/font.png", getenv("srcdir"));
 

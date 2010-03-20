@@ -28,8 +28,6 @@ struct dtk_window
 	// SDL Surface for window
 	SDL_Surface* window;
 
-	// Texture manager
-	struct dtk_texture_manager* texman;	
 	EventHandlerProc evthandler;
 };
 
@@ -156,13 +154,6 @@ dtk_hwnd dtk_create_window(unsigned int width, unsigned int height, unsigned int
 	if (init_opengl_state(wnd))
 		goto error;
 	
-/*
-	// Create texture manager
-	wnd->texman = create_texture_manager();
-	if (!wnd->texman)
-		goto error;
-*/
-		
 	// Return the structure holding window and window information	
 	return wnd;
 
@@ -197,7 +188,10 @@ void dtk_close(dtk_hwnd wnd)
 	if (current_window == wnd)
 		current_window = NULL;
 
-	destroy_texture_manager(wnd->texman);
+	// Assume there is only one window so destroy all texture in it. This
+	// assumption might be wrong in case of multiple windows support
+	dtk_delete_textures();
+
 	free(wnd->caption);
 	free(wnd);
 	SDL_Quit();
@@ -206,10 +200,6 @@ void dtk_close(dtk_hwnd wnd)
 	//FreeImage_DeInitialise();	
 }
 
-struct dtk_texture_manager* get_texmanager(struct dtk_window* wnd)
-{
-	return wnd->texman;
-}
 
 void dtk_make_current_window(dtk_hwnd wnd)
 {
