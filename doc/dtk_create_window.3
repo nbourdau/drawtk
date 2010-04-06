@@ -1,0 +1,43 @@
+.\"Copyright 2010 (c) EPFL
+.TH DTK_CREATE_WINDOW 3 2010 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_create_window, dtk_close - Create and destroy a window
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "dtk_hwnd dtk_create_window(unsigned int " width ", unsigned int " height ","
+.br
+.BI "              unsigned int " x ", unsigned int " y ","
+.br
+.BI "              unsigned int " bpp ", const char *" caption ");"
+.br
+.BI "void dtk_close(const dtk_hwnd " wnd ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_create_window\fP() creates a window of size (\fIwidth\fP,\fIheight\fP) to
+be used later as the target of next drawings. If \fIwidth\fP or \fIheight\fP is
+zero, then the created window will be full screen. Arguments \fIx\fP and
+\fIy\fP have currently no effect. \fIbpp\fP specifies the number of "bits per
+pixel" the underlying OpenGL framebuffer should support. \fIcaption\fP
+specifies the name of the window that the window manager should display.
+.LP
+The inner frame size for drawings depends on the aspect ratio of the window.
+The origin (0,0) of the frame is always the the center of the window. The
+smallest dimension of the window is equal to 2 in the drawing coordinates, so
+that a draw made in the box between (-1,-1) and (1,1) \fBalways\fP fits in the
+window.
+.LP
+\fPdtk_close\fP() destroys an unused window.
+.SH "RETURN VALUE"
+.LP
+\fBdtk_create_window\fP() returns an handle to the created window. On error, this function returns \fINULL\fP.
+.LP
+\fBdtk_close\fP() returns no value.
+.SH "SEE ALSO"
+.BR dtk_make_current_window (3),
+.BR dtk_update_screen (3),
+.BR dtk_process_events (3)
+
+

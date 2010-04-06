@@ -1,0 +1,38 @@
+.\"Copyright 2010 (c) EPFL
+.TH DTK_UPDATE_SCREEN 3 2010 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_update_screen, dtk_clear_screen, dtk_bgcolor - screen buffer manipulation
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "void dtk_update_screen(dtk_hwnd " wnd ");"
+.br
+.BI "void dtk_clear_screen(dtk_hwnd " wnd ");"
+.br
+.BI "void dtk_bgcolor(float *" bgcolor ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_bgcolor\fP() set \fIbgcolor\fP as the background color of the current
+rendering context. \fIbgcolor\fP should point to an array of 4 float
+corresponding to an normalized RGBA value. If unspecified, the background color
+is black.
+.LP
+\fBdtk_clear_screen\fP() fills the frame buffer with the background color of
+the window \fIwnd\fP.
+.LP
+\fBdtk_update_screen\fP() swaps the front and back frame buffers of the window
+\fIwnd\fP. Rendering is performed through double buffering, i.e. the draws are
+rendered on the back buffer which will be displayed on screen when a call to
+\fBdtk_update_screen\fP() will be performed. After an update, the content of
+the back buffer is undefined. So if the rendered scene does not rewrite the
+whole frame buffer, it is safer to call \fBdtk_clear_screen\fP() after an
+update of the screen.
+.SH "RETURN VALUE"
+.LP
+These functions return no value.
+.SH "SEE ALSO"
+.BR 
+
+

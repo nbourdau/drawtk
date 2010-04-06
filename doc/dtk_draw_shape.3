@@ -1,0 +1,27 @@
+.\"Copyright 2010 (c) EPFL
+.TH DTK_DRAW_SHAPE 3 2010 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_draw_shape - Draw a shape in the window
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "void dtk_draw_shape(const dtk_hshape " shp ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_draw_shape\fP() draw the shape referenced by \fIshp\fP in the current
+window. The position of the drawing depends on the rotation and translation
+previously set by \fBdtk_*move_shape\fP() and \fBdtk_*rotate_shape\fP() (the
+rotation is first applied to the shape and then the translation). 
+.LP
+This function assumes there is a valid OpenGL rendering context in the calling
+thread. So a successfull call to \fBdtk_make_current_window\fP() should have
+been performed previously in the \fBcurrent\fP thread.
+.SH "RETURN VALUE"
+.LP
+None.
+.SH "SEE ALSO"
+.BR dtk_move_shape (3),
+.BR dtk_make_current_window (3)
+

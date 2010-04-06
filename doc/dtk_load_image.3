@@ -1,0 +1,30 @@
+.\"Copyright 2010 (c) EPFL
+.TH DTK_LOAD_IMAGE 3 2010 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_load_image - Load an image file as a texture
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "dtk_htex dtk_load_image(const char *" filename ", unsigned int " mxlvl ");"
+.br
+.SH DESCRIPTION
+.LP
+This function load the image file specified by \fIfilename\fP argument. It will
+creates the mipmaps until level \fImxlvl\fP. Upon creation, the texture will
+then been tracked by an internal texture manager so that the next call using
+the same \fIfilename\fP argument will return the same texture handle, thus
+sparing the ressources of the system.
+.LP
+Mipmaps are version of the same image at lower resolution (every power of two).
+Mipmap at level 0 is the original image. Given the size of the texture
+displayed in the framebuffer, the closest mipmaps are used to interpolate the
+value of displayed pixels. Do a research on internet for further details about
+mipmaps.
+.SH "RETURN VALUE"
+.LP
+In case of success, the function returns the handle to the created texture. In
+case of failure, \fINULL\fP is returned.
+.SH "SEE ALSO"
+.BR 
+

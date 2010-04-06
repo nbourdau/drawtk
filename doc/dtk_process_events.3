@@ -1,0 +1,41 @@
+.\"Copyright 2010 (c) EPFL
+.TH DTK_PROCESS_EVENTS 3 2010 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_process_events, dtk_set_event_handler - Events processing
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "typedef int (*EventHandlerProc)(dtk_hwnd, unsigned int, const void*);"
+.sp
+.BI "void dtk_set_event_handler(dtk_hwnd " wnd ", EventHandlerProc " handler ");"
+.br
+.BI "int dtk_process_events(dtk_hwnd " wnd ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_set_event_handler\fP() set \fIhandler\fP as the current event handler
+for the window \fIwnd\fP. \fIhandler\fP is a function that as argument in the
+order:
+.IP " *" 3
+a reference of type \fBdtk_hwnd\fP to the window that has received the event.
+.IP " *" 3
+the type ID of the event.
+.IP " *" 3
+a generic pointer to an event-specific data.
+.LP
+\fBdtk_process_events\fP() processes pending events in the event queues
+associated to the window referenced by \fIwnd\fP, i.e.  for each event in the
+queue, it calls the event handler that has been set by
+\fBdtk_set_event_handler\fP(). \fBdtk_process_events\fP() returns if a event
+handler has returned 0 or if there is no more pending event in the queue.
+.SH "RETURN VALUE"
+.LP
+\fBdtk_set_event_handler\fP() does not return value.
+.LP
+\fBdtk_process_events\fP() returns 1 if there is no more pending event in the
+queue.  It returns 0 if the processing loop has been interrupted by an event
+handler, i.e. the last event handler has returned 0.
+
+
+

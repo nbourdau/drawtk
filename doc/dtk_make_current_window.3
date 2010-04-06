@@ -1,0 +1,27 @@
+.\"Copyright 2010 (c) EPFL
+.TH DTK_MAKE_CURRENT_WINDOW 3 2010 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_make_current_window - Make a window the target of the next draws
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "void dtk_make_current_window(dtk_hwnd " wnd ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_make_current_window\fP() makes the window referenced by \fIwnd\fP as the
+target of the next drawings. If \fIwnd\fP is \fINULL\fP then the function
+unbind the current window for next drawings.
+.LP
+For a sucessfull call to \fBdtk_draw_shape\fP(), a window \fBshould be\fP
+current.
+.LP
+The creation of the window \fBdoes not\fP make it current.
+.SH "RETURN VALUE"
+.LP
+None.
+.SH "SEE ALSO"
+.BR dtk_create_window (3),
+.BR dtk_draw_shape (3)
+

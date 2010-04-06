@@ -1,0 +1,40 @@
+.\"Copyright 2010 (c) EPFL
+.TH DTK_MOVE_SHAPE 3 2010 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_move_shape, dtk_relmove_shape, dtk_rotate_shape, dtk_relrotate_shape - shape displacement
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "void dtk_move_shape(dtk_hshape " shp ", float " x ", float " y ");"
+.br
+.BI "void dtk_relmove_shape(dtk_hshape " shp ", float " dx ", float " dy ");"
+.br
+.BI "void dtk_rotate_shape(dtk_hshape " shp ", float " deg ");"
+.br
+.BI "void dtk_relrotate_shape(dtk_hshape " shp ", float " ddeg ");"
+.br
+.SH DESCRIPTION
+.LP 
+These functions control the position and the rotation with which the shape
+\fIshp\fP will be next drawn. 
+.LP
+\fBdtk_move_shape\fP() set the translation the shape for the next draws. The
+position defined by \fIx\fP and \fIy\fP corresponds to the position of the
+origin of the shape (corresponding to the point (0,0) when the shape has
+been created).
+.LP
+\fBdtk_rotate_shape\fP() set the rotation (counter-clockwise) of the shape
+around its origin of the shape. This rotation is performed relatively to the
+initial posture of the shape (at creation time). The argument \fIdeg\fP
+specify the angle of rotation expressed in degrees.
+.LP
+\fBdtk_relmove_shape\fP() and \fBdtk_relrotate_shape\fP() do the same
+excepting that their arguments \fIdx\fP, \fIdy\fP and \fIddeg\fP updates
+the current parameters of the translation and rotation.
+.SH "RETURN VALUE"
+.LP
+None of these functions returns value.
+.SH "SEE ALSO"
+.BR dtk_draw_shape (3)
+
