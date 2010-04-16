@@ -24,6 +24,8 @@ int dtk_process_events(dtk_hwnd wnd);
 // Image functions
 typedef struct dtk_texture* dtk_htex;
 dtk_htex dtk_load_image(const char* filename, unsigned int mipmap_maxlevel);
+void dtk_destroy_texture(dtk_htex tex);
+
 
 
 // Handle to shape structure

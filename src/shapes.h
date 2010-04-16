@@ -42,6 +42,6 @@ struct dtk_shape* create_generic_shape(struct dtk_shape* shp,
                                        const GLuint* indices,
 				       GLenum primtype,
 				       const GLfloat* color,
-				       const struct dtk_texture* tex);
+				       struct dtk_texture* tex);
 
 #endif // SHAPES_H

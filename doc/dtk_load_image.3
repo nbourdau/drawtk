@@ -14,13 +14,19 @@ This function load the image file specified by \fIfilename\fP argument. It will
 creates the mipmaps until level \fImxlvl\fP. Upon creation, the texture will
 then been tracked by an internal texture manager so that the next call using
 the same \fIfilename\fP argument will return the same texture handle, thus
-sparing the ressources of the system.
+sparing the ressources of the system. 
+.LP
+There is no need for a valid window to create successfully a texture, i.e.
+creation of textures are completely decoupled from the creation of others
+ressources and can even be created in one thread to be used in another one.
 .LP
 Mipmaps are version of the same image at lower resolution (every power of two).
 Mipmap at level 0 is the original image. Given the size of the texture
 displayed in the framebuffer, the closest mipmaps are used to interpolate the
 value of displayed pixels. Do a research on internet for further details about
 mipmaps.
+.LP
+\fBdtk_load_image\fP() is thread-safe.
 .SH "RETURN VALUE"
 .LP
 In case of success, the function returns the handle to the created texture. In

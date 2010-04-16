@@ -153,6 +153,8 @@ dtk_hwnd dtk_create_window(unsigned int width, unsigned int height, unsigned int
 
 	if (init_opengl_state(wnd))
 		goto error;
+
+	acquire_texture_manager();
 	
 	// Return the structure holding window and window information	
 	return wnd;
@@ -188,9 +190,10 @@ void dtk_close(dtk_hwnd wnd)
 	if (current_window == wnd)
 		current_window = NULL;
 
-	// Assume there is only one window so destroy all texture in it. This
-	// assumption might be wrong in case of multiple windows support
-	dtk_delete_textures();
+	// Assume there is only one window so destroy all texture in it.
+	// This assumption might be wrong in case of multiple windows
+	// support
+	release_texture_manager();
 
 	free(wnd->caption);
 	free(wnd);

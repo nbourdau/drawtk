@@ -6,9 +6,8 @@
 
 struct dtk_texture_manager;
 
-GLuint get_texture_id(const struct dtk_texture* tex);
-void dtk_delete_textures(void);
-struct dtk_texture_manager* create_texture_manager(void);
-void destroy_texture_manager(struct dtk_texture_manager* texman);
+GLuint get_texture_id(struct dtk_texture* tex);
+void acquire_texture_manager(void);
+void release_texture_manager(void);
 
 #endif

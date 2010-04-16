@@ -30,10 +30,10 @@ AC_SUBST(LIBTOOL_DEPS)
 
 
 # Checks for libraries.
-AC_SEARCH_LIBS([glEnable], [GL], [], AC_MSG_ERROR([The openGL library cannot be found.]))
 AC_SEARCH_LIBS([cos], [m], [], AC_MSG_ERROR([The libm cannot be found.]))
 AC_SEARCH_LIBS([SDL_Init], [SDL], [], AC_MSG_ERROR([The SDL library must be installed.]))
 AC_SEARCH_LIBS([FreeImage_Load], [freeimage], [], AC_MSG_ERROR([The FreeImage library must be installed.]))
+AC_SEARCH_LIBS([glEnable], [GL], [], AC_MSG_ERROR([The openGL library cannot be found.]))
 
 # Checks for header files.
 

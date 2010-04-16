@@ -35,6 +35,11 @@ window.
 \fBdtk_create_window\fP() returns an handle to the created window. On error, this function returns \fINULL\fP.
 .LP
 \fBdtk_close\fP() returns no value.
+.SH LIMITATIONS
+.LP
+For the moment only one window can be created. Any subsequent call to
+\fBdtk_create_window\fP() will fail. This is due to the underlying SDL version
+used which supports only one window.
 .SH "SEE ALSO"
 .BR dtk_make_current_window (3),
 .BR dtk_update_screen (3),
