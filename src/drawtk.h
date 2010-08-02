@@ -53,8 +53,6 @@ void dtk_relrotate_shape(dtk_hshape shp, float ddeg);
 // Draw a shape
 void dtk_draw_shape(const dtk_hshape shp);
 
-void dtk_bind_shape_to_window(dtk_hshape shp, const dtk_hwnd window);
-
 // Destroy shape
 void dtk_destroy_shape(dtk_hshape shp);
 

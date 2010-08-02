@@ -29,9 +29,8 @@ struct single_shape
 	GLfloat* texcoords;
 	unsigned int usetex;
 	GLfloat color[4];
-	GLuint texid;
 	GLenum primtype;
-	struct dtk_window* wnd;
+	struct dtk_texture* tex;
 };
 
 struct dtk_shape* create_generic_shape(struct dtk_shape* shp,

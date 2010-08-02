@@ -415,9 +415,14 @@ void dtk_destroy_texture(struct dtk_texture* tex)
 
 GLuint get_texture_id(struct dtk_texture* tex)
 {
-	if (!tex)
+	if (!tex) 
 		return 0;
-
+	
+	// This allows to return quickly since once the texture has been
+	// loaded, it won't change until tex is destroyed
+	if (tex->id)
+		return tex->id;
+	
 	pthread_mutex_lock(&(tex->lock));
 	if (tex->id == 0)
 		load_gl_texture(tex);

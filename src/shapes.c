@@ -37,7 +37,7 @@ static void draw_single_shape(const struct dtk_shape* shp)
 	glVertexPointer(2, GL_FLOAT, 0, sinshp->vertices);
 	
 	glColor4fv(sinshp->color);		
-	glBindTexture(GL_TEXTURE_2D,sinshp->texid);
+	glBindTexture(GL_TEXTURE_2D, get_texture_id(sinshp->tex));
 	if (sinshp->texcoords) {
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		glTexCoordPointer(2, GL_FLOAT, 0, sinshp->texcoords);	
@@ -141,18 +141,7 @@ struct dtk_shape* create_generic_shape(struct dtk_shape* shp,
 						 struct dtk_texture* tex)
 {
 	struct single_shape* sinshp;
-	struct dtk_window* wnd;
 
-	// Check that there is a usable window
-	wnd = current_window;
-	/* 2009-10-15  Michele Tavella <michele.tavella@epfl.ch>
-	 * I do not care if this is NULL!
-	 */
-	/*
-	   if (!wnd)
-	   return NULL;
-	 */
-		
 	// Smart alloc (alloc only what is necessary)
 	shp = alloc_generic_shape(shp, numvert, numind, (tex ? 1 : 0));
 	if (!shp)
@@ -169,10 +158,8 @@ struct dtk_shape* create_generic_shape(struct dtk_shape* shp,
 		
 	// Fill the structures
 	sinshp->primtype = primtype;
-	sinshp->wnd = wnd;
 	memcpy(sinshp->color, color, sizeof(sinshp->color));
-	if (tex)
-		sinshp->texid = get_texture_id(tex);
+	sinshp->tex = tex;
 
 	return shp;
 }
@@ -277,24 +264,6 @@ void dtk_draw_shape(struct dtk_shape* shp)
 	glPopMatrix(); 
 }
                       
-/* 2009-10-15  Michele Tavella <michele.tavella@epfl.ch>
- * It breaks the basic principles behind the library, but it 
- * makes my life so easy... :-)
- */
-void dtk_bind_shape_to_window(struct dtk_shape* shp, const dtk_hwnd window) {
-	/* 2009-10-15  Michele Tavella <michele.tavella@epfl.ch>
-	 * Yes, I use assert()!
-	 */
-	assert(current_window != NULL);
-	assert(shp != NULL);
-	assert(window != NULL);
-
-	/* 2009-10-15  Michele Tavella <michele.tavella@epfl.ch>
-	 * And yes, I rape your structures!
-	 */
-	struct single_shape* data = (struct single_shape*)(shp->data);
-	data->wnd = window;
-}
 
 void dtk_move_shape(dtk_hshape shp, float x, float y)
 {
