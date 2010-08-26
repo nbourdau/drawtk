@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS=-I m4
-SUBDIRS = src tests doc
+SUBDIRS = lib src tests doc
  
 
 

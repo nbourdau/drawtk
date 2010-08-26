@@ -1,7 +1,6 @@
-lib_LTLIBRARIES = libdrawtk.la
+EXTRA_DIST=exports.sym
 
-#libdrawtk_includedir = $(includedir)/drawtk
-#libdrawtk_include_HEADERS = drawtk.h palette.h dtk_event.h
+lib_LTLIBRARIES = libdrawtk.la
 include_HEADERS = drawtk.h palette.h dtk_event.h
 
 libdrawtk_la_SOURCES = drawtk.h dtk_event.h		\
@@ -11,6 +10,6 @@ libdrawtk_la_SOURCES = drawtk.h dtk_event.h		\
 			 window.h window.c		\
 			 palette.h palette.c
 
-#libdrawtk_la_LDFLAGS = $(AM_CFLAGS) \
-#			 -version-info $(CURRENT):$(REVISION):$(AGE) \
-#			 -release $(RELEASE) 
+libdrawtk_la_LDFLAGS = $(AM_CFLAGS) \
+			 -export-symbols $(srcdir)/exports.sym  \
+			 -version-info $(CURRENT):$(REVISION):$(AGE) 

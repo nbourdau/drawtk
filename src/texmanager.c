@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <FreeImage.h>
 #include <SDL/SDL_opengl.h>
 #include <stdlib.h>
@@ -71,6 +75,7 @@ static struct dtk_texture_manager texman = {
  *                      Texture manager functions                        *
  *                                                                       *
  *************************************************************************/
+LOCAL_FN
 void acquire_texture_manager(void)
 {
 	pthread_mutex_lock(&texman.lstlock);
@@ -81,6 +86,7 @@ void acquire_texture_manager(void)
 }
 
 
+LOCAL_FN
 void release_texture_manager(void)
 {
 	struct dtk_texture *curr_tex, *next_tex;
@@ -105,6 +111,7 @@ void release_texture_manager(void)
  * of use. Otherwise it creates a minimal structure (init lock, and fill
  * string_id) with the flag tex->init set to 0.
  */
+LOCAL_FN
 struct dtk_texture* get_texture(const char *desc)
 {
 	struct dtk_texture *tex, **last;
@@ -142,6 +149,7 @@ out:
 /* Ask to remove a texture. This decrement the number of uses of the
  * texture. If that number reaches 0, it is actually removed.
  */
+LOCAL_FN
 void rem_texture(struct dtk_texture* tex)
 {
 	struct dtk_texture **last;
@@ -383,6 +391,7 @@ out:
 }
 
 
+API_EXPORTED
 struct dtk_texture* dtk_load_image(const char* filename, unsigned int mipmap_maxlevel)
 {
 	int fail = 0;
@@ -407,12 +416,15 @@ struct dtk_texture* dtk_load_image(const char* filename, unsigned int mipmap_max
 	
 }
 
+
+API_EXPORTED
 void dtk_destroy_texture(struct dtk_texture* tex)
 {
 	rem_texture(tex);
 }
 
 
+LOCAL_FN
 GLuint get_texture_id(struct dtk_texture* tex)
 {
 	if (!tex) 

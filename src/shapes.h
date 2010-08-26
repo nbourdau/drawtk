@@ -33,14 +33,11 @@ struct single_shape
 	struct dtk_texture* tex;
 };
 
-struct dtk_shape* create_generic_shape(struct dtk_shape* shp,
-                                       unsigned int numvert,
-                                       const GLfloat* vertices, 
-				       const GLfloat* texcoords,
-				       unsigned int numind,
-                                       const GLuint* indices,
-				       GLenum primtype,
-				       const GLfloat* color,
-				       struct dtk_texture* tex);
+LOCAL_FN struct dtk_shape*
+create_generic_shape(struct dtk_shape* shp, unsigned int numvert,
+                     const GLfloat* vertices, const GLfloat* texcoords,
+                     unsigned int numind, const GLuint* indices,
+                     GLenum primtype, const GLfloat* color,
+                     struct dtk_texture* tex);
 
 #endif // SHAPES_H

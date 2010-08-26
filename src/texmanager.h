@@ -6,8 +6,8 @@
 
 struct dtk_texture_manager;
 
-GLuint get_texture_id(struct dtk_texture* tex);
-void acquire_texture_manager(void);
-void release_texture_manager(void);
+LOCAL_FN GLuint get_texture_id(struct dtk_texture* tex);
+LOCAL_FN void acquire_texture_manager(void);
+LOCAL_FN void release_texture_manager(void);
 
 #endif

@@ -1,6 +1,11 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include "drawtk.h"
 #include "palette.h"
 
+API_EXPORTED
 const float pal_basic[NUM_BASIC_COLORS][4] = {
 	{1.0, 1.0, 1.0, 1.0},
 	{0.0, 0.0, 0.0, 1.0},
@@ -13,6 +18,7 @@ const float pal_basic[NUM_BASIC_COLORS][4] = {
 	{0.0, 1.0, 1.0, 1.0}		
 };
 
+API_EXPORTED
 const float pal_tango[NUM_TANGO_COLORS][4] = {
 
 	{252.0/256.0, 233.0/256.0, 79.0/256.0, 1.0f},

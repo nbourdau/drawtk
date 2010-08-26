@@ -1,8 +1,16 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif 
+
 #include <drawtk.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <palette.h>
+#include <time.h>
+
+#if !HAVE_DECL_CLOCK_NANOSLEEP
+#include "../lib/clock_nanosleep.h"
+#endif
 
 
 static char imgfilename[256], fontfilename[256];
@@ -43,6 +51,8 @@ int main(int argc, char* argv[])
 {
 	(void)argc;
 	(void)argv;
+	float angle;
+	struct timespec delay = {1, 0};
 
 	sprintf(imgfilename, "%s/navy.png", getenv("srcdir"));
 	sprintf(fontfilename, "%s/font.png", getenv("srcdir"));
@@ -54,7 +64,7 @@ int main(int argc, char* argv[])
 	dtk_clear_screen(wnd);
 	dtk_draw_shape(comp);
 	dtk_update_screen(wnd);
-	sleep(1);
+	clock_nanosleep(CLOCK_REALTIME, 0, &delay, NULL);
 	dtk_clear_screen(wnd);
 	
 	dtk_move_shape(tri,0.1,0.1);
@@ -62,20 +72,19 @@ int main(int argc, char* argv[])
 	dtk_move_shape(img2,-0.5,-0.5);
 	dtk_draw_shape(comp);
 	dtk_update_screen(wnd);
-	sleep(1);
 
-	dtk_clear_screen(wnd);
-	dtk_rotate_shape(arr,45.0f);
-	dtk_draw_shape(comp);
-	dtk_update_screen(wnd);
-	sleep(1);
+	delay.tv_sec = 0;
+	delay.tv_nsec = 5000000; // 5ms
+	for (angle=0.0f; angle<360.0f; angle+=1.0f) {
+		dtk_clear_screen(wnd);
+		dtk_rotate_shape(arr,angle);
+		dtk_rotate_shape(img2,-angle);
+		dtk_rotate_shape(comp,angle/2.0f);
+		dtk_draw_shape(comp);
+		dtk_update_screen(wnd);
+		clock_nanosleep(CLOCK_REALTIME, 0, &delay, NULL);
+	}
 
-	dtk_clear_screen(wnd);
-	dtk_rotate_shape(arr,90.0f);
-	dtk_draw_shape(comp);
-	dtk_update_screen(wnd);
-	sleep(1);
-	dtk_clear_screen(wnd);
 
 	dtk_destroy_shape(comp);
 	dtk_destroy_texture(tex);

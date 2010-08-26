@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <SDL/SDL_opengl.h>
 #include <math.h>
 #include <string.h>
@@ -5,6 +9,8 @@
 #include "shapes.h"
 
 #define TWO_PI ((float)(2.0*M_PI))
+
+API_EXPORTED
 dtk_hshape dtk_create_circle(struct dtk_shape* shp, float cx, float cy, float r, int isfull, const float* color, unsigned int numpoints)
 {	                  
 	unsigned int i,j;
@@ -39,6 +45,7 @@ dtk_hshape dtk_create_circle(struct dtk_shape* shp, float cx, float cy, float r,
 	return shp;
 } 
 
+API_EXPORTED
 dtk_hshape dtk_create_cross(struct dtk_shape* shp, float cx, float cy, float width, const float* color) 
 {
 	GLfloat vertices[8];
@@ -67,6 +74,7 @@ dtk_hshape dtk_create_cross(struct dtk_shape* shp, float cx, float cy, float wid
 	return shp;
 }
 
+API_EXPORTED
 dtk_hshape dtk_create_rectangle_2p(struct dtk_shape* shp, float p1_x, float p1_y, float p2_x, float p2_y, int isfull, const float* color)
 {
 	float vertices[8];
@@ -91,6 +99,7 @@ dtk_hshape dtk_create_rectangle_2p(struct dtk_shape* shp, float p1_x, float p1_y
 }
 
 
+API_EXPORTED
 dtk_hshape dtk_create_rectangle_hw(struct dtk_shape* shp, float cx, float cy, float width, float height, int isfull, const float* color)
 {
 	float vertices[8];
@@ -115,6 +124,7 @@ dtk_hshape dtk_create_rectangle_hw(struct dtk_shape* shp, float cx, float cy, fl
 }
 
 
+API_EXPORTED
 dtk_hshape dtk_create_arrow(struct dtk_shape* shp, float cx, float cy, float width, float height, int isfull, const float* color)
 {
 	float vertices[14];
@@ -156,6 +166,7 @@ dtk_hshape dtk_create_arrow(struct dtk_shape* shp, float cx, float cy, float wid
 }
 
 
+API_EXPORTED
 dtk_hshape dtk_create_triangle(struct dtk_shape* shp, float x1, float y1, float x2, float y2, float x3, float y3, int isfull, const float* color)
 {
 	GLfloat vertices[] = {x1, y1, x2, y2, x3, y3};
@@ -166,6 +177,7 @@ dtk_hshape dtk_create_triangle(struct dtk_shape* shp, float x1, float y1, float 
 }
 
 
+API_EXPORTED
 dtk_hshape dtk_create_line(struct dtk_shape* shp, float x1, float y1, float x2, float y2, const float* color)
 {
 	GLfloat vertices[] = {x1, y1, x2, y2};
@@ -175,6 +187,7 @@ dtk_hshape dtk_create_line(struct dtk_shape* shp, float x1, float y1, float x2, 
 }
 
 
+API_EXPORTED
 dtk_hshape dtk_create_shape(struct dtk_shape* shp, unsigned int numvert, const float* vertex_array, int isfull, const float* color)
 {
 	unsigned int i;
@@ -191,6 +204,8 @@ dtk_hshape dtk_create_shape(struct dtk_shape* shp, unsigned int numvert, const f
 	return shp;
 }
 
+
+API_EXPORTED
 dtk_hshape dtk_create_image(struct dtk_shape* shp, float x, float y, float width, float height, const float* color, dtk_htex image)
 {
 	GLfloat vertices[8];
@@ -233,6 +248,7 @@ dtk_hshape dtk_create_image(struct dtk_shape* shp, float x, float y, float width
 }
 
 
+API_EXPORTED
 dtk_hshape dtk_create_string(struct dtk_shape* shp, const char* str_text, float size, float x, float y, const float* color, const char* filepath)
 {
 	GLfloat primv[8] = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f};

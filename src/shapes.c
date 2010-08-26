@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <SDL/SDL_opengl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -130,6 +134,7 @@ error:
 }
 
 
+LOCAL_FN
 struct dtk_shape* create_generic_shape(struct dtk_shape* shp,
                                                  unsigned int numvert,
                                                  const GLfloat* vertices, 
@@ -247,7 +252,7 @@ dtk_hshape dtk_create_composite_shape(const dtk_hshape* shp_array, unsigned int 
  *                       Generic shape functions                         *
  *                                                                       *
  *************************************************************************/
-
+API_EXPORTED
 void dtk_draw_shape(struct dtk_shape* shp)
 {
 	assert(shp != NULL);
@@ -265,6 +270,7 @@ void dtk_draw_shape(struct dtk_shape* shp)
 }
                       
 
+API_EXPORTED
 void dtk_move_shape(dtk_hshape shp, float x, float y)
 {
 	assert(shp != NULL);
@@ -272,6 +278,8 @@ void dtk_move_shape(dtk_hshape shp, float x, float y)
 	shp->pos[1] = y;
 } 
 
+
+API_EXPORTED
 void dtk_relmove_shape(dtk_hshape shp, float dx, float dy)
 {
 	assert(shp != NULL);
@@ -279,18 +287,24 @@ void dtk_relmove_shape(dtk_hshape shp, float dx, float dy)
 	shp->pos[1] += dy;
 }
 
+
+API_EXPORTED
 void dtk_rotate_shape(dtk_hshape shp, float deg)
 {
 	assert(shp != NULL);
 	shp->Rot = deg;
 }
 
+
+API_EXPORTED
 void dtk_relrotate_shape(dtk_hshape shp, float ddeg)
 {
 	assert(shp != NULL);
 	shp->Rot += ddeg;
 }
 
+
+API_EXPORTED
 void dtk_destroy_shape(dtk_hshape shp)
 {
 	if (!shp) 

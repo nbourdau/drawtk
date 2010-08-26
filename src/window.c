@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
 #include "drawtk.h"
@@ -6,6 +10,7 @@
 #include "dtk_event.h"
 
 
+LOCAL_FN
 struct dtk_window* current_window = NULL;
 
 // Settings of the feedback window
@@ -38,7 +43,7 @@ struct dtk_window
  *                                                                       *
  *************************************************************************/
 
-int init_opengl_state(struct dtk_window* wnd)
+static int init_opengl_state(struct dtk_window* wnd)
 {
 	float ratio, iw, ih;
 	GLenum err;
@@ -77,7 +82,7 @@ int init_opengl_state(struct dtk_window* wnd)
 	return 0;
 }
 
-int resize_window(struct dtk_window* wnd, int width, int height, int fs)
+static int resize_window(struct dtk_window* wnd, int width, int height, int fs)
 {
 	int flags = SDL_OPENGL | SDL_RESIZABLE | SDL_ANYFORMAT;
 	const SDL_VideoInfo* info = NULL;
@@ -110,6 +115,8 @@ int resize_window(struct dtk_window* wnd, int width, int height, int fs)
 	return 0;
 }
 
+
+API_EXPORTED
 dtk_hwnd dtk_create_window(unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int bpp, const char* caption)
 {
 	int is_init = 0, fs = 0;
@@ -167,12 +174,16 @@ error:
 	return NULL;
 }                         
 
+
+API_EXPORTED
 void dtk_clear_screen(dtk_hwnd wnd)
 {
 	(void)wnd;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+
+API_EXPORTED
 void dtk_update_screen(dtk_hwnd wnd)  
 {                         
 	(void)wnd;
@@ -181,6 +192,8 @@ void dtk_update_screen(dtk_hwnd wnd)
 	SDL_GL_SwapBuffers();			
 }
 
+
+API_EXPORTED
 void dtk_close(dtk_hwnd wnd)
 {
 	if (!wnd) 
@@ -204,22 +217,26 @@ void dtk_close(dtk_hwnd wnd)
 }
 
 
+API_EXPORTED
 void dtk_make_current_window(dtk_hwnd wnd)
 {
 	current_window = wnd;	
 }
 
+API_EXPORTED
 void dtk_bgcolor(float* bgcolor)
 {
 	glClearColor(bgcolor[0], bgcolor[1], bgcolor[2], bgcolor[3]);	
 }
 
+API_EXPORTED
 void dtk_set_event_handler(dtk_hwnd wnd, EventHandlerProc handler)
 {
 	wnd->evthandler = handler;
 }
 
 
+API_EXPORTED
 int dtk_poll_event(struct dtk_window* wnd, unsigned int* type,
 		struct dtk_keyevent* keyevt, struct dtk_mouseevent* mouseevt) 
 {
@@ -270,6 +287,7 @@ int dtk_poll_event(struct dtk_window* wnd, unsigned int* type,
 	return 1;
 }
 
+API_EXPORTED
 int dtk_process_events(struct dtk_window* wnd)
 {
 	EventHandlerProc handler = wnd->evthandler;
