@@ -7,6 +7,7 @@
 #include <freetype/ftglyph.h>
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
+#include <stdint.h>
 
 #include "drawtk.h"
 #include "fonttex.h"
