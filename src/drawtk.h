@@ -26,10 +26,22 @@ typedef struct dtk_texture* dtk_htex;
 dtk_htex dtk_load_image(const char* filename, unsigned int mipmap_maxlevel);
 void dtk_destroy_texture(dtk_htex tex);
 
+// Font functions
+typedef struct dtk_font* dtk_hfont;
+dtk_hfont dtk_load_font(const char* fontname);
+void dtk_destroy_font(dtk_hfont font);
+
 
 
 // Handle to shape structure
 typedef struct dtk_shape* dtk_hshape;
+
+#define DTK_BOTTOM	0x00
+#define DTK_VMID	0x01
+#define DTK_TOP		0x02
+#define DTK_LEFT	0x00
+#define DTK_HMID	0x10
+#define DTK_RIGHT	0x20
 
 // Shape creation functions
 dtk_hshape dtk_create_rectangle_2p(dtk_hshape shp, float p1_x, float p1_y, float p2_x, float p2_y, int isfull, const float* color);
@@ -41,7 +53,10 @@ dtk_hshape dtk_create_line(dtk_hshape shp, float x1, float y1, float x2, float y
 dtk_hshape dtk_create_arrow(dtk_hshape shp, float cx, float cy, float width, float height, int isfull, const float* color);
 dtk_hshape dtk_create_cross(dtk_hshape shp, float cx, float cy, float width, const float* color);
 dtk_hshape dtk_create_image(dtk_hshape shp, float x, float y, float width, float height, const float* color, dtk_htex image);
-dtk_hshape dtk_create_string(dtk_hshape shp, const char* str_text, float size,  float x, float y, const float* color, const char* filepath);
+dtk_hshape dtk_create_string(struct dtk_shape* shp, const char* text,
+			     float size, float x, float y, 
+			     unsigned int alignment,
+			     const float* color, dtk_hfont font);
 dtk_hshape dtk_create_composite_shape(const dtk_hshape* shp_array, unsigned int num_shp);
 
 // Shape displacement functions

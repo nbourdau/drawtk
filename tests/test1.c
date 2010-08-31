@@ -18,6 +18,7 @@ static char text[] = "This is a test string!!!";
 
 dtk_hwnd wnd;
 dtk_htex tex, tex2;
+dtk_hfont font;
 dtk_hshape tri, tri2, cir, arr, rec1, rec2,cro, img, img2, str;
 dtk_hshape comp;
 
@@ -30,6 +31,7 @@ static void setup_shapes(void)
 {
 	tex = dtk_load_image(imgfilename, 4);
 	tex2 = dtk_load_image(imgfilename, 4);
+	font  = dtk_load_font(fontfilename);
 
 	dtk_hshape shplist[] = {
 		rec1 = dtk_create_rectangle_2p(NULL, -1.0f, -1.0f, -0.3f,-0.2f, 1, red),
@@ -38,7 +40,7 @@ static void setup_shapes(void)
 		img = dtk_create_image(NULL, 0.0f,0.0f,0.5f,0.5f,white, tex),
 		tri = dtk_create_triangle(NULL, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1, red),
 		tri2 = dtk_create_triangle(NULL, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1, blue),
-		str = dtk_create_string(NULL, text ,0.1,-0.9,-0.9, white, fontfilename),
+		str = dtk_create_string(NULL, text ,0.1,-0.0,-0.9, DTK_HMID, white, font),
 		cir = dtk_create_circle(NULL, -0.4f, -0.4f, 0.3f, 1, pal_tango[orange_light], 60),
 		arr = dtk_create_arrow(NULL, 0.0f, 0.0f, 1.0, 0.5, 1, red),
 		img2 = dtk_create_image(NULL, 0.0f,0.0f,0.5f,0.5f,white, tex2)
@@ -55,7 +57,7 @@ int main(int argc, char* argv[])
 	struct timespec delay = {1, 0};
 
 	sprintf(imgfilename, "%s/navy.png", getenv("srcdir"));
-	sprintf(fontfilename, "%s/font.png", getenv("srcdir"));
+	sprintf(fontfilename, "%s/test.ttf", getenv("srcdir"));
 
 	wnd = dtk_create_window(640, 480, 0, 0, 16, "hello");
 	dtk_make_current_window(wnd);

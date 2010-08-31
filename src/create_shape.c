@@ -4,11 +4,37 @@
 
 #include <SDL/SDL_opengl.h>
 #include <math.h>
+#include <float.h>
 #include <string.h>
 #include "drawtk.h"
 #include "shapes.h"
+#include "fonttex.h"
 
 #define TWO_PI ((float)(2.0*M_PI))
+#define MAX(v1, v2) ((v1) > (v2) ? (v1) : (v2))
+#define MIN(v1, v2) ((v1) < (v2) ? (v1) : (v2))
+
+static void get_bbox(struct single_shape* sinshp, float* left, float *right, 
+                                             float* top, float* bottom)
+{
+	unsigned int i;
+	float l, r, t, b;
+	l = b = FLT_MAX;
+	r = t = -FLT_MAX;
+	float* vert = sinshp->vertices;
+
+	for (i=0; i<sinshp->num_vert; i+=2) {
+		l = MIN(vert[0], l);
+		r = MAX(vert[0], r);
+		b = MIN(vert[1], b);
+		t = MAX(vert[1], t);
+		vert += 2;
+	}
+	*left = l;
+	*right = r;
+	*top = t;
+	*bottom = b;
+}
 
 API_EXPORTED
 dtk_hshape dtk_create_circle(struct dtk_shape* shp, float cx, float cy, float r, int isfull, const float* color, unsigned int numpoints)
@@ -249,56 +275,55 @@ dtk_hshape dtk_create_image(struct dtk_shape* shp, float x, float y, float width
 
 
 API_EXPORTED
-dtk_hshape dtk_create_string(struct dtk_shape* shp, const char* str_text, float size, float x, float y, const float* color, const char* filepath)
+dtk_hshape dtk_create_string(struct dtk_shape* shp, const char* text,
+			     float size, float x, float y,
+			     unsigned int alignment,
+			     const float* color, dtk_hfont font)
 {
-	GLfloat primv[8] = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f};
-	float tex_w, tex_h, tx, ty;
-	GLint primind[6] = {0, 1, 2, 0, 2, 3};
-	GLfloat *vertices, *texcoords;
-	GLuint* indices;
-	int i, j, len, row, col;
-	int row_num = 14, col_num =16;
+	GLfloat *vert, *tc;
+	GLuint* ind;
+	unsigned int i, len;
 	GLenum primtype = GL_TRIANGLES;
+	float pos = 0.0f;
+	float l,r,t,b,orgx, orgy;
 
-	len = str_text ? strlen(str_text) : 0;
+	len = text ? strlen(text) : 0;
 
-	shp = create_generic_shape(shp, 4*len, NULL, NULL, 6*len, NULL, primtype, color, dtk_load_image(filepath, 3));
+	shp = create_generic_shape(shp, 4*len, NULL, NULL, 6*len, NULL,
+	                           primtype, color, font->tex);
 	if (!shp)
 		return NULL;
 	
-	indices = ((struct single_shape*)(shp->data))->indices;
-	vertices = ((struct single_shape*)(shp->data))->vertices;
-	texcoords = ((struct single_shape*)(shp->data))->texcoords;
+	ind = ((struct single_shape*)(shp->data))->indices;
+	vert = ((struct single_shape*)(shp->data))->vertices;
+	tc = ((struct single_shape*)(shp->data))->texcoords;
 
-	// Size of a letter in texture coordinates
-	tex_w = (1.0f/(float)col_num);
-	tex_h = (1.0f/(float)row_num);
-	
-	// Create all other letter vertices
-	for(i=0; i<len; i++) {
-		// Find coordinates of letter in the image
-		row = (str_text[i]-32)/col_num;
-		col = (str_text[i]-32)%col_num;
+	// setup letter vertices
+	for (i=0; i<len; i++)
+		dtk_char_pos(font, text[i], vert+8*i, tc+8*i, 
+		             ind+6*i, 4*i, &pos);
 
-		// Texture coordinate of down left vertex of the letter
-		tx = tex_w*(float)col;
-		ty = 1.0f - tex_h*(float)(row+1);
-		
-		for (j=0; j<4; j++) {
-			vertices[8*i+2*j  ] = size * primv[2*j  ] + x;
-			vertices[8*i+2*j+1] = size * primv[2*j+1] + y;
-			
-			texcoords[8*i+2*j  ] = tex_w * primv[2*j  ] + tx;
-			texcoords[8*i+2*j+1] = tex_h * primv[2*j+1] + ty;
-		}
-		x += size;
+	get_bbox(shp->data, &l, &r, &b, &t);
+
+	if (alignment & DTK_HMID)
+		orgx = (l+r)/2.0f;
+	else if (alignment & DTK_RIGHT)
+		orgx = r;
+	else
+		orgx = l;
+
+	if (alignment & DTK_VMID)
+		orgy = (t+b)/2.0f;
+	else if (alignment & DTK_TOP)
+		orgy = t;
+	else
+		orgy = b;
+
+	for (i=0; i<8*len; i+=2) {
+		vert[i  ] = (vert[i  ] - orgx)*size + x;	
+		vert[i+1] = (vert[i+1] - orgy)*size + y;	
 	}
 
-	//Create all indices
-	for(i=0;i<len;i++)
-		for (j=0; j<6; j++)
-			indices[6*i+j] = 4*i + primind[j];
-		
 	return shp;
 }
 

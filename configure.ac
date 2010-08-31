@@ -64,6 +64,9 @@ AC_SEARCH_LIBS([cos], [m], [], AC_MSG_ERROR([The libm cannot be found.]))
 AC_SEARCH_LIBS([SDL_Init], [SDL], [], AC_MSG_ERROR([The SDL library must be installed.]))
 AC_SEARCH_LIBS([FreeImage_Load], [freeimage], [], AC_MSG_ERROR([The FreeImage library must be installed.]))
 AC_SEARCH_LIBS([glEnable], [GL], [], AC_MSG_ERROR([The openGL library cannot be found.]))
+AC_SEARCH_LIBS([FT_Load_Glyph], [freetype], [], AC_MSG_ERROR([The freetype library cannot be found.]))
+AM_CPPFLAGS="$AM_CPPFLAGS -I/usr/include/freetype2"
+AC_SUBST(AM_CPPFLAGS)
 
 # Checks for header files.
 

@@ -5,8 +5,8 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
 #include "drawtk.h"
-#include "texmanager.h"
 #include "window.h" 
+#include "texmanager.h"
 #include "dtk_event.h"
 
 
@@ -71,6 +71,7 @@ static int init_opengl_state(struct dtk_window* wnd)
 	// Setup transparency
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
 
 	// Check for errors
 	err = glGetError();

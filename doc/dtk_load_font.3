@@ -1,0 +1,47 @@
+.\"Copyright 2010 (c) EPFL
+.TH DTK_LOAD_FONT 3 2010 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_load_font - Load an font
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "dtk_hfont dtk_load_font(const char *" fontfilename ");"
+.br
+.BI "void dtk_destroy_font(dtk_hfont " font ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_load_font\fP() loads the font specified by \fIfontfilename\fP
+argument. This should be the path of a file whose file format can be any of
+the file format supported by the freetype library (TrueType and Type 1 among
+many others). Upon creation, the font data is then tracked by an internal
+resource manager so that the next call using the same \fIfontfilename\fP
+argument will return the same font handle, thus sparing the resources of
+the system. 
+.LP
+There is no need for a valid window to create successfully a font, i.e.
+font loading is completely decoupled from the creation of others
+resources and can even be created in one thread to be used in another one.
+.LP
+\fBdtk_destroy_font\fP() frees the resource referenced by \fIfont\fP. If the
+font is used several times, i.e. several call to \fBdtk_load_font\fP() with
+the same file path, it decreases the number of uses by one.
+.LP
+Calling \fBdtk_destroy_texture\fP() on each created font is currently not
+mandatory since all font remaining fonts are destroyed when the last
+window is closed. However, if no window can be closed (for example, no
+window has been created), \fBdtk_destroy_font\fP() should be called on each
+created font to avoid any memory leak.
+.LP
+\fBdtk_load_font\fP() and \fBdtk_destroy_texture\fP() are thread-safe.
+.SH "RETURN VALUE"
+.LP
+In case of success, the \fBdtk_load_font\fP() returns the handle to the
+loaded font. In case of failure, \fINULL\fP is returned.
+.LP
+\fBdtk_destroy_texture\fP() does not return any value.
+.SH "SEE ALSO"
+.BR dtk_create_string (3)
+
+

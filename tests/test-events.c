@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <palette.h>
 #include <dtk_event.h>
+#include <string.h>
 
 
 static char imgfilename[256], fontfilename[256];
@@ -13,6 +14,8 @@ dtk_hwnd wnd;
 dtk_hshape tri, tri2, cir, arr, rec1, rec2,cro, img, str;
 dtk_hshape comp;
 
+dtk_hfont font;
+
 #define red	pal_basic[red]
 #define green	pal_basic[green]
 #define white	pal_basic[white]
@@ -20,6 +23,7 @@ dtk_hshape comp;
 
 static void setup_shapes(void)
 {
+	font  = dtk_load_font(fontfilename);
 	dtk_hshape shplist[] = {
 		rec1 = dtk_create_rectangle_2p(NULL, -1.0f, -1.0f, -0.3f,-0.2f, 1, red),
 		rec2 = dtk_create_rectangle_hw(NULL, 0.0f, 0.0f, 0.5f, 0.6f, 1, green),
@@ -27,9 +31,9 @@ static void setup_shapes(void)
 		img = dtk_create_image(NULL, 0.0f,0.0f,0.5f,0.5f,white,dtk_load_image(imgfilename, 4)),
 		tri = dtk_create_triangle(NULL, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1, red),
 		tri2 = dtk_create_triangle(NULL, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1, blue),
-		str = dtk_create_string(NULL, text ,0.1,-0.9,-0.9, white, fontfilename),
 		cir = dtk_create_circle(NULL, -0.4f, -0.4f, 0.3f, 1, pal_tango[orange_light], 60),
 		arr = dtk_create_arrow(NULL, 0.0f, 0.0f, 1.0, 0.5, 1, red),
+		str = dtk_create_string(NULL, text ,0.1,-0.0,-0.9, DTK_RIGHT, white, font),
 	};
 
 	comp = dtk_create_composite_shape(shplist, sizeof(shplist)/sizeof(shplist[0]));
@@ -77,7 +81,10 @@ int main(int argc, char* argv[])
 	(void)argv;
 
 	sprintf(imgfilename, "%s/navy.png", getenv("srcdir"));
-	sprintf(fontfilename, "%s/font.png", getenv("srcdir"));
+	if (argc < 2)
+		sprintf(fontfilename, "%s/test.ttf", getenv("srcdir"));
+	else
+		strcpy(fontfilename, argv[1]);
 
 	wnd = dtk_create_window(1024, 768, 0, 0, 16, "hello");
 	dtk_make_current_window(wnd);

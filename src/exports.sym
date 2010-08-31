@@ -6,6 +6,8 @@ dtk_close
 dtk_bgcolor
 dtk_set_event_handler
 dtk_process_events
+dtk_load_font
+dtk_destroy_font
 dtk_load_image
 dtk_destroy_texture
 dtk_create_rectangle_2p

@@ -1,1 +1,53 @@
-.so man3/dtk_create_shape.3
+.\"Copyright 2010 (c) EPFL
+.TH DTK_CREATE_SHAPE 3 2010 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_create_string - Creates a shape displaying a string
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "dtk_hshape dtk_create_string(dtk_hshape " shp ", const char *" text ","
+.br
+.BI "                             float " size ", float " x ", float " y ","
+.br
+.BI "                             unsigned int " alignment ","
+.br
+.BI "                             const float *" color ", dtk_hfont " font ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_create_string\fP() creates a text specified by \fIstr_text\fP at
+location (\fIx\fP,\fIy\fP) with a font size of \fIsize\fP using a previously
+loaded font referenced by \fIfont\fP argument. 
+.LP
+The position (\fIx\fP,\fIy\fP) is interpreted according to the combination
+of flags controlling the vertical and horizontal alignment defined in the
+\fIalignment\fP argument:
+.IP " *" 3
+\fBDTK_BOTTOM\fP, \fBDTK_VMID\fP and \fBDTK_TOP\fP make the value \fIy\fP to
+be interpreted as respectively the bottom, the middle and the top of the
+bounding box of the shape.
+.IP " *" 3
+\fBDTK_LEFT\fP, \fBDTK_HMID\fP and \fBDTK_RIGHT\fP make the value \fIx\fP to
+be interpreted as respectively the left, the middle and the right of the
+bounding box of the shape.
+.LP
+\fIshp\fP and \fIcolor\fP has the same usage and meaning than in other shape
+creation functions (see \fBdtk_create_shape\fP(3)):
+.IP " *" 3
+\fIshp\fP can be used to modify a previously created shape. If it is
+non-null, the handle will be used to modify the shape referenced by
+\fIshp\fP: no new shape is created and the returned value is ensured to be
+\fIshp\fP in case of success, \fINULL\fP otherwise. If \fIshp\fP is
+\fINULL\fP, the function will attempt to create a new shape.
+.IP " *" 3
+\fIcolor\fP should point to a 4 float array containing a normalized RGBA
+value (i.e. each component is between 0.0 and 1.0).
+.SH "RETURN VALUE"
+.LP
+In case of success the function returns the handle to the newly created or
+modified shape. If the \fIshp\fP argument is non-null, the handle returned
+is the same value. In case of error, \fINULL\fP is returned.
+.SH "SEE ALSO"
+.BR dtk_create_string (3)
+
