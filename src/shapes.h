@@ -4,7 +4,7 @@
 #include <SDL/SDL_opengl.h>
 
 typedef void (*DrawShapeFn)(const struct dtk_shape* shp);
-typedef void (*DestroyShapeFn)(struct dtk_shape* shp);
+typedef void (*DestroyShapeFn)(void* data);
 
 struct dtk_shape
 {
@@ -22,22 +22,31 @@ struct dtk_shape
 
 struct single_shape
 {
-	GLuint num_ind;
 	GLuint* indices;
-	GLuint num_vert;
 	GLfloat* vertices;
 	GLfloat* texcoords;
-	unsigned int usetex;
-	GLfloat color[4];
+	GLfloat* colors;
+	GLuint num_ind;
+	GLuint num_vert;
+	unsigned int isalloc;
 	GLenum primtype;
 	struct dtk_texture* tex;
 };
 
-LOCAL_FN struct dtk_shape*
-create_generic_shape(struct dtk_shape* shp, unsigned int numvert,
-                     const GLfloat* vertices, const GLfloat* texcoords,
-                     unsigned int numind, const GLuint* indices,
-                     GLenum primtype, const GLfloat* color,
-                     struct dtk_texture* tex);
+
+#define DTKF_ALLOC 	0x01
+#define DTKF_UNICOLOR	0x02
+
+LOCAL_FN
+struct dtk_shape* create_generic_shape(struct dtk_shape* shp,
+                                                 unsigned int nvert,
+                                                 const GLfloat* vert, 
+						 const GLfloat* tc,
+						 const GLfloat* col,
+						 unsigned int nind,
+                                                 const GLuint* ind,
+						 GLenum primtype,
+						 struct dtk_texture* tex,
+						 unsigned int flags);
 
 #endif // SHAPES_H

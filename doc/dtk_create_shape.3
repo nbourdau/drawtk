@@ -3,8 +3,7 @@
 .SH NAME
 dtk_create_shape, dtk_create_rectangle_2p, dtk_create_rectangle_hw,
 dtk_create_triangle, dtk_create_circle, dtk_create_line, dtk_create_arrow,
-dtk_create_cross, dtk_create_image, dtk_create_string,
-dtk_create_composite_shape - Create and modify shapes
+dtk_create_cross, dtk_create_image - Create and modify shapes
 .SH SYNOPSIS
 .LP
 .B #include <drawtk.h>
@@ -65,16 +64,6 @@ dtk_create_composite_shape - Create and modify shapes
 .br
 .BI "                const float* " color ", dtk_htex " image ");"
 .br
-.BI "dtk_hshape dtk_create_string(dtk_hshape " shp ","
-.br
-.BI "                const char *" str_text ", float " size ", float " x ", float " y ","
-.br
-.BI "                const float *" color ", const char *" filepath ");"
-.br
-.BI "dtk_hshape dtk_create_composite_shape(const dtk_hshape *" shp_array ","
-.br
-.BI "                unsigned int " num_shp ");"
-.br
 .SH DESCRIPTION
 .LP
 \fBdtk_create_shape\fP() creates a shape specified by \fIind_num\fP vertices
@@ -131,18 +120,6 @@ centered at (\fIcx\fP,\fIcy\fP) containing the image loaded in texture
 disregarding the dimension of the image. The \fIcolor\fP argument modulates the
 pixel values of the image, i.e. to display the image the same way it exist in
 the image file, color should be white.
-.LP
-\fBdtk_create_string\fP() creates a text specified by \fIstr_text\fP at
-location (\fIx\fP,\fIy\fP) with a font size of \fIsize\fP using the charmap
-file located at \fIfilepath\fP. The font size corresponds to the height of the
-biggest glyph in the font table. 
-.LP
-\fBdtk_create_composite_shape\fP() creates a shape made of \fInum_shp\fP
-different shapes specified by the array \fIshp_array\fP. When
-\fBdtk_draw_shape\fP() in called on the composite shape, all referenced shapes
-will be rendered in the order of \fIshp_array\fP. The destruction of the
-composite shape \fBdoes not\fP destroy the underlaying shapes, so that
-\fIdtk_destroy_shape\fP() should called for all individual shapes.
 .SH "RETURN VALUE"
 .LP
 In case of success these functions return the handle to the newly created or modified

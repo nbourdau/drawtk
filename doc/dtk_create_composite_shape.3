@@ -1,1 +1,46 @@
-.so man3/dtk_create_shape.3
+.\"Copyright 2010 (c) EPFL
+.TH DTK_CREATE_COMPOSITE_SHAPE 3 2010 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_create_composite_shape - Create or modify a shape holding other shapes
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "dtk_hshape dtk_create_composite_shape(dtk_hshape " shp ","
+.br
+.BI "                                      unsigned int " num ","
+.br                                        
+.BI "                                      const dtk_hshape *" list ","
+.br
+.BI "                                      int " free_children ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_create_composite_shape\fP() creates a shape made of \fInum\fP
+different shapes specified by the array \fIlist\fP. When
+\fBdtk_draw_shape\fP(3) is called on the composite shape, all referenced
+shapes will be rendered in the order of \fIlist\fP. The composite shape
+create its own copy of the shape list, so there is no need to keep the array
+pointed by \fIlist\fP allocated after the function returns.
+.LP
+If \fIfree_children\fP is a non-zero value, the destruction of the composite
+shape will destroy the underlaying shapes. If \fIfree_children\fP is zero,
+destroying the composite shape will leave the referenced shapes untouched,
+so that \fIdtk_destroy_shape\fP() should be called for all individual
+shapes.
+.LP
+\fIshp\fP can be used to modify a previously created shape. If it is
+non-null, the handle will be used to modify the shape referenced by
+\fIshp\fP: no new shape is created and the returned value is ensured to be
+\fIshp\fP in case of success, \fINULL\fP otherwise. If \fIshp\fP is
+\fINULL\fP, the function will attempt to create a new shape.
+.SH "RETURN VALUE"
+.LP
+In case of success the function returns the handle to the newly created or
+modified shape. If the \fIshp\fP argument is non-null, the handle returned
+is the same value. In case of error, \fINULL\fP is returned.
+.SH "SEE ALSO"
+.BR dtk_destroy_shape (3),
+.BR dtk_create_shape (3)
+
+

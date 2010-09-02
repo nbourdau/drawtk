@@ -2,6 +2,7 @@ dist_man_MANS = dtk_move_shape.3 dtk_relmove_shape.3			\
 		dtk_rotate_shape.3 dtk_relrotate_shape.3		\
 		dtk_draw_shape.3					\
 		dtk_create_shape.3 dtk_create_composite_shape.3 	\
+		dtk_create_complex_shape.3				\
 		dtk_create_rectangle_2p.3 dtk_create_rectangle_hw.3	\
 		dtk_create_triangle.3 dtk_create_circle.3		\
 		dtk_create_line.3 dtk_create_arrow.3			\

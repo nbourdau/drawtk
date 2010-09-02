@@ -21,6 +21,7 @@ dtk_create_cross
 dtk_create_image
 dtk_create_string
 dtk_create_composite_shape
+dtk_create_complex_shape
 dtk_move_shape
 dtk_relmove_shape
 dtk_rotate_shape

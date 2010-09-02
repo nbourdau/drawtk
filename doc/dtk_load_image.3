@@ -20,17 +20,18 @@ There is no need for a valid window to create successfully a texture, i.e.
 creation of textures are completely decoupled from the creation of others
 ressources and can even be created in one thread to be used in another one.
 .LP
-Mipmaps are version of the same image at lower resolution (every power of two).
-Mipmap at level 0 is the original image. Given the size of the texture
-displayed in the framebuffer, the closest mipmaps are used to interpolate the
-value of displayed pixels. Do a research on internet for further details about
-mipmaps.
-.LP
-\fBdtk_load_image\fP() is thread-safe.
+Mipmaps are version of the same image at lower resolution (every power of
+two). Mipmap at level 0 is the original image. Given the size of the texture
+displayed in the framebuffer, the closest mipmaps are used to interpolate
+the value of displayed pixels. Do a research on internet for further details
+about mipmaps.
 .SH "RETURN VALUE"
 .LP
-In case of success, the function returns the handle to the created texture. In
-case of failure, \fINULL\fP is returned.
+In case of success, the function returns the handle to the created texture.
+In case of failure, \fINULL\fP is returned.
+.SH "THREAD SAFETY"
+.LP
+\fBdtk_load_image\fP() is thread-safe.
 .SH "SEE ALSO"
 .BR 
 

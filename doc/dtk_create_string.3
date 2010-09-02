@@ -1,7 +1,7 @@
 .\"Copyright 2010 (c) EPFL
-.TH DTK_CREATE_SHAPE 3 2010 "EPFL" "Draw Toolkit manual"
+.TH DTK_CREATE_STRING 3 2010 "EPFL" "Draw Toolkit manual"
 .SH NAME
-dtk_create_string - Creates a shape displaying a string
+dtk_create_string - Creates or modify a shape to display a string
 .SH SYNOPSIS
 .LP
 .B #include <drawtk.h>
@@ -16,9 +16,9 @@ dtk_create_string - Creates a shape displaying a string
 .br
 .SH DESCRIPTION
 .LP
-\fBdtk_create_string\fP() creates a text specified by \fIstr_text\fP at
+\fBdtk_create_string\fP() creates a text specified by \fItext\fP at
 location (\fIx\fP,\fIy\fP) with a font size of \fIsize\fP using a previously
-loaded font referenced by \fIfont\fP argument. 
+loaded font referenced by \fIfont\fP argument (see \fBdtk_load_font\fP(3)). 
 .LP
 The position (\fIx\fP,\fIy\fP) is interpreted according to the combination
 of flags controlling the vertical and horizontal alignment defined in the
@@ -49,5 +49,6 @@ In case of success the function returns the handle to the newly created or
 modified shape. If the \fIshp\fP argument is non-null, the handle returned
 is the same value. In case of error, \fINULL\fP is returned.
 .SH "SEE ALSO"
-.BR dtk_create_string (3)
+.BR dtk_load_font (3),
+.BR dtk_create_shape (3)
 

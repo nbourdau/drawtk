@@ -1,0 +1,91 @@
+.\"Copyright 2010 (c) EPFL
+.TH DTK_CREATE_COMPLEX_SHAPE 3 2010 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_create_complex_shape - Creates or modify a shape to display custom and
+evolving content
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "dtk_hshape dtk_create_complex_shape(dtk_hshape " shp ","
+.br
+.BI "                    unsigned int " nvert ", const float *" vertpos ","
+.br
+.BI "                    const float *" vertcolor ", const float *" texcoords ",
+.br
+.BI "                    unsigned int " nind ", const unsigned int *" ind ",
+.br
+.BI "                    unsigned int " type ", dtk_htex " tex ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_create_complex_shape\fP() creates a shape displaying a complex,
+custom and possibly evolving content described by vertex attribute buffers
+(\fIvertpos\fP, \fIvertcolor\fP and \fItexcoords\fP) and an array \fIind\fP
+containing the indices of vertices whose order describes how to connect
+the vertices altogether in order to form primitives (controlled by
+\fItype\fP). \fItex\fP can be used to specify a texture to be mapped onto
+the shape.
+.LP
+\fIvertpos\fP should point to an array of \fInvert\fP pairs of float values
+corresponding of the position (x,y) of each vertex. \fIvertcolor\fP should
+point to an array of \fInvert\fP quatuples of float values corresponding of
+the color (R,G,B,A) of each vertex. \fItexcoords\fP can be either
+\fBNULL\fP or can point to an array of \fInvert\fP pairs of float values
+corresponding to the texture coordinates (u,v) of the vertex. If
+\fItexcoords\fP is \fBNULL\fP, no texture will be used even if \fItex\fP is 
+not null.
+.LP
+\fIind\fP should point to an array of \fInind\fP indices of the vertices in
+the vertex attribute buffers. This list of indices determines how the
+vertices form the primitives and depends on \fItype\fP zhich can take one
+the following value (See OpenGL manual to have detail):
+.TP
+.B DTK_TRIANGLE_STRIP
+The first three vertices defines the first triangle (and their order is
+significant). Each subsequent vertex defines a new triangle using that
+point along with two vertices from the previous triangle.
+.TP
+.B DTK_TRIANGLE_FAN
+A triangle fan is the same as a triangle strip with one exception: the first
+vertex of the list is always the first vertex of each triangle.
+.TP
+.B DTK_TRIANGLES
+Separate triangles are specified. Every 3 indices defines in the order a
+triangle. If \fInind\fP is not a multiple of 3, the excedent 1 or 2 indices 
+are ignored.
+.TP
+.B DTK_LINE_STRIP
+A series of one or more connected line segments is specified by
+enclosing a series of two or more endpoints. In this case, the ith index
+specifies the end point of the i-1st segment and the start point of the ith 
+segment.
+.TP
+.B DTK_LINES
+Individual line segments, each specified by a pair of vertices. If
+\fInind\fP is odd, then the last index is ignored.
+.LP
+\fIshp\fP can be used to modify a previously created shape. If it is
+non-null, the handle will be used to modify the shape referenced by
+\fIshp\fP: no new shape is created and the returned value is ensured to be
+\fIshp\fP in case of success, \fINULL\fP otherwise. If \fIshp\fP is
+\fINULL\fP, the function will attempt to create a new shape.
+.LP
+The arrays \fIvertpos\fP, \fIvertcolor\fP, \fItexcoords\fP and \fIind\fP are
+not copied into internal structures of the created shape. This allows to
+dynamically change any aspect of the shape. However, in return it forces to
+\fBkeep the buffers allocated during the whole life time of the shape\fP.
+.SH "RETURN VALUE"
+.LP
+In case of success the function returns the handle to the newly created or
+modified shape. If the \fIshp\fP argument is non-null, the handle returned
+is the same value. In case of error, \fINULL\fP is returned.
+.SH "THREAD SAFETY"
+.LP
+The data contained into the buffers are accessed only during the creation
+and the draw of the shape. So if the data is updated in a different thread
+than the one used for drawing, some locking is needed.
+.SH "SEE ALSO"
+.BR dtk_create_shape (3)
+
+

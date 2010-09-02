@@ -36,7 +36,9 @@ static void setup_shapes(void)
 		str = dtk_create_string(NULL, text ,0.1,-0.0,-0.9, DTK_RIGHT, white, font),
 	};
 
-	comp = dtk_create_composite_shape(shplist, sizeof(shplist)/sizeof(shplist[0]));
+	comp = dtk_create_composite_shape(NULL, 
+	                            sizeof(shplist)/sizeof(shplist[0]),
+				    shplist, 1);
 }
 
 void redraw(dtk_hwnd wnd)
@@ -94,6 +96,8 @@ int main(int argc, char* argv[])
 	redraw(wnd);
 	while (dtk_process_events(wnd));
 
+	dtk_destroy_font(font);
+	dtk_destroy_shape(comp);
 	dtk_close(wnd);
 
 	return 0;

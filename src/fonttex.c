@@ -138,6 +138,7 @@ static
 void font_destroy(struct dtk_texture* tex)
 {
 	free(tex->aux);
+	free(tex);
 }
 
 

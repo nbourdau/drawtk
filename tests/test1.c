@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <palette.h>
 #include <time.h>
+#include <math.h>
 
 #if !HAVE_DECL_CLOCK_NANOSLEEP
 #include "../lib/clock_nanosleep.h"
@@ -16,16 +17,48 @@
 static char imgfilename[256], fontfilename[256];
 static char text[] = "This is a test string!!!";
 
+#define NUMVERT	4
+#define NUMIND	4
+float vertpos[2*NUMVERT];
+float vertcolor[4*NUMVERT];
+unsigned int indices[NUMIND];
+
 dtk_hwnd wnd;
 dtk_htex tex, tex2;
 dtk_hfont font;
-dtk_hshape tri, tri2, cir, arr, rec1, rec2,cro, img, img2, str;
+dtk_hshape tri, tri2, cir, arr, rec1, rec2,cro, img, img2, str, cshp;
 dtk_hshape comp;
 
 #define red	pal_basic[red]
 #define green	pal_basic[green]
 #define white	pal_basic[white]
 #define blue	pal_basic[blue]
+
+void setup_complex(void)
+{
+	unsigned int i;
+
+	vertpos[0] = -0.5f;
+	vertpos[1] = -1.0f;
+	vertpos[2] = -0.5f;
+	vertpos[3] = -0.5f;
+	vertpos[4] = 0.0f;
+	vertpos[5] = -1.0f;
+	vertpos[6] = 0.0f;
+	vertpos[7] = -0.5f;
+
+	for (i=0; i<4*NUMVERT; i+=4) {
+		vertcolor[i  ] = 0.0f;
+		vertcolor[i+1] = 0.0f;
+		vertcolor[i+2] = 0.0f;
+		vertcolor[i+3] = 1.0f;
+	}
+
+	indices[0] = 0;
+	indices[1] = 1;
+	indices[2] = 2;
+	indices[3] = 3;
+}
 
 static void setup_shapes(void)
 {
@@ -46,7 +79,14 @@ static void setup_shapes(void)
 		img2 = dtk_create_image(NULL, 0.0f,0.0f,0.5f,0.5f,white, tex2)
 	};
 
-	comp = dtk_create_composite_shape(shplist, sizeof(shplist)/sizeof(shplist[0]));
+	comp = dtk_create_composite_shape(NULL, 
+	                           sizeof(shplist)/sizeof(shplist[0]),
+				   shplist, 1);
+	setup_complex();
+	cshp = dtk_create_complex_shape(NULL, 
+	                                NUMVERT, vertpos, vertcolor, NULL,
+					NUMIND, indices,
+					DTK_TRIANGLE_STRIP, NULL);
 }
 
 int main(int argc, char* argv[])
@@ -65,6 +105,7 @@ int main(int argc, char* argv[])
 
 	dtk_clear_screen(wnd);
 	dtk_draw_shape(comp);
+	dtk_draw_shape(cshp);
 	dtk_update_screen(wnd);
 	clock_nanosleep(CLOCK_REALTIME, 0, &delay, NULL);
 	dtk_clear_screen(wnd);
@@ -73,23 +114,36 @@ int main(int argc, char* argv[])
 	dtk_move_shape(arr,-0.5,-0.5);
 	dtk_move_shape(img2,-0.5,-0.5);
 	dtk_draw_shape(comp);
+	dtk_draw_shape(cshp);
 	dtk_update_screen(wnd);
 
 	delay.tv_sec = 0;
 	delay.tv_nsec = 5000000; // 5ms
-	for (angle=0.0f; angle<360.0f; angle+=1.0f) {
+	for (angle=0.0f; angle<720.0f; angle+=1.0f) {
 		dtk_clear_screen(wnd);
 		dtk_rotate_shape(arr,angle);
 		dtk_rotate_shape(img2,-angle);
 		dtk_rotate_shape(comp,angle/2.0f);
 		dtk_draw_shape(comp);
+
+		vertpos[2] = -0.5f+0.2f*cos(4*3.14*angle/360.0f);
+		vertpos[3] = -0.5f+0.2f*sin(4*3.14*angle/360.0f);
+		vertpos[2] = -0.5f+0.2f*sin(4*3.14*angle/360.0f);
+		vertpos[3] = -0.5f+0.2f*cos(4*3.14*angle/360.0f);
+		vertcolor[4*0+1] = fabs(sin(4*3.14*angle/360.0f));
+		vertcolor[4*1+0] = fabs(cos(4*3.14*angle/360.0f));
+		vertcolor[4*2+2] = fabs(cos(4*3.14*angle/360.0f));
+		vertcolor[4*3+3] = fabs(sin(4*3.14*angle/360.0f));
+		dtk_draw_shape(cshp);
 		dtk_update_screen(wnd);
 		clock_nanosleep(CLOCK_REALTIME, 0, &delay, NULL);
 	}
 
 
 	dtk_destroy_shape(comp);
+	dtk_destroy_shape(cshp);
 	dtk_destroy_texture(tex);
+	dtk_destroy_font(font);
 	dtk_close(wnd);
 
 

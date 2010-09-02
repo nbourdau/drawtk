@@ -14,6 +14,15 @@
 #define MAX(v1, v2) ((v1) > (v2) ? (v1) : (v2))
 #define MIN(v1, v2) ((v1) < (v2) ? (v1) : (v2))
 
+static GLenum primitive_mode[] = {
+	[DTK_TRIANGLES] = GL_TRIANGLES,
+	[DTK_TRIANGLE_STRIP] = GL_TRIANGLE_STRIP,
+	[DTK_TRIANGLE_FAN] = GL_TRIANGLE_FAN,
+	[DTK_LINES] = GL_LINES,
+	[DTK_LINE_STRIP] = GL_LINE_STRIP
+};
+#define NUM_PRIM_MODE (sizeof(primitive_mode)/sizeof(primitive_mode[0]))
+
 static void get_bbox(struct single_shape* sinshp, float* left, float *right, 
                                              float* top, float* bottom)
 {
@@ -45,7 +54,9 @@ dtk_hshape dtk_create_circle(struct dtk_shape* shp, float cx, float cy, float r,
 	GLuint numind = isfull ? numpoints+2 : numpoints;
 	GLenum primtype = isfull ? GL_TRIANGLE_FAN : GL_LINE_LOOP;
 
-	shp = create_generic_shape(shp, numvert, NULL, NULL,numind, NULL, primtype, color,NULL);
+	shp = create_generic_shape(shp, numvert, NULL, NULL, color,
+	                                numind, NULL, primtype,
+					NULL, DTKF_ALLOC | DTKF_UNICOLOR);
 	if (!shp)
 		return NULL;
 
@@ -95,7 +106,9 @@ dtk_hshape dtk_create_cross(struct dtk_shape* shp, float cx, float cy, float wid
 	vertices[6] = cx;
 	vertices[7] = -width/2 + cy;
 
-	shp = create_generic_shape(shp, 4, vertices, NULL,4, indices, primtype, color,NULL);
+	shp = create_generic_shape(shp, 4, vertices, NULL, color,
+	                                4, indices, primtype,
+					NULL, DTKF_ALLOC|DTKF_UNICOLOR);
 	
 	return shp;
 }
@@ -119,7 +132,9 @@ dtk_hshape dtk_create_rectangle_2p(struct dtk_shape* shp, float p1_x, float p1_y
 	vertices[6] = p2_x;
 	vertices[7] = p1_y;
 
-	shp = create_generic_shape(shp, 4, vertices, NULL,4, indices, primtype, color,NULL);
+	shp = create_generic_shape(shp, 4, vertices, NULL, color,
+	                                4, indices, primtype, 
+					NULL, DTKF_ALLOC|DTKF_UNICOLOR);
 	
 	return shp;
 }
@@ -144,7 +159,9 @@ dtk_hshape dtk_create_rectangle_hw(struct dtk_shape* shp, float cx, float cy, fl
 	vertices[6] = width + cx;
 	vertices[7] = 0 + cy;
 
-	shp = create_generic_shape(shp, 4, vertices, NULL,4, indices, primtype, color,NULL);
+	shp = create_generic_shape(shp, 4, vertices, NULL, color,
+	                                4, indices, primtype,
+					NULL, DTKF_ALLOC|DTKF_UNICOLOR);
 	
 	return shp;
 }
@@ -187,7 +204,9 @@ dtk_hshape dtk_create_arrow(struct dtk_shape* shp, float cx, float cy, float wid
 	vertices[12] = Warr + cx;
 	vertices[13] = Htot/2 + cy;
 
-	shp = create_generic_shape(shp, 7, vertices, NULL, 7, indices, primtype, color,NULL);
+	shp = create_generic_shape(shp, 7, vertices, NULL, color,
+	                                7, indices, primtype,
+					NULL, DTKF_ALLOC|DTKF_UNICOLOR);
 	return shp;
 }
 
@@ -199,7 +218,9 @@ dtk_hshape dtk_create_triangle(struct dtk_shape* shp, float x1, float y1, float 
 	GLuint indices[] = {0, 1, 2};
 	GLenum primtype = isfull ? GL_TRIANGLES : GL_LINE_LOOP;
 	
-	return create_generic_shape(shp, 3, vertices, NULL, 3, indices, primtype, color,NULL);
+	return create_generic_shape(shp, 3, vertices, NULL, color,
+	                                 3, indices, primtype,
+					 NULL, DTKF_ALLOC|DTKF_UNICOLOR);
 }
 
 
@@ -209,7 +230,9 @@ dtk_hshape dtk_create_line(struct dtk_shape* shp, float x1, float y1, float x2, 
 	GLfloat vertices[] = {x1, y1, x2, y2};
 	GLuint indices[] = {0, 1};
 	
-	return create_generic_shape(shp, 2, vertices, NULL, 2, indices, GL_LINES, color,NULL);
+	return create_generic_shape(shp, 2, vertices, NULL, color,
+	                                 2, indices, GL_LINES,
+					 NULL, DTKF_ALLOC|DTKF_UNICOLOR);
 }
 
 
@@ -220,7 +243,9 @@ dtk_hshape dtk_create_shape(struct dtk_shape* shp, unsigned int numvert, const f
 	struct single_shape* sinshp; 
 	GLenum primtype = isfull ? GL_TRIANGLE_FAN : GL_LINE_LOOP;
 
-	shp = create_generic_shape(shp, numvert, vertex_array, NULL, numvert, NULL, primtype, color,NULL);
+	shp = create_generic_shape(shp, numvert, vertex_array, NULL, color, 
+	                                numvert, NULL, primtype,
+					NULL, DTKF_ALLOC|DTKF_UNICOLOR);
 	if (shp) {
 		sinshp = shp->data;
 		for (i=0; i<numvert; i++)
@@ -268,7 +293,9 @@ dtk_hshape dtk_create_image(struct dtk_shape* shp, float x, float y, float width
 	textcoords[6] = 1;
 	textcoords[7] = 0;
 	
-	shp = create_generic_shape(shp, 4, vertices, textcoords, 4, indices, primtype, color, image);
+	shp = create_generic_shape(shp, 4, vertices, textcoords, color,
+	                                4, indices, primtype,
+					image, DTKF_ALLOC|DTKF_UNICOLOR);
 	
 	return shp;
 }
@@ -282,15 +309,13 @@ dtk_hshape dtk_create_string(struct dtk_shape* shp, const char* text,
 {
 	GLfloat *vert, *tc;
 	GLuint* ind;
-	unsigned int i, len;
-	GLenum primtype = GL_TRIANGLES;
 	float pos = 0.0f;
 	float l,r,t,b,orgx, orgy;
+	unsigned int i, len = text ? strlen(text) : 0;
 
-	len = text ? strlen(text) : 0;
-
-	shp = create_generic_shape(shp, 4*len, NULL, NULL, 6*len, NULL,
-	                           primtype, color, font->tex);
+	shp = create_generic_shape(shp, 4*len, NULL, NULL, color, 
+	                               6*len, NULL, GL_TRIANGLES,
+				       font->tex, DTKF_ALLOC|DTKF_UNICOLOR);
 	if (!shp)
 		return NULL;
 	
@@ -327,3 +352,29 @@ dtk_hshape dtk_create_string(struct dtk_shape* shp, const char* text,
 	return shp;
 }
 
+API_EXPORTED
+dtk_hshape dtk_create_complex_shape(dtk_hshape shp,
+                 unsigned int nvert, const float* vertpos,
+		 const float* vertcolor, const float* texcoords,
+		 unsigned int nind, const unsigned int *ind,
+		 unsigned int type, dtk_htex tex)
+{
+	struct single_shape* sinshp;
+
+	if (type >= NUM_PRIM_MODE)
+		return NULL;
+
+	shp = create_generic_shape(shp, nvert, NULL, NULL, NULL, 
+	                               nind, NULL, primitive_mode[type],
+				       tex, 0);
+	if (!shp)
+		return NULL;
+
+	sinshp = shp->data;
+	sinshp->vertices = (float*)vertpos;
+	sinshp->colors = (float*)vertcolor;
+	sinshp->texcoords = (float*)texcoords;
+	sinshp->indices = (unsigned int*)ind;
+	
+	return shp;
+}

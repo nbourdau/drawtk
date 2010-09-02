@@ -33,14 +33,15 @@ mandatory since all font remaining fonts are destroyed when the last
 window is closed. However, if no window can be closed (for example, no
 window has been created), \fBdtk_destroy_font\fP() should be called on each
 created font to avoid any memory leak.
-.LP
-\fBdtk_load_font\fP() and \fBdtk_destroy_texture\fP() are thread-safe.
 .SH "RETURN VALUE"
 .LP
 In case of success, the \fBdtk_load_font\fP() returns the handle to the
 loaded font. In case of failure, \fINULL\fP is returned.
 .LP
 \fBdtk_destroy_texture\fP() does not return any value.
+.SH "THREAD SAFETY"
+.LP
+\fBdtk_load_font\fP() and \fBdtk_destroy_texture\fP() are thread-safe.
 .SH "SEE ALSO"
 .BR dtk_create_string (3)
 

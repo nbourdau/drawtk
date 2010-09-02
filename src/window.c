@@ -57,6 +57,9 @@ static int init_opengl_state(struct dtk_window* wnd)
 	ih = (ratio > 1.0f) ? 1.0f : 1.0f/ratio;
 	glOrtho(-iw, iw, -ih, ih, -1, 1);
 
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+
 	// Init identity for modelview matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();

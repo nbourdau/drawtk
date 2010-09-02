@@ -42,6 +42,11 @@ typedef struct dtk_shape* dtk_hshape;
 #define DTK_LEFT	0x00
 #define DTK_HMID	0x10
 #define DTK_RIGHT	0x20
+#define DTK_TRIANGLES		0
+#define DTK_TRIANGLE_STRIP	1
+#define DTK_TRIANGLE_FAN	2
+#define DTK_LINES		3
+#define DTK_LINE_STRIP		4
 
 // Shape creation functions
 dtk_hshape dtk_create_rectangle_2p(dtk_hshape shp, float p1_x, float p1_y, float p2_x, float p2_y, int isfull, const float* color);
@@ -57,7 +62,13 @@ dtk_hshape dtk_create_string(struct dtk_shape* shp, const char* text,
 			     float size, float x, float y, 
 			     unsigned int alignment,
 			     const float* color, dtk_hfont font);
-dtk_hshape dtk_create_composite_shape(const dtk_hshape* shp_array, unsigned int num_shp);
+dtk_hshape dtk_create_composite_shape(dtk_hshape shp, unsigned int num_shp, 
+                                const dtk_hshape* array, int free_children);
+dtk_hshape dtk_create_complex_shape(dtk_hshape shp,
+                         unsigned int nvert, const float* vertpos,
+		         const float* vertcolor, const float* texcoords,
+                         unsigned int nind, const unsigned int *ind,
+                         unsigned int type, dtk_htex tex);
 
 // Shape displacement functions
 void dtk_move_shape(dtk_hshape shp, float x, float y);
