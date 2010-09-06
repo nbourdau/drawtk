@@ -1,7 +1,7 @@
 #ifndef SHAPES_H
 #define SHAPES_H
 
-#include <SDL/SDL_opengl.h>
+#include <GL/gl.h>
 
 typedef void (*DrawShapeFn)(const struct dtk_shape* shp);
 typedef void (*DestroyShapeFn)(void* data);

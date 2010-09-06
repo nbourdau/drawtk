@@ -269,6 +269,7 @@ struct composite_shape* alloc_composite_shape(struct composite_shape* cshp,
 }
 
 
+API_EXPORTED
 dtk_hshape dtk_create_composite_shape(struct dtk_shape* shp,
                                       unsigned int num_shp,
                                       const dtk_hshape* array,

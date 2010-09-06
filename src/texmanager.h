@@ -1,7 +1,7 @@
 #ifndef TEXMANAGER_H
 #define TEXMANAGER_H
 
-#include <GL/gl.h>
+#include <SDL/SDL_opengl.h>
 #include <pthread.h>
 #include "drawtk.h"
 
