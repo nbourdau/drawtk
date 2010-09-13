@@ -8,7 +8,8 @@
 #include "texmanager.h"
 
 static
-int find_dib_color_settings(FIBITMAP *dib, GLint* intfmt, GLenum* fmt, GLenum* tp)
+int find_dib_color_settings(FIBITMAP *dib, GLint* intfmt,
+                            GLenum* fmt, GLenum* tp)
 {
 	GLenum format, internalformat, type;
 	int bpp = FreeImage_GetBPP(dib);
@@ -56,7 +57,9 @@ int find_dib_color_settings(FIBITMAP *dib, GLint* intfmt, GLenum* fmt, GLenum* t
   * compute mipmaps until level mxlvl (included).
   * Assume that tex->lock is hold
   */
-static int load_texture_from_file(struct dtk_texture* tex, const char* filename, unsigned int mxlvl)
+static
+int load_texture_from_file(struct dtk_texture* tex, const char* filename,
+                            unsigned int mxlvl)
 {
 	unsigned int w, h, bpp;
 	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;

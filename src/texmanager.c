@@ -10,7 +10,6 @@
 #include <pthread.h>
 
 #include "texmanager.h"
-#include "imagetex.h"
 #include "window.h"
 
 #ifndef MAX_MIPMAP
