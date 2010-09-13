@@ -6,34 +6,27 @@ extern "C" {
 #endif 
 
 
-// Handle to window
-typedef struct dtk_window* dtk_hwnd;
-
-typedef int (*EventHandlerProc)(dtk_hwnd wnd, unsigned int type, const void* data);
-
 // Window functions
+typedef struct dtk_window* dtk_hwnd;
 dtk_hwnd dtk_create_window(unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int bpp, const char* caption);
 void dtk_make_current_window(dtk_hwnd wnd);
 void dtk_clear_screen(dtk_hwnd wnd);
 void dtk_update_screen(dtk_hwnd wnd);
 void dtk_close(dtk_hwnd wnd);
 void dtk_bgcolor(float* bgcolor);
-void dtk_set_event_handler(dtk_hwnd wnd, EventHandlerProc handler);
-int dtk_process_events(dtk_hwnd wnd);
 
-// Image functions
+/* Image functions */
 typedef struct dtk_texture* dtk_htex;
 dtk_htex dtk_load_image(const char* filename, unsigned int mipmap_maxlevel);
 void dtk_destroy_texture(dtk_htex tex);
 
-// Font functions
+/* Font functions */
 typedef struct dtk_font* dtk_hfont;
 dtk_hfont dtk_load_font(const char* fontname);
 void dtk_destroy_font(dtk_hfont font);
 
 
-
-// Handle to shape structure
+/* Handle to shape structure */
 typedef struct dtk_shape* dtk_hshape;
 
 #define DTK_BOTTOM	0x00
@@ -48,7 +41,7 @@ typedef struct dtk_shape* dtk_hshape;
 #define DTK_LINES		3
 #define DTK_LINE_STRIP		4
 
-// Shape creation functions
+/* Shape creation functions */
 dtk_hshape dtk_create_rectangle_2p(dtk_hshape shp, float p1_x, float p1_y, float p2_x, float p2_y, int isfull, const float* color);
 dtk_hshape dtk_create_rectangle_hw(dtk_hshape shp, float cx, float cy, float height, float width, int isfull, const float* color);
 dtk_hshape dtk_create_triangle(dtk_hshape shp, float x1, float y1, float x2, float y2, float x3, float y3, int isfull, const float* color);
@@ -70,23 +63,17 @@ dtk_hshape dtk_create_complex_shape(dtk_hshape shp,
                          unsigned int nind, const unsigned int *ind,
                          unsigned int type, dtk_htex tex);
 
-// Shape displacement functions
+/* Shape displacement functions */
 void dtk_move_shape(dtk_hshape shp, float x, float y);
 void dtk_relmove_shape(dtk_hshape shp, float dx, float dy);
 void dtk_rotate_shape(dtk_hshape shp, float deg);
 void dtk_relrotate_shape(dtk_hshape shp, float ddeg);
 
-// Draw a shape
+/* Draw a shape */
 void dtk_draw_shape(const dtk_hshape shp);
 
-// Destroy shape
+/* Destroy shape */
 void dtk_destroy_shape(dtk_hshape shp);
-
-
-typedef struct dtk_keyevent* dtk_keyboard;
-typedef struct dtk_mouseevent* dtk_mouse;
-int dtk_poll_event(dtk_hwnd wnd, unsigned int* type,
-		dtk_keyboard keyevt, dtk_mouse mouseevt);
 
 #ifdef __cplusplus
 }

@@ -48,10 +48,9 @@ void redraw(dtk_hwnd wnd)
 	dtk_update_screen(wnd);
 }
 
-int event_handler(dtk_hwnd wnd, unsigned int type, const void* data)
+int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 {
 	int retcode = 1;
-	const struct dtk_keyevent* keyevt = data;
 
 	switch (type) {
 	case DTK_EVT_QUIT:
@@ -64,7 +63,7 @@ int event_handler(dtk_hwnd wnd, unsigned int type, const void* data)
 		break;
 	
 	case DTK_EVT_KEYBOARD:
-		if (keyevt->sym == SDLK_ESCAPE)
+		if (evt->key.sym == DTKK_ESCAPE)
 			retcode = 0;
 		else
 			retcode = 1;

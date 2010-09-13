@@ -8,7 +8,7 @@ libdrawtk_la_SOURCES = drawtk.h dtk_event.h		\
 			 create_shape.c			\
 			 texmanager.h texmanager.c	\
 			 imagetex.c fonttex.h fonttex.c	\
-			 window.h window.c		\
+			 window.h window.c events.c	\
 			 palette.h palette.c
 
 libdrawtk_la_LDFLAGS = $(AM_LDFLAGS) \

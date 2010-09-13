@@ -28,6 +28,5 @@ dtk_rotate_shape
 dtk_relrotate_shape
 dtk_draw_shape
 dtk_destroy_shape
-dtk_poll_event
 pal_basic
 pal_tango

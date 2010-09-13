@@ -13,29 +13,6 @@
 LOCAL_FN
 struct dtk_window* current_window = NULL;
 
-// Settings of the feedback window
-struct dtk_window
-{
-	// Dimensions (pixels)
-	unsigned int width;
-	unsigned int height;
-	
-	// Position (pixels)
-	unsigned int x;
-	unsigned int y;
-
-	// Bits per pixel
-	unsigned int bpp;
-	
-	// Window caption
-	char* caption;
-
-	// SDL Surface for window
-	SDL_Surface* window;
-
-	EventHandlerProc evthandler;
-};
-
 
 /*************************************************************************
  *                                                                       *
@@ -43,7 +20,8 @@ struct dtk_window
  *                                                                       *
  *************************************************************************/
 
-static int init_opengl_state(struct dtk_window* wnd)
+LOCAL_FN
+int init_opengl_state(struct dtk_window* wnd)
 {
 	float ratio, iw, ih;
 	GLenum err;
@@ -86,7 +64,9 @@ static int init_opengl_state(struct dtk_window* wnd)
 	return 0;
 }
 
-static int resize_window(struct dtk_window* wnd, int width, int height, int fs)
+
+LOCAL_FN
+int resize_window(struct dtk_window* wnd, int width, int height, int fs)
 {
 	int flags = SDL_OPENGL | SDL_RESIZABLE | SDL_ANYFORMAT;
 	const SDL_VideoInfo* info = NULL;
@@ -234,111 +214,9 @@ void dtk_bgcolor(float* bgcolor)
 }
 
 API_EXPORTED
-void dtk_set_event_handler(dtk_hwnd wnd, EventHandlerProc handler)
+void dtk_set_event_handler(dtk_hwnd wnd, DTKEvtProc handler)
 {
 	wnd->evthandler = handler;
 }
 
 
-API_EXPORTED
-int dtk_poll_event(struct dtk_window* wnd, unsigned int* type,
-		struct dtk_keyevent* keyevt, struct dtk_mouseevent* mouseevt) 
-{
-	SDL_Event evt;
-	if(!SDL_PollEvent(&evt))
-		return 0;
-
-	switch (evt.type) {
-		case SDL_QUIT:
-			*type = DTK_EVT_QUIT;
-			break;
-		case SDL_VIDEOEXPOSE:
-			*type = DTK_EVT_REDRAW;
-			break;
-		case SDL_VIDEORESIZE:
-			resize_window(wnd, evt.resize.w, evt.resize.h, 0);
-			init_opengl_state(wnd);
-			break;
-		case SDL_KEYDOWN:
-		case SDL_KEYUP:
-			*type = DTK_EVT_KEYBOARD;
-			keyevt->state = evt.key.state;
-			keyevt->sym = evt.key.keysym.sym;
-			keyevt->mod = evt.key.keysym.mod;
-			break;
-		/* 2010-01-27  Michele Tavella <michele.tavella@epfl.ch>
-		 * Please do not change the order, otherwise Ganga 
-		 * will kill you (indian style).
-		 */
-		case SDL_MOUSEMOTION:
-			*type = DTK_EVT_MOUSEMOTION;
-			mouseevt->button = evt.button.button;
-			mouseevt->state = evt.button.state;
-			mouseevt->x = evt.button.x;
-			mouseevt->y = evt.button.y;
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
-			*type = DTK_EVT_MOUSE;
-			mouseevt->button = evt.button.button;
-			mouseevt->state = evt.button.state;
-			mouseevt->x = evt.button.x;
-			mouseevt->y = evt.button.y;
-			break;
-		default:
-			break;
-	}
-	return 1;
-}
-
-API_EXPORTED
-int dtk_process_events(struct dtk_window* wnd)
-{
-	EventHandlerProc handler = wnd->evthandler;
-	SDL_Event evt;
-	int ret = 1;
-
-	while (SDL_PollEvent(&evt)) {
-		switch (evt.type) {
-		case SDL_QUIT:
-			if (handler) 
-				ret = handler(wnd, DTK_EVT_QUIT, NULL);
-			break;
-
-		case SDL_VIDEOEXPOSE:
-			if (handler)
-				ret = handler(wnd, DTK_EVT_REDRAW, NULL);
-			break;
-
-		case SDL_VIDEORESIZE:
-			resize_window(wnd, evt.resize.w, evt.resize.h, 0);
-			init_opengl_state(wnd);
-			break;
-
-		case SDL_KEYUP:
-		case SDL_KEYDOWN:
-			if (handler) {
-				struct dtk_keyevent keyevt = {
-					.state = evt.key.state,
-					.sym = evt.key.keysym.sym,
-					.mod = evt.key.keysym.mod
-				};
-				ret = handler(wnd, DTK_EVT_KEYBOARD, &keyevt);
-			}
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-			if(handler) {
-				struct dtk_mouseevent mouseevt = {
-					.button = evt.button.button,
-					.state = evt.button.state,
-					.x = evt.button.x,
-					.y = evt.button.y
-				};
-				ret = handler(wnd,DTK_EVT_MOUSE,&mouseevt);
-			}
-		}
-		if (!ret)
-			return 0;
-	}
-	return 1;
-}

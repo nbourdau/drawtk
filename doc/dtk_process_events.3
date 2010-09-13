@@ -4,31 +4,90 @@
 dtk_process_events, dtk_set_event_handler - Events processing
 .SH SYNOPSIS
 .LP
-.B #include <drawtk.h>
+.B #include <dtk_event.h>
 .sp
-.BI "typedef int (*EventHandlerProc)(dtk_hwnd, unsigned int, const void*);"
+.BI "typedef int (*DTKEvtProc)(dtk_hwnd, int, const union dtk_event*);"
 .sp
-.BI "void dtk_set_event_handler(dtk_hwnd " wnd ", EventHandlerProc " handler ");"
+.BI "void dtk_set_event_handler(dtk_hwnd " wnd ", DTKEvtProc " handler ");"
 .br
 .BI "int dtk_process_events(dtk_hwnd " wnd ");"
 .br
 .SH DESCRIPTION
 .LP
 \fBdtk_set_event_handler\fP() set \fIhandler\fP as the current event handler
-for the window \fIwnd\fP. \fIhandler\fP is a function that as argument in the
-order:
+for the window \fIwnd\fP. \fIhandler\fP is a function that has arguments in
+the following order:
 .IP " *" 3
-a reference of type \fBdtk_hwnd\fP to the window that has received the event.
+a reference of type \fBdtk_hwnd\fP to the window that has received the
+event.
 .IP " *" 3
 the type ID of the event.
 .IP " *" 3
-a generic pointer to an event-specific data.
+a pointer to a \fBunion dtk_event\fP holding event-specific data (if not
+\fBNULL\fP) defined as follows:
+.sp
+.in +4n
+.nf
+union dtk_event {
+    struct dtk_keyevent key;
+    struct dtk_mouseevent mouse;
+};
+.fi
+.in
 .LP
 \fBdtk_process_events\fP() processes pending events in the event queues
-associated to the window referenced by \fIwnd\fP, i.e.  for each event in the
-queue, it calls the event handler that has been set by
+associated to the window referenced by \fIwnd\fP, i.e.  for each event in
+the queue, it calls the event handler that has been set by
 \fBdtk_set_event_handler\fP(). \fBdtk_process_events\fP() returns if a event
 handler has returned 0 or if there is no more pending event in the queue.
+.LP
+The type ID of the event can be one of the following:
+.TP
+.B DTK_EVT_REDRAW
+This event indicates that the whole window or parts of it must be redrawn.
+This may be caused by another window has been overlapped it or the window
+has been resized. If such an event is received, the event pointer passed to
+the handler will be \fBNULL\fP.
+.TP
+.B DTK_EVT_QUIT
+This event indicates that the close button of the window has been clicked.
+The event pointer passed will be \fBNULL\fP.
+.TP
+.B DTK_EVT_KEYBOARD
+Indicates that a key of the keyboard has been pressed or released. If such
+an event is received, the meaningfull member of the \fBunion dtk_event\fP
+will be \fIkey\fP which is defined as follows:
+.sp
+.in +4n
+.nf
+struct dtk_keyevent {
+    unsigned int state;  /* pressed or released */
+    unsigned int sym;    /* Symbolic code of the key */
+    unsigned int mod;    /* modifiers key */
+};
+.fi
+.in
+.TP
+.B DTK_EVT_MOUSEBUTTON
+This event indicates that one of the mouse buttons has been pressed or
+released. If such an event is received, the meaningfull member of the
+\fBunion dtk_event\fP will be \fImouse\fP which is defined as follows:
+.sp
+.in +4n
+.nf
+struct dtk_mouseevent {
+    unsigned int button; /* button identifier */
+    unsigned int state;  /* pressed or realeased */
+    unsigned int x;   /* x-coordinate of the mouse position */
+    unsigned int y;   /* y-coordinate of the mouse position */
+};
+.fi
+.in
+.TP
+.B DTK_EVT_MOUSEMOTION
+This is similar to the \fBDTK_EVT_MOUSEBUTTON\fP but indicates that the
+mouse has moved. Event data should also be accessed through \fImouse\fP
+member but its \fIbutton\fP and \fIstate\fP members will be meaningless.
 .SH "RETURN VALUE"
 .LP
 \fBdtk_set_event_handler\fP() does not return value.
