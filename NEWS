@@ -1,0 +1,13 @@
+
+Overview of Changes from libfeedback to libdrawtk0.0.0
+======================================================
+
+* New features
+	- Improved texture loading:
+		created window is no longer needed
+		texture loading  in a separated thread is now possible
+	- Shapes are now independent object from window
+	- Better string support
+	- Add Windows support
+	
+

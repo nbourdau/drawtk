@@ -1,0 +1,27 @@
+                         
+			       DRAW TOOLKIT
+
+
+Presentation
+============
+
+This package provides an C library to perform efficient 2D drawings. The
+drawing is done by OpenGL which allow us fast and nice rendering of basic
+shapes, text and images (and more in future). It has been implemented as a
+thin layer that hides the complexity of the OpenGL library.
+
+
+Supported platforms
+===================
+
+Any platforms supported by SDL, freetype 2 and freeimage should be able to
+compile, and run this library. However it has been tested only on GNU/Linux
+and Win32 (using MinGW)
+
+
+Compilation
+===========
+
+This library is organized as a GNU package and can be compiled and
+installed in the same way (see INSTALL file for further information).
+

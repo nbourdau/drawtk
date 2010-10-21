@@ -31,12 +31,13 @@ AC_CANONICAL_BUILD
 AC_PROG_CC_C99
 LT_INIT([win32-dll disable-static])
 AC_SUBST(LIBTOOL_DEPS)
-AC_CHECK_FT2
+
 
 
 AC_DEF_API_EXPORT_ATTRS
 
 # Checks for libraries.
+PKG_CHECK_MODULES(FREETYPE2, freetype2)
 AC_SEARCH_LIBS([pthread_create], [pthread posix4], 
                [], AC_MSG_ERROR([The pthread library has not been found]))
 AC_SEARCH_LIBS([cos], [m], [], AC_MSG_ERROR([The libm cannot be found.]))
@@ -58,6 +59,9 @@ AC_CHECK_FUNCS([nanosleep gettimeofday ftime _ftime])
 AC_CHECK_FUNC_FNARG([GetSystemTimeAsFileTime], [0], [#include <windows.h>])
 AC_REPLACE_FUNCS([clock_gettime clock_nanosleep])
 
+LIBS="$LIBS $FREETYPE2_LIBS"
+AC_SUBST(AM_CPPFLAGS, "$FREETYPE2_CFLAGS")
+AC_SUBST(AM_LDFLAGS, "$FREETYPE2_LDFLAGS")
 
 AC_SUBST([CURRENT],[lib_current])
 AC_SUBST([REVISION],[lib_revision])

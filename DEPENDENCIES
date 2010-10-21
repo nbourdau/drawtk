@@ -1,3 +1,4 @@
-libsdl
-libfreeimage
+sdl 1.2
+freeimage
+freetype 2
 
