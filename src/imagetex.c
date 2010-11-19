@@ -125,6 +125,7 @@ out:
 }
 
 
+API_EXPORTED
 struct dtk_texture* dtk_load_image(const char* filename, unsigned int mxlvl)
 {
 	int fail = 0;

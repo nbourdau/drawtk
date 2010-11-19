@@ -10,6 +10,7 @@ dist_man_MANS = dtk_move_shape.3 dtk_relmove_shape.3			\
 		dtk_create_string.3					\
 		dtk_destroy_shape.3					\
 		dtk_load_image.3 dtk_destroy_texture.3			\
+		dtk_texture_getsize.3					\
 		dtk_load_font.3 dtk_destroy_font.3			\
 		dtk_create_window.3 dtk_close.3				\
 		dtk_make_current_window.3				\

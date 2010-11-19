@@ -36,6 +36,8 @@ void dtk_bgcolor(float* bgcolor);
 typedef struct dtk_texture* dtk_htex;
 dtk_htex dtk_load_image(const char* filename, unsigned int mipmap_maxlevel);
 void dtk_destroy_texture(dtk_htex tex);
+void dtk_texture_getsize(struct dtk_texture* tex, unsigned int* w,
+                                                   unsigned int* h);
 
 /* Font functions */
 typedef struct dtk_font* dtk_hfont;

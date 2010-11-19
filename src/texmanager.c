@@ -267,6 +267,17 @@ void dtk_destroy_texture(struct dtk_texture* tex)
 	rem_texture(tex);
 }
 
+API_EXPORTED
+void dtk_texture_getsize(struct dtk_texture* tex, unsigned int* w,
+                                                  unsigned int* h)
+{
+	if (tex == NULL || w==NULL || h==NULL)
+		return;
+
+	*w = tex->sizes[0].w;
+	*h = tex->sizes[0].h;
+}
+
 
 LOCAL_FN
 GLuint get_texture_id(struct dtk_texture* tex)
