@@ -1,0 +1,98 @@
+.\"Copyright 2010 (c) EPFL
+.TH DTK_GET_COLOR 3 2010 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_get_color - provides predefined set of colors
+.SH SYNOPSIS
+.LP
+.B #include <dtk_colors.h>
+.sp
+.BI "const float* dtk_get_color(unsigned int " ind ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_get_color\fP() returns the \fIind\fP-th color in a predefined palette
+of colors. The returned value in a pointer to a array of 4 float
+representing an RGBA color.
+.LP
+For more convenient usage, prefer the following macros that call
+\fBdtk_get_color\fP() with the correct argument:
+.RS
+.B dtk_white		
+.br
+.B dtk_black
+.br
+.B dtk_yellow		
+.br
+.B dtk_orange		
+.br
+.B dtk_blue		
+.br
+.B dtk_green		
+.br
+.B dtk_red 		
+.br
+.B dtk_magenta		
+.br
+.B dtk_cyan		
+.br
+.B dtk_butter_light	
+.br
+.B dtk_butter_med		
+.br
+.B dtk_butter_dark		
+.br
+.B dtk_orange_light	
+.br
+.B dtk_orange_med		
+.br
+.B dtk_orange_dark		
+.br
+.B dtk_chocolate_light	
+.br
+.B dtk_chocolate_med	
+.br
+.B dtk_chocolate_dark	
+.br
+.B dtk_chameleon_light	
+.br
+.B dtk_chameleon_med	
+.br
+.B dtk_chameleon_dark	
+.br
+.B dtk_skyblue_light	
+.br
+.B dtk_skyblue_med		
+.br
+.B dtk_skyblue_dark	
+.br
+.B dtk_plum_light		
+.br
+.B dtk_plum_med		
+.br
+.B dtk_plum_dark		
+.br
+.B dtk_scarletred_light	
+.br
+.B dtk_scarletred_med	
+.br
+.B dtk_scarletred_dark	
+.br
+.B dtk_aluminium_light	
+.br
+.B dtk_aluminium_med	
+.br
+.B dtk_aluminium_dark	
+.br
+.B dtk_aluminium2_light	
+.br
+.B dtk_aluminium2_med	
+.br
+.B dtk_aluminium2_dark	
+.br
+.RE
+.SH "RETURN VALUE"
+.LP
+The pointer to the RGBA value of the color if \find\P refers to correct
+value, NULL otherwise.
+
+

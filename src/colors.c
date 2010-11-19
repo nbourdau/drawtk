@@ -19,11 +19,11 @@
 # include <config.h>
 #endif
 
-#include "drawtk.h"
-#include "palette.h"
+#include <stddef.h>
+#include <dtk_colors.h>
 
-API_EXPORTED
-const float pal_basic[NUM_BASIC_COLORS][4] = {
+static
+const float palette_col[][4] = {
 	{1.0, 1.0, 1.0, 1.0},
 	{0.0, 0.0, 0.0, 1.0},
 	{1.0, 1.0, 0.0, 1.0},
@@ -32,12 +32,7 @@ const float pal_basic[NUM_BASIC_COLORS][4] = {
 	{0.0, 1.0, 0.0, 1.0},
 	{1.0, 0.0, 0.0, 1.0},
 	{1.0, 0.0, 1.0, 1.0},
-	{0.0, 1.0, 1.0, 1.0}		
-};
-
-API_EXPORTED
-const float pal_tango[NUM_TANGO_COLORS][4] = {
-
+	{0.0, 1.0, 1.0, 1.0},
 	{252.0/256.0, 233.0/256.0, 79.0/256.0, 1.0f},
 	{237.0/256.0, 212.0/256.0, 0.0/256.0, 1.0f},		
 	{196.0/256.0, 160.0/256.0, 0.0f/256.0f, 1.0f},
@@ -65,6 +60,15 @@ const float pal_tango[NUM_TANGO_COLORS][4] = {
 	{136.0/256.0, 138.0/256.0, 133.0/256.0, 1.0f},
 	{85.0/256.0, 87.0/256.0, 83.0/256.0, 1.0f},
 	{46.0/256.0, 52.0/256.0, 54.0/256.0, 1.0f}		
-
 };
+#define NUMCOL	(sizeof(palette_col)/sizeof(palette_col[0]))
+
+API_EXPORTED
+const float* dtk_get_color(unsigned int ind)
+{
+	if (ind >= NUMCOL)
+		return NULL;
+
+	return palette_col[ind];
+}
 

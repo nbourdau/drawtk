@@ -22,7 +22,7 @@
 #include <drawtk.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <palette.h>
+#include <dtk_colors.h>
 #include <time.h>
 #include <math.h>
 
@@ -46,10 +46,10 @@ dtk_hfont font;
 dtk_hshape tri, tri2, cir, arr, rec1, rec2,cro, img, img2, str, cshp;
 dtk_hshape comp;
 
-#define red	pal_basic[red]
-#define green	pal_basic[green]
-#define white	pal_basic[white]
-#define blue	pal_basic[blue]
+#define red	dtk_red
+#define green	dtk_green
+#define white	dtk_white
+#define blue	dtk_blue
 
 void setup_complex(void)
 {
@@ -91,7 +91,7 @@ static void setup_shapes(void)
 		tri = dtk_create_triangle(NULL, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1, red),
 		tri2 = dtk_create_triangle(NULL, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1, blue),
 		str = dtk_create_string(NULL, text ,0.1,-0.0,-0.9, DTK_HMID, white, font),
-		cir = dtk_create_circle(NULL, -0.4f, -0.4f, 0.3f, 1, pal_tango[orange_light], 60),
+		cir = dtk_create_circle(NULL, -0.4f, -0.4f, 0.3f, 1, dtk_orange_light, 60),
 		arr = dtk_create_arrow(NULL, 0.0f, 0.0f, 1.0, 0.5, 1, red),
 		img2 = dtk_create_image(NULL, 0.0f,0.0f,0.5f,0.5f,white, tex2)
 	};

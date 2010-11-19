@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <palette.h>
+#include <dtk_colors.h>
 #include <dtk_event.h>
 #include <string.h>
 
@@ -33,10 +33,10 @@ dtk_hshape comp;
 
 dtk_hfont font;
 
-#define red	pal_basic[red]
-#define green	pal_basic[green]
-#define white	pal_basic[white]
-#define blue	pal_basic[blue]
+#define red	dtk_red
+#define green	dtk_green
+#define white	dtk_white
+#define blue	dtk_blue
 
 static void setup_shapes(void)
 {
@@ -48,7 +48,7 @@ static void setup_shapes(void)
 		img = dtk_create_image(NULL, 0.0f,0.0f,0.5f,0.5f,white,dtk_load_image(imgfilename, 4)),
 		tri = dtk_create_triangle(NULL, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1, red),
 		tri2 = dtk_create_triangle(NULL, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1, blue),
-		cir = dtk_create_circle(NULL, -0.4f, -0.4f, 0.3f, 1, pal_tango[orange_light], 60),
+		cir = dtk_create_circle(NULL, -0.4f, -0.4f, 0.3f, 1, dtk_orange_light, 60),
 		arr = dtk_create_arrow(NULL, 0.0f, 0.0f, 1.0, 0.5, 1, red),
 		str = dtk_create_string(NULL, text ,0.1,-0.0,-0.9, DTK_RIGHT, white, font),
 	};

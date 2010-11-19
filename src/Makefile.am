@@ -1,7 +1,7 @@
 EXTRA_DIST = exports.sym
 
 lib_LTLIBRARIES = libdrawtk.la
-include_HEADERS = drawtk.h palette.h dtk_event.h
+include_HEADERS = drawtk.h dtk_colors.h dtk_event.h
 
 libdrawtk_la_SOURCES = drawtk.h dtk_event.h		\
 			 shapes.c shapes.h		\
@@ -9,7 +9,7 @@ libdrawtk_la_SOURCES = drawtk.h dtk_event.h		\
 			 texmanager.h texmanager.c	\
 			 imagetex.c fonttex.h fonttex.c	\
 			 window.h window.c events.c	\
-			 palette.h palette.c
+			 dtk_colors.h colors.c
 
 
 libdrawtk_la_LDFLAGS = $(AM_LDFLAGS)\

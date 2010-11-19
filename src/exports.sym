@@ -28,5 +28,4 @@ dtk_rotate_shape
 dtk_relrotate_shape
 dtk_draw_shape
 dtk_destroy_shape
-pal_basic
-pal_tango
+dtk_get_color
