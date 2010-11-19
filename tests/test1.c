@@ -79,9 +79,12 @@ void setup_complex(void)
 
 static void setup_shapes(void)
 {
+	unsigned int w, h;
 	tex = dtk_load_image(imgfilename, 4);
 	tex2 = dtk_load_image(imgfilename, 4);
 	font  = dtk_load_font(fontfilename);
+	dtk_texture_getsize(tex, &w, &h);
+	printf("texture size: %ux%u\n", w, h);
 
 	dtk_hshape shplist[] = {
 		rec1 = dtk_create_rectangle_2p(NULL, -1.0f, -1.0f, -0.3f,-0.2f, 1, red),

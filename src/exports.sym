@@ -9,6 +9,7 @@ dtk_process_events
 dtk_load_font
 dtk_destroy_font
 dtk_load_image
+dtk_texture_getsize
 dtk_destroy_texture
 dtk_create_rectangle_2p
 dtk_create_rectangle_hw
