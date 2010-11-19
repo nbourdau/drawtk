@@ -41,7 +41,7 @@ PKG_CHECK_MODULES(FREETYPE2, freetype2)
 AC_SEARCH_LIBS([pthread_create], [pthread posix4], 
                [], AC_MSG_ERROR([The pthread library has not been found]))
 AC_SEARCH_LIBS([cos], [m], [], AC_MSG_ERROR([The libm cannot be found.]))
-AC_SEARCH_LIBS([SDL_Init], [SDL], [], AC_MSG_ERROR([The SDL library must be installed.]))
+AC_SEARCH_LIBS([SDL_Init], [SDL SDL-1.2], [], AC_MSG_ERROR([The SDL library must be installed.]))
 AC_SEARCH_LIBS_FNARG([FreeImage_Load], [freeimage],
         [0,0,0], [#include <FreeImage.h>],
         [], AC_MSG_ERROR([The FreeImage library must be installed.]))
@@ -67,6 +67,6 @@ AC_SUBST([CURRENT],[lib_current])
 AC_SUBST([REVISION],[lib_revision])
 AC_SUBST([AGE],[lib_age])
 
-AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile tests/Makefile doc/Makefile])
+AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile src/drawtk.pc tests/Makefile doc/Makefile])
 AC_OUTPUT
 

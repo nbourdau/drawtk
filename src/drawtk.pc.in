@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: drawtk
+Description: simple C library to perform efficient 2D drawings
+Version: @PACKAGE_VERSION@
+
+Libs: -L${libdir} -ldrawtk
+Libs.private: @LIBS@
+Cflags: -I${includedir}
+
