@@ -1,0 +1,6 @@
+/usr/include/*
+/usr/lib/libdrawtk.la
+/usr/lib/libdrawtk.so
+/usr/lib/pkgconfig/*
+/usr/share/man/man3/*
+/usr/share/doc/drawtk/*
