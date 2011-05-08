@@ -22,7 +22,6 @@
 extern "C" {
 #endif 
 
-
 // Window functions
 typedef struct dtk_window* dtk_hwnd;
 dtk_hwnd dtk_create_window(unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int bpp, const char* caption);

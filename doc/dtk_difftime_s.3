@@ -1,0 +1,43 @@
+.\"Copyright 2011 (c) EPFL
+.TH DTK_ADDTIME 3 2011 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_difftime_s, dtk_difftime_ms, dtk_difftime_us, dtk_difftime_ns - timestamp difference
+.SH SYNOPSIS
+.LP
+.B #include <dtk_time.h>
+.sp
+.BI "long dtk_difftime_s(const struct dtk_timespec* " ts ","
+.br
+.BI "                    const struct dtk_timespec* " orig ");"
+.br
+.BI "long dtk_difftime_ms(const struct dtk_timespec* " ts ","
+.br
+.BI "                     const struct dtk_timespec* " orig ");"
+.br
+.BI "long dtk_difftime_us(const struct dtk_timespec* " ts ","
+.br
+.BI "                     const struct dtk_timespec* " orig ");"
+.br
+.BI "long dtk_difftime_ns(const struct dtk_timespec* " ts ","
+.br
+.BI "                     const struct dtk_timespec* " orig ");"
+.br
+.SH DESCRIPTION
+These functions returns the difference of time from \fIorig\fP to \fIts\fP.
+.LP
+\fBdtk_difftime_s\fP() returns the difference in seconds. 
+.LP
+\fBdtk_difftime_ms\fP() returns the difference in milliseconds. 
+.LP
+\fBdtk_difftime_us\fP() returns the difference in microseconds. 
+.LP
+\fBdtk_difftime_ns\fP() returns the difference in nanoseconds. 
+.SH "RETURN VALUE"
+.LP
+All the functions return the difference of time.
+.SH "SEE ALSO"
+.BR dtk_nanosleep (3),
+.BR dtk_gettime (3),
+.BR dtk_addtime (3)
+
+

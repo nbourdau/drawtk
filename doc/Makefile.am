@@ -16,7 +16,11 @@ dist_man_MANS = dtk_move_shape.3 dtk_relmove_shape.3			\
 		dtk_make_current_window.3				\
 		dtk_update_screen.3 dtk_clear_screen.3 dtk_bgcolor.3	\
 		dtk_process_events.3 dtk_set_event_handler.3		\
-		dtk_get_color.3
+		dtk_get_color.3						\
+		dtk_gettime.3 dtk_nanosleep.3				\
+		dtk_addtime.3 dtk_difftime_s.3				\
+		dtk_difftime_ms.3 dtk_difftime_us.3 dtk_difftime_ns.3
+		
 
 
 

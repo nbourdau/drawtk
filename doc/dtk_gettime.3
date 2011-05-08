@@ -1,0 +1,37 @@
+.\"Copyright 2011 (c) EPFL
+.TH DTK_GETTIME 3 2011 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_gettime - high resolution timestamp
+.SH SYNOPSIS
+.LP
+.B #include <dtk_time.h>
+.sp
+.BI "void dtk_gettime(struct dtk_timespec* " ts ");"
+.br
+.SH DESCRIPTION
+The function \fBdtk_gettime\fP() retrieves the time of a high precision
+clock. The time is returned in the \fIts\fP argument which is a pointer to
+a dtk_timespec structure defined as:
+.sp
+.in +4n
+.nf
+struct dtk_timespec {
+    long sec;    /* seconds */
+    long nsec;   /* nanoseconds */
+};
+.fi
+.in
+.LP
+The time represents seconds and nanoseconds since the Epoch, 1970-01-01
+00:00:00 +0000  (UTC). 
+.SH "RETURN VALUE"
+.LP
+None
+.SH NOTE
+.LP
+This function is wrapper to \fBclock_gettime\fP(2) if it is provided by the
+system. Otherwise, it implements the function by using the timer with the
+highest precision available on the system.
+.SH "SEE ALSO"
+.BR dtk_nanosleep (3),
+.BR clock_gettime (2)

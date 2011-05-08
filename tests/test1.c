@@ -23,13 +23,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dtk_colors.h>
-#include <time.h>
+#include <dtk_time.h>
 #include <math.h>
-
-#if !HAVE_DECL_CLOCK_NANOSLEEP
-#include "../lib/clock_nanosleep.h"
-#endif
-
 
 static char imgfilename[256], fontfilename[256];
 static char text[] = "This is a test string!!!";
@@ -114,7 +109,7 @@ int main(int argc, char* argv[])
 	(void)argc;
 	(void)argv;
 	float angle;
-	struct timespec delay = {1, 0};
+	struct dtk_timespec delay = {1, 0};
 
 	sprintf(imgfilename, "%s/navy.png", getenv("srcdir"));
 	sprintf(fontfilename, "%s/test.ttf", getenv("srcdir"));
@@ -127,7 +122,7 @@ int main(int argc, char* argv[])
 	dtk_draw_shape(comp);
 	dtk_draw_shape(cshp);
 	dtk_update_screen(wnd);
-	clock_nanosleep(CLOCK_REALTIME, 0, &delay, NULL);
+	dtk_nanosleep(0, &delay, NULL);
 	dtk_clear_screen(wnd);
 	
 	dtk_move_shape(tri,0.1,0.1);
@@ -137,8 +132,8 @@ int main(int argc, char* argv[])
 	dtk_draw_shape(cshp);
 	dtk_update_screen(wnd);
 
-	delay.tv_sec = 0;
-	delay.tv_nsec = 5000000; // 5ms
+	delay.sec = 0;
+	delay.nsec = 5000000; // 5ms
 	for (angle=0.0f; angle<720.0f; angle+=1.0f) {
 		dtk_clear_screen(wnd);
 		dtk_rotate_shape(arr,angle);
@@ -156,7 +151,7 @@ int main(int argc, char* argv[])
 		vertcolor[4*3+3] = fabs(sin(4*3.14*angle/360.0f));
 		dtk_draw_shape(cshp);
 		dtk_update_screen(wnd);
-		clock_nanosleep(CLOCK_REALTIME, 0, &delay, NULL);
+		dtk_nanosleep(0, &delay, NULL);
 	}
 
 

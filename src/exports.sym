@@ -30,3 +30,10 @@ dtk_relrotate_shape
 dtk_draw_shape
 dtk_destroy_shape
 dtk_get_color
+dtk_gettime
+dtk_nanosleep
+dtk_addtime
+dtk_difftime_s
+dtk_difftime_ms
+dtk_difftime_us
+dtk_difftime_ns

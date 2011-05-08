@@ -1,0 +1,65 @@
+.\"Copyright 2011 (c) EPFL
+.TH DTK_NANOSLEEP 3 2011 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_nanosleep - high-resolution sleep
+.SH SYNOPSIS
+.LP
+.B #include <dtk_time.h>
+.sp
+.BI "int dtk_nanosleep(int " abs ", const struct dtk_timespec* " req ","
+.br
+.BI "                           struct dtk_timespec* " rem ");"
+.br
+.SH DESCRIPTION
+The function \fBdtk_nanosleep\fP() allows the caller to sleep for an
+interval with nanosecond precision. If the argument \fIabs\fP is zero, the
+specified interval is interpretated as a relative value, otherwise an
+absolute value. The interval is specified by the \fIreq\fP argument which is
+a pointer to a dtk_timespec structure defined as:
+.sp
+.in +4n
+.nf
+struct dtk_timespec {
+    long sec;    /* seconds */
+    long nsec;   /* nanoseconds */
+};
+.fi
+.in
+.LP
+If interpreted as an absolute value, it represents seconds and nanoseconds
+since the Epoch, 1970-01-01 00:00:00 +0000  (UTC). 
+.LP
+\fBdtk_nanosleep\fP() suspends the execution of the calling thread
+until either at least the time specified by \fIreq\fP has elapsed,
+or a signal is delivered that causes a signal handler to be called or
+that terminates the process.
+.LP
+If the call is interrupted by a signal handler, \fBdtk_nanosleep\fP()
+returns -1, and sets \fIerrno\fP to \fBEINTR\fP. In addition, if \fIrem\fP
+is not NULL, and \fIabs\fP is zero, it returns the remaining unslept time
+in \fIrem\fP. This value can then be used to call \fBdtk_nanosleep\fP()
+again and complete a (relative) sleep.
+.SH "RETURN VALUE"
+.LP
+On successfully sleeping for the requested interval, \fBdtk_nanosleep\fP()
+returns 0. If the call is interrupted by a signal handler or encounters an
+error, then it returns -1 and \fIerrno\fP is set appropriately.
+.SH ERRORS
+.LP
+\fBdtk_nanosleep\fP() will fail if:
+.TP
+.B EINTR
+The sleep was interrupted by a signal handler.
+.TP
+.B EINVAL
+The value in the \fInsec\fP field was not in the range 0 to 999999999 or
+\fIsec\fP was negative.
+.SH NOTE
+.LP
+This function is a wrapper to \fBclock_nanosleep\fP(2) if it is provided by
+the system. Otherwise, it implements the function by using the sleep
+function with the highest precision available on the system.
+.SH "SEE ALSO"
+.BR dtk_nanosleep (3),
+.BR clock_nanosleep (2)
+
