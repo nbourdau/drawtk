@@ -164,17 +164,17 @@ dtk_hshape dtk_create_rectangle_hw(struct dtk_shape* shp, float cx, float cy, fl
 	GLuint indices[4] = {0, 1, 2, 3};
 	GLenum primtype = isfull ? GL_TRIANGLE_FAN : GL_LINE_LOOP;
 	
-	vertices[0] = 0 + cx;
-	vertices[1] = 0 + cy;
+	vertices[0] = -width/2 + cx;
+	vertices[1] = -height/2 + cy;
 	
-	vertices[2] = 0 + cx;
-	vertices[3] = height + cy;
+	vertices[2] = -width/2 + cx;
+	vertices[3] = height/2 + cy;
 	
-	vertices[4] = width + cx;
-	vertices[5] = height + cy;
+	vertices[4] = width/2 + cx;
+	vertices[5] = height/2 + cy;
 	
-	vertices[6] = width + cx;
-	vertices[7] = 0 + cy;
+	vertices[6] = width/2 + cx;
+	vertices[7] = -height/2 + cy;
 
 	shp = create_generic_shape(shp, 4, vertices, NULL, color,
 	                                4, indices, primtype,
