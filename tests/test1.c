@@ -104,12 +104,14 @@ static void setup_shapes(void)
 					DTK_TRIANGLE_STRIP, NULL);
 }
 
+#define ROTSPEED	(360.0f / 2000.0f)
 int main(int argc, char* argv[])
 {
 	(void)argc;
 	(void)argv;
-	float angle;
+	float angle = 0.0f;
 	struct dtk_timespec delay = {1, 0};
+	struct dtk_timespec tini, ts;
 
 	sprintf(imgfilename, "%s/navy.png", getenv("srcdir"));
 	sprintf(fontfilename, "%s/test.ttf", getenv("srcdir"));
@@ -134,8 +136,13 @@ int main(int argc, char* argv[])
 
 	delay.sec = 0;
 	delay.nsec = 5000000; // 5ms
-	for (angle=0.0f; angle<720.0f; angle+=1.0f) {
+	dtk_gettime(&tini);
+	do {
 		dtk_clear_screen(wnd);
+
+		dtk_gettime(&ts);
+		angle = dtk_difftime_ms(&ts, &tini)*ROTSPEED;
+
 		dtk_rotate_shape(arr,angle);
 		dtk_rotate_shape(img2,-angle);
 		dtk_rotate_shape(comp,angle/2.0f);
@@ -152,7 +159,7 @@ int main(int argc, char* argv[])
 		dtk_draw_shape(cshp);
 		dtk_update_screen(wnd);
 		dtk_nanosleep(0, &delay, NULL);
-	}
+	} while (angle < 720.0f);
 
 
 	dtk_destroy_shape(comp);
