@@ -1,7 +1,7 @@
 EXTRA_DIST = exports.sym
 
 lib_LTLIBRARIES = libdrawtk.la
-include_HEADERS = drawtk.h dtk_colors.h dtk_event.h
+include_HEADERS = drawtk.h dtk_colors.h dtk_event.h dtk_time.h
 
 libdrawtk_la_SOURCES = drawtk.h dtk_event.h		\
 			 shapes.c shapes.h		\
