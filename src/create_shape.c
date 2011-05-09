@@ -49,7 +49,7 @@ static void get_bbox(struct single_shape* sinshp, float* left, float *right,
 	r = t = -FLT_MAX;
 	float* vert = sinshp->vertices;
 
-	for (i=0; i<sinshp->num_vert; i+=2) {
+	for (i=0; i<2*sinshp->num_vert; i+=2) {
 		l = MIN(vert[0], l);
 		r = MAX(vert[0], r);
 		b = MIN(vert[1], b);
@@ -345,7 +345,7 @@ dtk_hshape dtk_create_string(struct dtk_shape* shp, const char* text,
 		dtk_char_pos(font, text[i], vert+8*i, tc+8*i, 
 		             ind+6*i, 4*i, &pos);
 
-	get_bbox(shp->data, &l, &r, &b, &t);
+	get_bbox(shp->data, &l, &r, &t, &b);
 
 	if (alignment & DTK_HMID)
 		orgx = (l+r)/2.0f;
