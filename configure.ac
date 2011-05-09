@@ -28,6 +28,7 @@ AC_CANONICAL_HOST
 AC_CANONICAL_BUILD
 
 # Checks for programs.
+AC_PROG_CC_C_O
 AC_PROG_CC_C99
 LT_INIT([win32-dll disable-static])
 AC_SUBST(LIBTOOL_DEPS)
