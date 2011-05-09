@@ -1,1 +1,54 @@
-.so man3/dtk_create_shape.3
+.\"Copyright 2011 (c) EPFL
+.TH DTK_CREATE_RECTANGLE_2P 3 2011 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_create_triangle_2p, dtk_create_rectangle_hw - Create and modify rectangular shapes
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "dtk_hshape dtk_create_rectangle_2p(dtk_hshape " shp ","
+.br
+.BI "                float " p1_x ", float " p1_y ", float " p2_x ", float " p2_y ","
+.br
+.BI "                int " filled ", const float *" color ");"
+.br
+.BI "dtk_hshape dtk_create_rectangle_hw(dtk_hshape " shp ","
+.br
+.BI "                float " cx ", float " cy ", float " h ", float " w ","
+.br
+.BI "                int " filled ", const float *" color ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_create_rectangle_2p\fP() creates a rectangle whose the opposing corners
+are located at (\fIp1_x\fP,\fIp1_y\fP) and  (\fIp2_x\fP,\fIp2_y\fP).
+.LP
+\fBdtk_create_rectangle_hw\fP() creates a rectangle with height \fIh\fP and
+width \fIw\fP and with its center located at (\fIcx\fP,\fIcy\fP) in the
+original frame.
+.LP
+\fIshp\fP, \fIfilled\fP and \fIcolor\fP have the same usage and meaning as for
+other shape creation function:
+.IP " *" 3
+\fIshp\fP can be used to modify a previously created shape. If it is non-null,
+the handle will be used to modify the shape referenced by \fIshp\fP: no new
+shape is created and the returned value is ensured to be \fIshp\fP in case of
+success, \fINULL\fP otherwise. If \fIshp\fP is \fINULL\fP, the function will
+attempt to create a new shape.
+.LP
+.IP " *" 3
+\fIfilled\fP is set to 0 if the described shape should be a continous line or a
+non-null value if the shape is supposed to be filled polygon.
+.LP
+.IP " *" 3
+\fIcolor\fP should point to a 4 float array containing a normalized RGBA value
+(i.e. each component is between 0.0 and 1.0).
+.SH "RETURN VALUE"
+.LP
+In case of success these functions return the handle to the newly created or modified
+shape. If the \fIshp\fP argument is non-null, the handle returned is the
+same value. In case of error, \fINULL\fP is returned.
+.SH "SEE ALSO"
+.BR dtk_destroy_shape (3)
+
+

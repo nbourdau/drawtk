@@ -1,9 +1,7 @@
-.\"Copyright 2010 (c) EPFL
-.TH DTK_CREATE_SHAPE 3 2010 "EPFL" "Draw Toolkit manual"
+.\"Copyright 2010-2011 (c) EPFL
+.TH DTK_CREATE_SHAPE 3 2011 "EPFL" "Draw Toolkit manual"
 .SH NAME
-dtk_create_shape, dtk_create_rectangle_2p, dtk_create_rectangle_hw,
-dtk_create_triangle, dtk_create_circle, dtk_create_line, dtk_create_arrow,
-dtk_create_cross, dtk_create_image - Create and modify shapes
+dtk_create_shape - Create and modify custom shape
 .SH SYNOPSIS
 .LP
 .B #include <drawtk.h>
@@ -14,56 +12,6 @@ dtk_create_cross, dtk_create_image - Create and modify shapes
 .br
 .BI "                int " filled ", const float *" color ");"
 .br
-.BI "dtk_hshape dtk_create_rectangle_2p(dtk_hshape " shp ","
-.br
-.BI "                float " p1_x ", float " p1_y ", float " p2_x ", float " p2_y ","
-.br
-.BI "                int " filled ", const float *" color ");"
-.br
-.BI "dtk_hshape dtk_create_rectangle_hw(dtk_hshape " shp ","
-.br
-.BI "                float " cx ", float " cy ", float " height ", float " width ","
-.br
-.BI "                int " filled ", const float *" color ");"
-.br
-.BI "dtk_hshape dtk_create_triangle(dtk_hshape " shp ","
-.br
-.BI "                float " x1 ", float " y1 ",
-.br
-.BI "                float " x2 ", float " y2 ","
-.br
-.BI "                float " x3 ", float " y3 ","
-.br
-.BI "                int " filled ", const float *" color ");"
-.br
-.BI "dtk_hshape dtk_create_circle(dtk_hshape " shp ","
-.br
-.BI "                float " cx ", float " cy ", float " r ", int " filled ","
-.br
-.BI "                const float *" color ", unsigned int " numpoints ");"
-.br
-.BI "dtk_hshape dtk_create_line(dtk_hshape " shp ","
-.br
-.BI "                float " x1 ", float " y1 ", float " x2 ", float " y2 ","
-.br
-.BI "                const float *" color ");"
-.br
-.BI "dtk_hshape dtk_create_arrow(dtk_hshape " shp ","
-.br
-.BI "                float " cx ", float " cy ", float " width ", float " height ","
-.br
-.BI "                int " filled ", const float *" color ");"
-.br
-.BI "dtk_hshape dtk_create_cross(dtk_hshape " shp ","
-.br
-.BI "                float " cx ", float " cy ", float " width ", const float *" color ");"
-.br
-.BI "dtk_hshape dtk_create_image(dtk_hshape " shp ", "
-.br
-.BI "                float " x ", float " y ", float " width ", float " height ","
-.br
-.BI "                const float* " color ", dtk_htex " image ");"
-.br
 .SH DESCRIPTION
 .LP
 \fBdtk_create_shape\fP() creates a shape specified by \fIind_num\fP vertices
@@ -71,8 +19,8 @@ referenced by \fIvertex_array\fP. In this array, the position parameters (x,y)
 of each vertex are packed together and the list should ordered, so that the
 array is filled in the following way: x0,y0,x1,y1,x2,y2,...,xN,yN.
 .LP
-\fIshp\fP, \fIfilled\fP and \fIcolor\fP have the same usage and meaning in all
-described function here:
+\fIshp\fP, \fIfilled\fP and \fIcolor\fP have the same usage and meaning as for
+other shape creation function:
 .IP " *" 3
 \fIshp\fP can be used to modify a previously created shape. If it is non-null,
 the handle will be used to modify the shape referenced by \fIshp\fP: no new
@@ -82,51 +30,19 @@ attempt to create a new shape.
 .LP
 .IP " *" 3
 \fIfilled\fP is set to 0 if the described shape should be a continous line or a
-non-null value if the shape is supposed to be filled polygon. For
-\fBdtk_create_shape\fP(), in case of filled polygon request, the last point
-specified in \fIvertex_array\fP will be connected with the first one.
+non-null value if the shape is supposed to be filled polygon. In the case of
+filled polygon request, the last point specified in \fIvertex_array\fP will be
+connected with the first one.
 .LP
 .IP " *" 3
 \fIcolor\fP should point to a 4 float array containing a normalized RGBA value
 (i.e. each component is between 0.0 and 1.0).
-.LP
-\fBdtk_create_rectangle_2p\fP() creates a rectangle whose the opposing corners
-are located at (\fIp1_x\fP,\fIp1_y\fP) and  (\fIp2_x\fP,\fIp2_y\fP).
-.LP
-\fBdtk_create_rectangle_hw\fP() creates a rectangle with height \fIh\fP and
-width \fIw\fP and with its center located at (\fIcx\fP,\fIcy\fP) in the
-original frame.
-.LP
-\fBdtk_create_triangle\fP() creates a triangle between the vertices
-(\fIx1\fP,\fIy1\fP), (\fIx2\fP,\fIy2\fP) and (\fIx3\fP,\fIy3\fP).
-.LP
-\fBdtk_create_circle\fP() creates an approximation of a circle of radius
-\fIr\fP centered at (\fIcx\fP,\fIcy\fP) using \fInum_points\fP vertices. 
-.LP
-\fBdtk_create_line\fP() creates a line between the points (\fIx1\fP,\fIy1\fP)
-and (\fIx2\fP,\fIy2\fP).
-.LP
-\fBdtk_create_arrow\fP() creates an arrow pointing to the left with the pointed
-pointed located at (\fIcx\fP,\fIcy\fP) with a total width of \fIwidth\fP, a hat
-of length \fIwidth\fP/3 , a total height of \fIheight\fP and the width of the
-body being \fIheight\fP/2.
-.LP
-\fBdtk_create_cross\fP() creates a cross whose centered is located at
-(\fIcx\fP,\fIcy\fP) with a length of \fIwidth\fP.
-.LP
-\fBdtk_create_image\fP() creates a rectangle of size (\fIheight\fP,\fIwidth\fP)
-centered at (\fIcx\fP,\fIcy\fP) containing the image loaded in texture
-\fIimage\fP. The image will by stretched to fit the size of the rectangle
-disregarding the dimension of the image. The \fIcolor\fP argument modulates the
-pixel values of the image, i.e. to display the image the same way it exist in
-the image file, color should be white.
 .SH "RETURN VALUE"
 .LP
 In case of success these functions return the handle to the newly created or modified
 shape. If the \fIshp\fP argument is non-null, the handle returned is the
 same value. In case of error, \fINULL\fP is returned.
 .SH "SEE ALSO"
-.BR dtk_destroy_shape (3),
-.BR dtk_load_image (3)
+.BR dtk_destroy_shape (3)
 
 

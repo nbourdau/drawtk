@@ -1,1 +1,43 @@
-.so man3/dtk_create_shape.3
+.\"Copyright 2010-2011 (c) EPFL
+.TH DTK_CREATE_IMAGE 3 2011 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_create_image - Create and modify a shape displaying an image
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "dtk_hshape dtk_create_image(dtk_hshape " shp ", "
+.br
+.BI "                float " x ", float " y ", float " width ", float " height ","
+.br
+.BI "                const float* " color ", dtk_htex " image ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_create_image\fP() creates a rectangle of size (\fIheight\fP,\fIwidth\fP)
+centered at (\fIcx\fP,\fIcy\fP) containing the image loaded in texture
+\fIimage\fP. The image will by stretched to fit the size of the rectangle
+disregarding the dimension of the image. The \fIcolor\fP argument modulates the
+pixel values of the image, i.e. to display the image the same way it exist in
+the image file, color should be white.
+.LP
+\fIshp\fP and \fIcolor\fP have the same usage and meaning as for
+other shape creation function:
+.IP " *" 3
+\fIshp\fP can be used to modify a previously created shape. If it is non-null,
+the handle will be used to modify the shape referenced by \fIshp\fP: no new
+shape is created and the returned value is ensured to be \fIshp\fP in case of
+success, \fINULL\fP otherwise. If \fIshp\fP is \fINULL\fP, the function will
+attempt to create a new shape.
+.LP
+.IP " *" 3
+\fIcolor\fP should point to a 4 float array containing a normalized RGBA value
+(i.e. each component is between 0.0 and 1.0).
+.SH "RETURN VALUE"
+.LP
+In case of success these functions return the handle to the newly created or modified
+shape. If the \fIshp\fP argument is non-null, the handle returned is the
+same value. In case of error, \fINULL\fP is returned.
+.SH "SEE ALSO"
+.BR dtk_destroy_shape (3),
+.BR dtk_load_image (3)

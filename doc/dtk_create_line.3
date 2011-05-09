@@ -1,1 +1,40 @@
-.so man3/dtk_create_shape.3
+.\"Copyright 2010-2011 (c) EPFL
+.TH DTK_CREATE_LINE 3 2011 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_create_line - Create and modify line shape
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "dtk_hshape dtk_create_line(dtk_hshape " shp ","
+.br
+.BI "                float " x1 ", float " y1 ", float " x2 ", float " y2 ","
+.br
+.BI "                const float *" color ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_create_line\fP() creates a line between the points (\fIx1\fP,\fIy1\fP)
+and (\fIx2\fP,\fIy2\fP).
+.LP
+\fIshp\fP and \fIcolor\fP have the same usage and meaning as for
+other shape creation function:
+.IP " *" 3
+\fIshp\fP can be used to modify a previously created shape. If it is non-null,
+the handle will be used to modify the shape referenced by \fIshp\fP: no new
+shape is created and the returned value is ensured to be \fIshp\fP in case of
+success, \fINULL\fP otherwise. If \fIshp\fP is \fINULL\fP, the function will
+attempt to create a new shape.
+.LP
+.IP " *" 3
+\fIcolor\fP should point to a 4 float array containing a normalized RGBA value
+(i.e. each component is between 0.0 and 1.0).
+.SH "RETURN VALUE"
+.LP
+In case of success these functions return the handle to the newly created or modified
+shape. If the \fIshp\fP argument is non-null, the handle returned is the
+same value. In case of error, \fINULL\fP is returned.
+.SH "SEE ALSO"
+.BR dtk_destroy_shape (3)
+
+
