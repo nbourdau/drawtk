@@ -37,6 +37,16 @@ AC_SUBST(LIBTOOL_DEPS)
 
 AC_DEF_API_EXPORT_ATTRS
 
+# Replacement checks
+AC_SEARCH_LIBS([clock_gettime], [rt posix4])
+AC_SEARCH_LIBS([clock_nanosleep], [rt posix4])
+AC_CHECK_TYPES([struct timespec, clockid_t])
+AC_CHECK_DECLS([clock_gettime, clock_nanosleep],,,[#include <time.h>])
+AC_CHECK_FUNCS([nanosleep gettimeofday ftime _ftime])
+AC_CHECK_FUNC_FNARG([GetSystemTimeAsFileTime], [0], [#include <windows.h>])
+AC_REPLACE_FUNCS([clock_gettime clock_nanosleep])
+
+
 # Checks for libraries.
 PKG_CHECK_MODULES(FREETYPE2, freetype2)
 AC_SEARCH_LIBS([pthread_create], [pthread posix4], 
@@ -50,15 +60,6 @@ AC_SEARCH_LIBS_FNARG([glEnable], [GL opengl32],
         [0], [#include <SDL/SDL_opengl.h>],
 	[], AC_MSG_ERROR([The openGL library cannot be found.]))
 
-
-# Replacement checks
-AC_SEARCH_LIBS([clock_gettime], [rt posix4])
-AC_SEARCH_LIBS([clock_nanosleep], [rt posix4])
-AC_CHECK_TYPES([struct timespec, clockid_t])
-AC_CHECK_DECLS([clock_gettime, clock_nanosleep],,,[#include <time.h>])
-AC_CHECK_FUNCS([nanosleep gettimeofday ftime _ftime])
-AC_CHECK_FUNC_FNARG([GetSystemTimeAsFileTime], [0], [#include <windows.h>])
-AC_REPLACE_FUNCS([clock_gettime clock_nanosleep])
 
 LIBS="$LIBS $FREETYPE2_LIBS"
 AC_SUBST(AM_CPPFLAGS, "$FREETYPE2_CFLAGS")
