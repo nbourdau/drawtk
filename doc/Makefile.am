@@ -13,7 +13,7 @@ dist_man_MANS = dtk_move_shape.3 dtk_relmove_shape.3			\
 		dtk_texture_getsize.3					\
 		dtk_load_font.3 dtk_destroy_font.3			\
 		dtk_create_window.3 dtk_close.3				\
-		dtk_make_current_window.3				\
+		dtk_make_current_window.3 dtk_window_getsize.3		\
 		dtk_update_screen.3 dtk_clear_screen.3 dtk_bgcolor.3	\
 		dtk_process_events.3 dtk_set_event_handler.3		\
 		dtk_get_color.3						\

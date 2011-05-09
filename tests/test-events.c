@@ -68,6 +68,7 @@ void redraw(dtk_hwnd wnd)
 int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 {
 	int retcode = 1;
+	unsigned int h = 0,w = 0;
 
 	switch (type) {
 	case DTK_EVT_QUIT:
@@ -76,6 +77,8 @@ int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 
 	case DTK_EVT_REDRAW:
 		redraw(wnd);
+		dtk_window_getsize(wnd, &h, &w);
+		printf("window size: h=%u  w=%u\n", h, w);
 		retcode = 1;
 		break;
 	

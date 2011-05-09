@@ -195,6 +195,17 @@ void dtk_update_screen(dtk_hwnd wnd)
 
 
 API_EXPORTED
+void dtk_window_getsize(dtk_hwnd wnd, unsigned int* w, unsigned int* h)
+{
+	if (!wnd || !h || !w)
+		return;
+
+	*w = wnd->width;
+	*h = wnd->height;
+}
+
+
+API_EXPORTED
 void dtk_close(dtk_hwnd wnd)
 {
 	if (!wnd) 

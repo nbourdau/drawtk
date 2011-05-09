@@ -2,6 +2,7 @@ dtk_create_window
 dtk_make_current_window
 dtk_clear_screen
 dtk_update_screen
+dtk_window_getsize
 dtk_close
 dtk_bgcolor
 dtk_set_event_handler

@@ -1,0 +1,24 @@
+.\"Copyright 2011 (c) EPFL
+.TH DTK_WINDOW_GETSIZE 3 2011 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_window_getsize - Return window size in pixel
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "void dtk_window_getsize(dtk_hwnd " wnd ", unsigned int *" w ","
+.br
+.BI "                                      unsigned int *" h ");"
+.br
+.SH DESCRIPTION
+.LP
+This function returns the current size in pixel of the window associated
+with the handle \fIwnd\fP into the values pointed by \fIw\fP and \fIh\fP.
+If \fIwnd\fP, \fIw\fP or \fIh\fP is NULL, the function does nothing.
+.SH "RETURN VALUE"
+.LP
+None
+.SH "SEE ALSO"
+.BR dtk_create_window (3)
+
+

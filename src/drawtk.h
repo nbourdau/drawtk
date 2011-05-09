@@ -28,6 +28,7 @@ dtk_hwnd dtk_create_window(unsigned int width, unsigned int height, unsigned int
 void dtk_make_current_window(dtk_hwnd wnd);
 void dtk_clear_screen(dtk_hwnd wnd);
 void dtk_update_screen(dtk_hwnd wnd);
+void dtk_window_getsize(dtk_hwnd wnd, unsigned int* w, unsigned int* h);
 void dtk_close(dtk_hwnd wnd);
 void dtk_bgcolor(float* bgcolor);
 
@@ -35,8 +36,7 @@ void dtk_bgcolor(float* bgcolor);
 typedef struct dtk_texture* dtk_htex;
 dtk_htex dtk_load_image(const char* filename, unsigned int mipmap_maxlevel);
 void dtk_destroy_texture(dtk_htex tex);
-void dtk_texture_getsize(struct dtk_texture* tex, unsigned int* w,
-                                                   unsigned int* h);
+void dtk_texture_getsize(dtk_htex, unsigned int* w, unsigned int* h);
 
 /* Font functions */
 typedef struct dtk_font* dtk_hfont;
