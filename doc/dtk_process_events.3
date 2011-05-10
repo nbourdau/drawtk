@@ -41,6 +41,10 @@ the queue, it calls the event handler that has been set by
 \fBdtk_set_event_handler\fP(). \fBdtk_process_events\fP() returns if a event
 handler has returned 0 or if there is no more pending event in the queue.
 .LP
+If \fBdtk_set_event_handler\fP() has never been called or called with
+\fIhandle\fP as NULL, it use a minimalistic event handler that returns 0
+(i.e. stop the loop) when pressing the close button on the window.
+.LP
 The type ID of the event can be one of the following:
 .TP
 .B DTK_EVT_REDRAW

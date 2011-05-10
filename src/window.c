@@ -141,6 +141,7 @@ dtk_hwnd dtk_create_window(unsigned int width, unsigned int height, unsigned int
 	wnd->bpp = bpp;
 	strcpy(wndstr, caption);
 	wnd->caption = wndstr;
+	wnd->evthandler = NULL;
 
 	// Init parameters of the frame buffers
 	SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );

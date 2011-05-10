@@ -302,6 +302,8 @@ int dtk_process_events(struct dtk_window* wnd)
 		case SDL_QUIT:
 			if (handler) 
 				ret = handler(wnd, DTK_EVT_QUIT, NULL);
+			else
+				ret = 0;
 			break;
 
 		case SDL_VIDEOEXPOSE:
