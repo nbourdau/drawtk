@@ -28,7 +28,8 @@ AM_CPPFLAGS = $(CPPFLAGS) -I$(top_srcdir)/src
 LDADD = $(top_builddir)/src/libdrawtk.la
 
 # Verify at least that the example compiles
-check_PROGRAMS = bounce
+check_PROGRAMS = bounce bars
 bounce_SOURCES = examples/bounce.c
+bars_SOURCES = examples/bars.c
 
 

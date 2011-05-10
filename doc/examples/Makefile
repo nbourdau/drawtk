@@ -1,10 +1,12 @@
 LIBS=-ldrawtk
-CFLAGS=-Wall -Wextra -g3
 
-all: bounce
+all: bounce bars
 
 bounce: bounce.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
+bars: bars.c
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+
 clean:
-	$(RM) bounce
+	$(RM) bounce bars

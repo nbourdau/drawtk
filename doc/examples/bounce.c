@@ -38,8 +38,8 @@
 #include <dtk_time.h>
 
 
-#define VX	1.0f // per sec
-#define VY	1.0f // per sec
+#define VX	1.0f /* per sec */
+#define VY	1.0f /* per sec */
 #define WIDTH	0.1f
 #define HEIGHT	0.1f
 #define MAXX	(1.0f - WIDTH/2.0f)
@@ -160,7 +160,7 @@ int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 
 int main(void)
 {
-	struct dtk_timespec delay = {0, 5000000}; // 5ms
+	struct dtk_timespec delay = {0, 5000000}; /* 5ms */
 	
 	/* Setup a a window to performe the drawings and 
 	   register its event handling function */
