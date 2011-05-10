@@ -33,8 +33,8 @@ const float* dtk_get_color(unsigned int ind);
 #define dtk_red 		(dtk_get_color(6))
 #define dtk_magenta		(dtk_get_color(7))
 #define dtk_cyan		(dtk_get_color(8))
-// See http://tango.freedesktop.org/Tango_Icon_Theme_Guidelines
-// for the definition of the TANGO colors
+/* See http://tango.freedesktop.org/Tango_Icon_Theme_Guidelines
+   for the definition of the TANGO colors */
 #define dtk_butter_light	(dtk_get_color(9))
 #define dtk_butter_med		(dtk_get_color(10))
 #define dtk_butter_dark		(dtk_get_color(11))
