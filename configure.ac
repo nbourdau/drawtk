@@ -47,6 +47,7 @@ AC_REPLACE_FUNCS([clock_gettime clock_nanosleep])
 
 # Checks for libraries.
 PKG_CHECK_MODULES(FREETYPE2, freetype2)
+PKG_CHECK_MODULES(FONTCONFIG, fontconfig)
 AC_SEARCH_LIBS([pthread_create], [pthread posix4], 
                [], AC_MSG_ERROR([The pthread library has not been found]))
 AC_SEARCH_LIBS([cos], [m], [], AC_MSG_ERROR([The libm cannot be found.]))
@@ -59,9 +60,9 @@ AC_SEARCH_LIBS_FNARG([glEnable], [GL opengl32],
 	[], AC_MSG_ERROR([The openGL library cannot be found.]))
 
 
-LIBS="$LIBS $FREETYPE2_LIBS"
-AC_SUBST(AM_CPPFLAGS, "$FREETYPE2_CFLAGS")
-AC_SUBST(AM_LDFLAGS, "$FREETYPE2_LDFLAGS")
+LIBS="$LIBS $FREETYPE2_LIBS $FONTCONFIG_LIBS"
+AC_SUBST(AM_CPPFLAGS, "$CPPFLAGS $FREETYPE2_CFLAGS $FONTCONFIG_FLAGS")
+AC_SUBST(AM_LDFLAGS, "$LDFLAGS $FREETYPE2_LDFLAGS $FONTCONFIG_FLAGS")
 
 AC_SUBST([CURRENT],[lib_current])
 AC_SUBST([REVISION],[lib_revision])

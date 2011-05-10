@@ -6,19 +6,23 @@ dtk_load_font - Load an font
 .LP
 .B #include <drawtk.h>
 .sp
-.BI "dtk_hfont dtk_load_font(const char *" fontfilename ");"
+.BI "dtk_hfont dtk_load_font(const char *" fontname ");"
 .br
 .BI "void dtk_destroy_font(dtk_hfont " font ");"
 .br
 .SH DESCRIPTION
 .LP
-\fBdtk_load_font\fP() loads the font specified by \fIfontfilename\fP
+\fBdtk_load_font\fP() loads the font specified by \fIfontname\fP
 argument. This should be the path of a file whose file format can be any of
 the file format supported by the freetype library (TrueType and Type 1 among
-many others). Upon creation, the font data is then tracked by an internal
-resource manager so that the next call using the same \fIfontfilename\fP
-argument will return the same font handle, thus sparing the resources of
-the system. 
+many others) or a font description pattern understood by fontconfig (like
+"Times new roman:bold"). \fBdtk_load_font\fP() will first interpret
+\fIfontname\fP as a font filename and then, if this fail interpret as a font
+pattern and load the closest font available on the system.
+.LP
+Upon creation, the font data is then tracked by an internal resource manager
+so that the next call using the same \fIfontname\fP argument will return the
+same font handle, thus sparing the resources of the system. 
 .LP
 There is no need for a valid window to create successfully a font, i.e.
 font loading is completely decoupled from the creation of others
@@ -44,5 +48,7 @@ loaded font. In case of failure, \fINULL\fP is returned.
 \fBdtk_load_font\fP() and \fBdtk_destroy_texture\fP() are thread-safe.
 .SH "SEE ALSO"
 .BR dtk_create_string (3)
+.BR fc-list (1)
+.BR FcPatternFormat (3)
 
 

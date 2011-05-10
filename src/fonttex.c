@@ -24,6 +24,7 @@
 #include <freetype/ftglyph.h>
 #include <freetype/ftoutln.h>
 #include <freetype/fttrigon.h>
+#include <fontconfig/fontconfig.h>
 #include <stdint.h>
 
 #include "drawtk.h"
@@ -68,8 +69,8 @@ void get_max_size(FT_Face face, unsigned int *h, unsigned int *w)
 
 
 static
-void render_character(FT_Face face, uint8_t* bits, unsigned ic,
-                      struct dtk_font* font, unsigned int ppem, unsigned int lvl)
+void render_char(FT_Face face, uint8_t* bits, unsigned ic,
+                 struct dtk_font* font, unsigned int ppem, unsigned int lvl)
 {
 	int j, imin, w, jmax, h, cm_w, cm_h, ch_h, ch_w;
 	FT_Bitmap* bitmap;
@@ -121,35 +122,58 @@ void render_character(FT_Face face, uint8_t* bits, unsigned ic,
 }
 
 
-static 
-void load_glyph(void** bits, struct dtk_font* font, const char* fname,
-                unsigned int mxlvl)
+static
+int load_glyph(void **bits, struct dtk_font *font, const char *fname,
+		unsigned int mxlvl)
 {
-	int i;
+	int i, error = 0;
 	FT_Face face;
 	FT_Library library;
 	unsigned int h, w, max_size, lvl, maxsc, ppem;
-	maxsc= (0x01<<mxlvl);
+	maxsc = (0x01 << mxlvl);
 
-	FT_Init_FreeType( &library );
+	FT_Init_FreeType(&library);
 
-	FT_New_Face(library, fname, 0, &face);
+	// First test with fname as filename, otherwise
+	// as a font description
+	if (FT_New_Face(library, fname, 0, &face)) {
+		int id;
+		unsigned char* fn = NULL;
+		FcPattern *pat, *match;
+		FcResult result;
+
+		pat = FcNameParse((unsigned char*)fname);
+		match = FcFontMatch(0, pat, &result);
+
+		if ( FcPatternGetString(match, FC_FILE, 0, &fn)
+		  || FcPatternGetInteger(match, FC_INDEX, 0, &id)
+		  || FT_New_Face(library, (char*)fn, id, &face))
+			error = 1;
+	
+		FcPatternDestroy(pat);
+		FcPatternDestroy(match);
+	}
+
+	if (error) {
+		FT_Done_FreeType(library);
+		return -1;
+	}
+
 	FT_Set_Pixel_Sizes(face, CHWIDTH, CHHEIGHT);
 	//max_size = MAX(face->max_advance_width, face->max_advance_height);
 	get_max_size(face, &h, &w);
 	max_size = MAX(h, w);
-	ppem = maxsc * ((SIZE * SIZE) / (max_size*maxsc));
+	ppem = maxsc * ((SIZE * SIZE) / (max_size * maxsc));
 	//FT_Set_Pixel_Sizes(face, (unsigned int)ppem, (unsigned int)ppem);
 
-	for (i=32; i<256; i++) {
-		for (lvl=0; lvl<=mxlvl; lvl++) 
-			render_character(face, bits[lvl], i, font, ppem, lvl);
-	}
-	
+	for (i = 32; i < 256; i++) 
+		for (lvl = 0; lvl <= mxlvl; lvl++)
+			render_char(face, bits[lvl], i, font, ppem, lvl);
+
 	FT_Done_Face(face);
 	FT_Done_FreeType(library);
+	return 0;
 }
-
 
 static
 void font_destroy(struct dtk_texture* tex)
@@ -237,7 +261,8 @@ struct dtk_font* dtk_load_font(const char* fontname)
 			fail = 1;
 		tex->aux = font;
 		font->tex = tex;
-		load_glyph(tex->data, tex->aux, fontname, FONT_MXLVL);
+		if (load_glyph(tex->data, tex->aux, fontname, FONT_MXLVL))
+			fail = 1;
 		tex->destroyfn = font_destroy;
 		tex->isinit = 1;
 

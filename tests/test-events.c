@@ -24,7 +24,7 @@
 #include <string.h>
 
 
-static char imgfilename[256], fontfilename[256];
+static char imgfilename[256], fontfilename[] = "Times new roman:bold";
 static char text[] = "This is a test string!!!";
 
 dtk_hwnd wnd;
@@ -102,10 +102,6 @@ int main(int argc, char* argv[])
 	(void)argv;
 
 	sprintf(imgfilename, "%s/navy.png", getenv("srcdir"));
-	if (argc < 2)
-		sprintf(fontfilename, "%s/test.ttf", getenv("srcdir"));
-	else
-		strcpy(fontfilename, argv[1]);
 
 	wnd = dtk_create_window(1024, 768, 0, 0, 16, "hello");
 	dtk_make_current_window(wnd);
