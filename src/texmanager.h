@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009-2010  EPFL (Ecole Polytechnique Fédérale de Lausanne)
+    Copyright (C) 2009-2011  EPFL (Ecole Polytechnique Fédérale de Lausanne)
     Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
 
     This program is free software: you can redistribute it and/or modify
@@ -22,13 +22,14 @@
 #include <pthread.h>
 #include "drawtk.h"
 
+#define DTK_PALIGN	(sizeof(int))
 struct dtk_texture;
 
 typedef void (*destroyproc)(struct dtk_texture*);
 typedef struct dtk_texture* (*createproc)(const char*);
 
 struct dtk_size {
-	unsigned int w, h;
+	unsigned int w, h, stride;
 };
 
 // Structure for textures

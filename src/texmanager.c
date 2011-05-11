@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009-2010  EPFL (Ecole Polytechnique Fédérale de Lausanne)
+    Copyright (C) 2009-2011  EPFL (Ecole Polytechnique Fédérale de Lausanne)
     Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
 
     This program is free software: you can redistribute it and/or modify
@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include <limits.h>
 
 #include "texmanager.h"
 #include "window.h"
@@ -206,7 +207,7 @@ int alloc_image_data(struct dtk_texture* tex,
 		     unsigned int w, unsigned int h,
 		     unsigned int mxlvl, unsigned int bpp)
 {
-	unsigned int i;
+	unsigned int i, stride;
 	
 	// Allocate texture structure
 	tex->mxlvl = mxlvl;
@@ -220,9 +221,14 @@ int alloc_image_data(struct dtk_texture* tex,
 		if (!h || !w)
 			return 1;
 
+		stride = w*bpp/CHAR_BIT;
+		// round up to the next DTK_ALIGN-byte boundary
+		stride = ((stride+DTK_PALIGN-1)/DTK_PALIGN) * DTK_PALIGN;
+
 		tex->sizes[i].h = h;
 		tex->sizes[i].w = w;
-		tex->data[i] = malloc(bpp/sizeof(char)*h*w);
+		tex->sizes[i].stride = stride;
+		tex->data[i] = calloc(w,stride);
 		w /= 2;
 		h /= 2;
 	}
@@ -247,6 +253,7 @@ void load_gl_texture(struct dtk_texture* tex)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, tex->mxlvl);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, DTK_PALIGN);
 
 	// Load each mipmap in video memory 
 	for (lvl=0; lvl<=tex->mxlvl; lvl++) {
@@ -311,7 +318,7 @@ void compute_mipmaps(struct dtk_texture* tex)
 	
 	dib = FreeImage_ConvertFromRawBits(tex->data[0], 
 	                tex->sizes[0].w, tex->sizes[0].h,
-			tex->sizes[0].w * tex->bpp/8, tex->bpp,
+			tex->sizes[0].stride, tex->bpp,
 			tex->rmsk, tex->gmsk, tex->bmsk, FALSE);
 	
 	for (i=1; i<=tex->mxlvl; i++) {
@@ -319,7 +326,7 @@ void compute_mipmaps(struct dtk_texture* tex)
 				tex->sizes[i].w, tex->sizes[i].h,
 				FILTER_BICUBIC);
 		FreeImage_ConvertToRawBits(tex->data[i], dib2,
-				tex->sizes[i].w * tex->bpp/8, tex->bpp,
+				tex->sizes[i].stride, tex->bpp,
 				tex->rmsk, tex->gmsk, tex->bmsk, FALSE);
 		FreeImage_Unload(dib2);
 	}
