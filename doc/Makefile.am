@@ -22,6 +22,7 @@ dist_man_MANS = dtk_move_shape.3 dtk_relmove_shape.3			\
 		dtk_difftime_ms.3 dtk_difftime_us.3 dtk_difftime_ns.3
 		
 nobase_dist_doc_DATA = examples/Makefile		\
+                       examples/bars.c			\
                        examples/bounce.c
 
 AM_CPPFLAGS = $(CPPFLAGS) -I$(top_srcdir)/src
