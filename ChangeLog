@@ -1,4 +1,383 @@
-09-09-25  Michele Tavella <michele.tavella@epfl.ch>
-- Towards final implementation
-- Apart from the missinge error codes and sprintf, the lib is at its final
-  stage!
+2011-05-11 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/imagetex.c, src/texmanager.c, src/texmanager.h: bugfix:
+	texture is corrupted with weird sized image
+
+	* commit 561ba9ea3ee0930ebb2e6180d5c279f1a886f2d8
+
+2011-05-10 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/Makefile.am, doc/examples/Makefile, doc/examples/bars.c,
+	doc/examples/bounce.c: Add example bars.c
+
+	* commit 19aa799139fa496e523fba36c86e38d6b5ff2e44
+
+2011-05-10 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* configure.ac, debian/control, doc/dtk_load_font.3,
+	src/fonttex.c, tests/test-events.c: dtk_load_font can accept a
+	font description
+
+	* commit 10406d2afcf0d582bd8bcb37f89dbe774b14c850
+
+2011-05-10 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/drawtk.h, src/dtk_colors.h: Make the exported headers
+	ANSI compliant
+
+	* commit 92d75b558b1923103d5b4a4ca83a7cc2d9f4fb3e
+
+2011-05-10 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/dtk_process_events.3, src/events.c, src/window.c: Implement
+	minimalistic event handler if it not set
+
+	* commit e2cdd744f5ecf7d8a8cd5a001c5bddbdbf1da399
+
+2011-05-10 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/create_shape.c: bugfix: strings does not respect alignment
+	parameter
+
+	* commit f00d6e8769022902bb183e26ff9fb28fe2a957c5
+
+2011-05-09 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/Makefile.am, doc/dtk_window_getsize.3, src/drawtk.h,
+	src/exports.sym, src/window.c, tests/test-events.c: Add
+	dtk_window_getsize API function
+
+	* commit ec6b2bb2d1d8e4f35976dfc54da24819ef2b0cc5
+
+2011-05-09 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* configure.ac: Fix configure.ac to compile examples
+
+	* commit fa46f0d4a6d2aa4635a50e1ff0e41b7a73e6534d
+
+2011-05-09 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* configure.ac, debian/control: Fix debian package dependencies
+
+	* commit 3069a8b2329bda3328a7ca3a0dc90aed4d1f42fc
+
+2011-05-09 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/dtk_create_arrow.3, doc/dtk_create_circle.3,
+	doc/dtk_create_cross.3, doc/dtk_create_image.3,
+	doc/dtk_create_line.3, doc/dtk_create_rectangle_2p.3,
+	doc/dtk_create_rectangle_hw.3, doc/dtk_create_shape.3,
+	doc/dtk_create_triangle.3: Separate dtk_create_* manpages
+	(help readibility)
+
+	* commit 53f60cbba1f4ba318afa96f3565624092f202985
+
+2011-05-09 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* configure.ac, doc/Makefile.am, doc/examples/Makefile,
+	doc/examples/bounce.c: Add example: bounce.c
+
+	* commit 0f4251925f8fdc1ee0a26591968037ea81044016
+
+2011-05-09 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/create_shape.c: bugfix: dtk_create_rectangle_hw does not
+	center shape
+
+	* commit e38d2f5f79ef4aed552cf81a5ee22faa8be6af43
+
+2011-05-09 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/Makefile.am: export missing dtk_time.h
+
+	* commit 2bfa00ab0fd8b8e0939c481d17c32934c3833015
+
+2011-05-09 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* tests/test1.c: Update test1 gettime
+
+	* commit cc45a789a8578a9ca1dd88803ce8a044d23c46a1
+
+2011-05-09 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/Makefile.am, doc/dtk_addtime.3, doc/dtk_difftime_ms.3,
+	doc/dtk_difftime_ns.3, doc/dtk_difftime_s.3,
+	doc/dtk_difftime_us.3, doc/dtk_gettime.3, doc/dtk_nanosleep.3,
+	src/Makefile.am, src/drawtk.h, src/dtk_time.h, src/exports.sym,
+	src/time.c, tests/Makefile.am, tests/test1.c: Adds timing
+	functions
+
+	* commit f0219da2f2ed0aaf0a31e570da0951548acab70e
+
+2011-05-06 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* Makefile.am, NEWS, configure.ac, debian/changelog,
+	debian/compat, debian/control, debian/copyright, debian/docs,
+	debian/libdrawtk0-dev.install, debian/libdrawtk0.install,
+	debian/postinst.ex, debian/postrm.ex, debian/preinst.ex,
+	debian/prerm.ex, debian/rules: Adds Debian packaging system
+
+	* commit 62eae3457b40c5f66d1ec9e1eeca2469de042ae6
+
+2010-11-19 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* configure.ac, src/Makefile.am, src/drawtk.pc.in: export
+	pk-gconfig file
+
+	* commit 656fecc253abd330c19b6fd03c0d60e5e386b8e5
+
+2010-11-19 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/exports.sym, tests/test1.c: Add missing dtk_texture_getsize
+	in exports.sym (+test)
+
+	* commit b0cc1626048efc158c44c6441b1ae76977ce7946
+
+2010-11-19 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/Makefile.am, doc/dtk_texture_getsize.3, src/drawtk.h,
+	src/imagetex.c, src/texmanager.c: Add dtk_texture_getsize
+
+	* commit ad87af73703cc40c76a5fd6a94c9af528bea95a2
+
+2010-11-19 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/Makefile.am, doc/dtk_get_color.3, src/Makefile.am,
+	src/colors.c, src/dtk_colors.h, src/exports.sym, src/palette.c,
+	src/palette.h, tests/test-events.c, tests/test1.c: Change the
+	usage of predefined colors
+
+	palette.h has been renamed in dtk_colors.h. Introduction of the
+	dtk_get_color() function to get predefined colors instead of
+	exported table of color. The enumration has been transformed
+	into macros that call this function.
+
+	* commit 995abc8514dd33d94a12ebdfc0b57d7c4fe49c0f
+
+2010-10-21 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* DEPENDENCIES, NEWS, README, configure.ac, lib/clock_gettime.c,
+	lib/clock_gettime.h, lib/clock_nanosleep.c, lib/clock_nanosleep.h,
+	lib/convfiletime.h, lib/timespec.h, src/Makefile.am,
+	src/create_shape.c, src/drawtk.h, src/dtk_event.h, src/events.c,
+	src/fonttex.c, src/fonttex.h, src/imagetex.c, src/palette.c,
+	src/palette.h, src/shapes.c, src/shapes.h, src/texmanager.c,
+	src/texmanager.h, src/window.c, src/window.h, tests/test-events.c,
+	tests/test1.c: Package cleanup
+
+	Improves the build system. Add GPLv3 Notice in each source
+	code file.  Update README and NEWS
+
+	* commit 0e8aff19bce4e5dc117d26472953096b5b26ca48
+
+2010-09-14 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/texmanager.c: clamp texture coords: removes annoying
+	artifacts on borders
+
+	* commit 72687025ba84423705e4576a3529b314dd2021ec
+
+2010-09-13 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/dtk_process_events.3, src/Makefile.am, src/drawtk.h,
+	src/dtk_event.h, src/events.c, src/exports.sym, src/window.c,
+	src/window.h, tests/test-events.c: Clean events support
+
+	Removes dtk_poll_event since it would prevent future backward
+	compatibility. Removes any SDL dependencies from exported headers
+	(which was honestly a real bad idea). Uses pointer of union
+	dtk_event instead of pointer of void to be more C++ friendly and
+	to prevent "misguided" casts.  Separates the event related code
+	into separate source files and headers (now dtk_event.h contains
+	all event related declarations).
+
+	* commit d65d8e664004163f766edcaf623d60a6f82c8a58
+
+2010-09-13 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/imagetex.c, src/imagetex.h, src/texmanager.c,
+	tests/Makefile.am: Forgotten: update the package with the string
+	related changeset
+
+	* commit a1b9e8ff5f9a202456f628a6ddd99870d14ad6c1
+
+2010-09-06 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* configure.ac, m4/api-exports.m4, m4/doxygen.m4, m4/funcarg.m4,
+	src/Makefile.am, src/shapes.c, src/shapes.h, src/texmanager.h,
+	tests/Makefile.am: Add win32 support
+
+	Configure.ac has been rewritten to achieve this. Now there is
+	a way to test stdcall functions
+
+	* commit dd36e3d1b20e9fdb08d9b23feb89af8735d20e54
+
+2010-09-03 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/Makefile.am, doc/dtk_create_complex_shape.3,
+	doc/dtk_create_composite_shape.3, doc/dtk_create_shape.3,
+	doc/dtk_create_string.3, doc/dtk_load_font.3,
+	doc/dtk_load_image.3, src/create_shape.c, src/drawtk.h,
+	src/exports.sym, src/fonttex.c, src/shapes.c, src/shapes.h,
+	src/window.c, tests/test-events.c, tests/test1.c: Rework shape
+	code and add dtk_create_complex_shape
+
+	Improves the code of shape allocation and draw: now any shape is
+	interchangeable with any other. dtk_create_composite_shape uses
+	a new argument specifying whether the children should destroyed
+	at the destruction of the shape. Add the dtk_create_complex_shape
+	function.
+
+	* commit 357ff48ae387fca59bd7e9be597e02d726bfc3a6
+
+2010-08-31 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/fonttex.c: Add missing header in fonttex.c
+
+	* commit e98d264207a34b7fb01baed8388e815d0bfc74fb
+
+2010-08-31 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* configure.ac, doc/Makefile.am, doc/dtk_create_string.3,
+	doc/dtk_destroy_font.3, doc/dtk_load_font.3, src/Makefile.am,
+	src/create_shape.c, src/drawtk.h, src/exports.sym, src/fonttex.c,
+	src/fonttex.h, src/imagetex.c, src/imagetex.h, src/texmanager.c,
+	src/texmanager.h, src/window.c, src/window.h, tests/font.png,
+	tests/test-events.c, tests/test.ttf, tests/test1.c: Rework
+	string support
+
+	Add font as a new texture resource (introduction of dtk_hfont). We
+	use now the freetype library to create a font charmap on the fly,
+	thus making possible to change the font.
+
+	* commit f5dcf56acf759247f89656be7b46bf3932ad3f76
+
+2010-08-26 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* Makefile.am, configure.ac, lib/Makefile.am, lib/clock_gettime.c,
+	lib/clock_gettime.h, lib/clock_nanosleep.c, lib/clock_nanosleep.h,
+	lib/convfiletime.h, lib/timespec.h, src/Makefile.am,
+	src/create_shape.c, src/exports.sym, src/palette.c, src/shapes.c,
+	src/shapes.h, src/texmanager.c, src/texmanager.h, src/window.c,
+	src/window.h, tests/Makefile.am, tests/test1.c: Add visibility
+	to symbols and add mvt in test1.c
+
+	* commit 8615acc78a39f680f83074ba2f3598208b3d3742
+
+2010-08-02 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/drawtk.h, src/shapes.c, src/shapes.h, src/texmanager.c:
+	Remove shape to window binding + adapt draw shape
+
+	Since the texture loading has been improved, there is no required
+	in the code to bind a shape to a window... So remove it. This
+	commit adapts also the draw shape function is order to fully
+	take advantage of texture preloading
+
+	* commit 461e90b5c77548255053b440fb0d5b0139328663
+
+2010-04-16 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* configure.ac, doc/Makefile.am, doc/dtk_create_window.3,
+	doc/dtk_destroy_texture.3, doc/dtk_load_image.3, src/drawtk.h,
+	src/shapes.c, src/shapes.h, src/texmanager.c, src/texmanager.h,
+	src/window.c, tests/test1.c: Improve texture loading
+
+	Improve the code of the texture manager. Texture structure
+	now holds in main memory the image data which is loaded into
+	video memory when the GL texture ID is requested for the first
+	time. This makes the creation of texture independent to the
+	the creation of OpenGL context (corresponding usually to the
+	creation of the window). Loading and destroying textures are
+	now thread-safe.
+
+	* commit e529f9f1a956631cc6827203f3659e454a9c5c38
+
+2010-04-06 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* Makefile.am, configure.ac, doc/Makefile.am, doc/dtk_bgcolor.3,
+	doc/dtk_clear_screen.3, doc/dtk_close.3, doc/dtk_create_arrow.3,
+	doc/dtk_create_circle.3, doc/dtk_create_composite_shape.3,
+	doc/dtk_create_cross.3, doc/dtk_create_image.3,
+	doc/dtk_create_line.3, doc/dtk_create_rectangle_2p.3,
+	doc/dtk_create_rectangle_hw.3, doc/dtk_create_shape.3,
+	doc/dtk_create_string.3, doc/dtk_create_triangle.3,
+	doc/dtk_create_window.3, doc/dtk_destroy_shape.3,
+	doc/dtk_draw_shape.3, doc/dtk_load_image.3,
+	doc/dtk_make_current_window.3, doc/dtk_move_shape.3,
+	doc/dtk_process_events.3, doc/dtk_relmove_shape.3,
+	doc/dtk_relrotate_shape.3, doc/dtk_rotate_shape.3,
+	doc/dtk_set_event_handler.3, doc/dtk_update_screen.3: Add manpages
+	to the package
+
+	Create the manpages for the API of the library. This manpages
+	are still rough and there might still be some mistakes or
+	missing features. However it should enough to start to use the
+	library. From now, any changes (adding, deletion or modification)
+	to the API or behavior of the library SHOULD lead to a change
+	in the manpages.
+
+	* commit 63c5c15730224b6eda7ed7bb24c1d0308b99022a
+
+2010-03-20 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/Makefile.am, src/create_shape.c, src/shapes.c, src/shapes.h,
+	src/window.c, tests/test-events.c, tests/test1.c: Small cleanups
+	in the source codes
+
+	Remove warnings when compiling the test programs. Remove obsolete
+	code related to texture manager IN the window structure.  Separate
+	the code of shapes into 2 parts: one for the logic of the shapes
+	(shapes.c), one the creation of a specific shape (create_shape.c)
+
+	* commit ca85e081dd24c23a47cbab61d17611dea9908f7c
+
+2010-03-18 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* COPYING, Makefile.am, configure.ac, doc/Makefile.am,
+	doc/doxinclude.am, doc/doxygen.cfg, examples/Makefile.am,
+	examples/colortest.c, examples/develtest.c, examples/font.bmp,
+	extra/palette_tango_black.png, extra/palette_tango_white.png,
+	src/Makefile.am, src/Makefile.in: Cleanup the package, license
+	to GPLv3
+
+	Remove unused or outdated files/folders (extra, doc,
+	examples). Add the missing library check in the configure
+	script for OpenGL lib. Remove Doxygen checks since it is not
+	yet used. Fill COPYING file with GPLv3 license.
+
+	* commit df19a91741db81fc771256c8e7eb68d7c60db71f
+
+2010-03-18 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* configure.ac, examples/Makefile.am, examples/colortest.c,
+	examples/develtest.c, src/Makefile.am, src/Makefile.in,
+	src/drawtk.h, src/dtk_event.h, src/fb_event.h, src/feedback.h,
+	src/palette.c, src/palette.h, src/shapes.c, src/texmanager.c,
+	src/texmanager.h, src/window.c, src/window.h, tests/Makefile.am,
+	tests/test-events.c, tests/test1.c: Change library libfeedback
+	to libdrawtk
+
+	The package name is now drawtk. Internal prefix for functions
+	is now dtk_* and DTK_* for macros instead of fb_* and FB_*. The
+	exported headers have also changed: feedback.h has changed into
+	drawtk.h and fb_event.h has become dtk_event.h
+
+	* commit 855f2d50dbd0412739c046ad8141fc2cbe0a867c
+
+2010-03-02 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* AUTHORS, ChangeLog, DEPENDENCIES, INSTALL,
+	Makefile.am, autogen.sh, configure.ac, doc/Makefile.am,
+	doc/doxinclude.am, doc/doxygen.cfg, examples/Makefile.am,
+	examples/colortest.c, examples/develtest.c, examples/font.bmp,
+	extra/palette_tango_black.png, extra/palette_tango_white.png,
+	m4/doxygen.m4, src/Makefile.am, src/Makefile.in,
+	src/fb_event.h, src/feedback.h, src/palette.c, src/palette.h,
+	src/shapes.c, src/texmanager.c, src/texmanager.h, src/window.c,
+	src/window.h, tests/Makefile.am, tests/font.png, tests/navy.png,
+	tests/test-events.c, tests/test1.c: State of libfeedback in the
+	SVN on 01/03/2010
+
+	* commit 255de376c81a7cac114c5f5026c01db0ea433c5f
+

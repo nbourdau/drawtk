@@ -1,4 +1,5 @@
 sdl 1.2
 freeimage
-freetype 2
+freetype
+fontconfig
 
