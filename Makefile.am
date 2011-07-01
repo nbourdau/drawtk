@@ -3,11 +3,9 @@ SUBDIRS = lib src tests doc
  
 doc_DATA = AUTHORS NEWS README COPYING
 
-EXTRA_DIST = debian/changelog debian/compat debian/control\
-		debian/copyright debian/docs		\
-		debian/postinst.ex debian/postrm.ex	\
-		debian/preinst.ex debian/prerm.ex	\
-		debian/rules				\
+EXTRA_DIST = debian/changelog debian/compat		\
+		debian/control	debian/copyright	\
+		debian/rules debian/shlibs.local	\
 		debian/libdrawtk0.install		\
 		debian/libdrawtk0-dev.install		
 
