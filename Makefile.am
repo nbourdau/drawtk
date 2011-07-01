@@ -6,6 +6,7 @@ doc_DATA = AUTHORS NEWS README COPYING
 EXTRA_DIST = debian/changelog debian/compat		\
 		debian/control	debian/copyright	\
 		debian/rules debian/shlibs.local	\
+		debian/symbols				\
 		debian/libdrawtk0.install		\
 		debian/libdrawtk0-dev.install		
 
