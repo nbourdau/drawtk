@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libdrawtk.la
-include_HEADERS = drawtk.h dtk_colors.h dtk_event.h dtk_time.h
-
+include_HEADERS = drawtk.h dtk_colors.h dtk_event.h dtk_time.h dtk_gstreamer.h
+ 
 libdrawtk_la_SOURCES = drawtk.h dtk_event.h		\
 			 shapes.c shapes.h		\
 			 create_shape.c			\
@@ -8,7 +8,8 @@ libdrawtk_la_SOURCES = drawtk.h dtk_event.h		\
 			 imagetex.c fonttex.h fonttex.c	\
 			 window.h window.c events.c	\
 			 dtk_colors.h colors.c		\
-			 dtk_time.h time.c
+			 dtk_time.h time.c              \
+			 dtk_gstreamer.c dtk_gstreamer.h
 
 libdrawtk_la_LIBADD = $(LTLIBOBJS)
 
