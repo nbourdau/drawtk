@@ -21,16 +21,19 @@ dist_man_MANS = dtk_move_shape.3 dtk_relmove_shape.3			\
 		dtk_addtime.3 dtk_difftime_s.3				\
 		dtk_difftime_ms.3 dtk_difftime_us.3 dtk_difftime_ns.3
 		
-nobase_dist_doc_DATA = examples/Makefile		\
-                       examples/bars.c			\
-                       examples/bounce.c
+examplesdir = $(docdir)/examples
+dist_examples_DATA = examples/Makefile		\
+                     examples/bars.c		\
+                     examples/bounce.c		\
+		     examples/errormon.c
 
 AM_CPPFLAGS = $(CPPFLAGS) -I$(top_srcdir)/src
 LDADD = $(top_builddir)/src/libdrawtk.la
 
 # Verify at least that the example compiles
-check_PROGRAMS = bounce bars
+check_PROGRAMS = bounce bars errormon
 bounce_SOURCES = examples/bounce.c
 bars_SOURCES = examples/bars.c
+errormon_SOURCES = examples/errormon.c
 
 
