@@ -8,7 +8,8 @@ EXTRA_DIST = debian/changelog debian/compat		\
 		debian/rules debian/shlibs.local	\
 		debian/symbols				\
 		debian/libdrawtk0.install		\
-		debian/libdrawtk0-dev.install		
+		debian/libdrawtk0-dev.install		\
+		debian/libdrawtk0-dev.examples	
 
 REMOVE_DISTDIR = \
   { test ! -d "$(distdir)" \
