@@ -60,6 +60,9 @@ struct dtk_texture
 
 	// To be used in a linked list
 	struct dtk_texture* next_tex;
+
+        // video
+        int isvideo;
 };
 
 

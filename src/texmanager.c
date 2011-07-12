@@ -29,6 +29,7 @@
 
 #include "texmanager.h"
 #include "window.h"
+#include "dtk_gstreamer.h"
 
 #ifndef MAX_MIPMAP
 #define MAX_MIPMAP	10
@@ -119,6 +120,7 @@ struct dtk_texture* get_texture(const char *desc)
 		strncpy(tex->string_id, desc, 255);
 		tex->aux = NULL;
 		tex->data = NULL;
+                tex->isvideo = 0;
 		
 		// append at the end of the list
 		*last = tex;
@@ -292,11 +294,27 @@ GLuint get_texture_id(struct dtk_texture* tex)
 	if (!tex) 
 		return 0;
 	
+        // updating stuff
+        if (tex->isvideo)
+        {
+                if(!tex->isinit)
+                {
+                        if(tex->data)
+                                dtk_gst_update_texture(tex);
+                        else
+                                return 0;
+                }
+
+                return tex->id;
+        }
+
 	// This allows to return quickly since once the texture has been
 	// loaded, it won't change until tex is destroyed
 	if (tex->id)
+        {
 		return tex->id;
-	
+        }
+
 	pthread_mutex_lock(&(tex->lock));
 	if (tex->id == 0)
 		load_gl_texture(tex);

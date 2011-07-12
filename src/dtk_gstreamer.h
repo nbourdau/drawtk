@@ -21,18 +21,24 @@
 
 #include <stdbool.h>
 
+#include "drawtk.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
         typedef struct dtk_gst_pipeline* dtk_gst_hpipeline;
 
-
         // CREATE AND INITIALIZE PIPELINE
-        dtk_gst_hpipeline dtk_gst_create_pipeline(const char* name);
+        dtk_gst_hpipeline dtk_gst_create_empty_pipeline(const char* name);
+        dtk_gst_hpipeline dtk_gst_create_tcp_pipeline(const char* name, const char* server, unsigned int port);
+        dtk_gst_hpipeline dtk_gst_create_udp_pipeline(const char* name, unsigned int port);
+        //dtk_gst_hpipeline dtk_gst_create_rtp_pipeline(const char* name, unsigned int port);
+        dtk_gst_hpipeline dtk_gst_create_file_pipeline(const char* name, const char* file);
 
         // ADD ELEMENT TO PIPELINE
-        // Elements are defined by Gstreamer factory/name combinations
+        // Elements are defined by Gstreamer factories
+        // Name is a unique element identifier
         // Additional parameters are specified as NULL-terminated var-args
         bool dtk_gst_add_element(
                 dtk_gst_hpipeline pipe,
@@ -57,16 +63,23 @@ extern "C" {
                 );
 
         // START PIPELINE EXECUTION
-        bool dtk_gst_run_pipeline(dtk_gst_hpipeline pipe);
+        dtk_htex dtk_gst_run_pipeline(dtk_gst_hpipeline pipe);
 
-        // CHECK PIPELINE ALIVE
-        bool dtk_gst_is_pipeline_alive(dtk_gst_hpipeline pipe);
+        // GET PIPELINE STATUS
+        bool dtk_gst_is_pipeline_running(dtk_gst_hpipeline pipe);
 
 	// STOP PIPELINE EXECUTIOn
 	void dtk_gst_stop_pipeline(dtk_gst_hpipeline pipe);
+
+        // GET TEXTURE HANDLE
+        dtk_htex dtk_gst_get_texture(dtk_gst_hpipeline pipe);
+
+        // UPDATE TEXTURE
+        void dtk_gst_update_texture(dtk_htex tex);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+

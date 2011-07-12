@@ -16,15 +16,15 @@ int main (int   argc, char *argv[])
   bool success;
 
   // Initialisation 
-  dtk_gst_hpipeline pipe = dtk_gst_create_pipeline("dtk_pipeline");
+  dtk_gst_hpipeline pipe = dtk_gst_create_empty_pipeline("dtk_pipeline");
 
   success = (pipe!=NULL);
 
   // Add elements 
-  success = success && dtk_gst_add_element_full(pipe, "tcpclientsrc",	"tv-source", "port", 38501, NULL);
+  success = success && dtk_gst_add_element_full(pipe, "tcpclientsrc",	"tcp-src", "port", 38501, NULL);
   success = success && dtk_gst_add_element(pipe, "multipartdemux",	"demuxer");
   success = success && dtk_gst_add_element(pipe, "jpegdec",		"decoder");
-  success = success && dtk_gst_add_element(pipe, "ffmpegcolorspace",		"converter");
+  success = success && dtk_gst_add_element(pipe, "ffmpegcolorspace",	"converter");
   success = success && dtk_gst_add_element(pipe, "autovideosink",	"autovideosink");
   
   if (!success) {
