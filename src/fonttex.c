@@ -178,8 +178,7 @@ int load_glyph(void **bits, struct dtk_font *font, const char *fname,
 static
 void font_destroy(struct dtk_texture* tex)
 {
-	free(tex->aux);
-	free(tex);
+        free(tex->aux);
 }
 
 

@@ -29,7 +29,6 @@
 
 #include "texmanager.h"
 #include "window.h"
-#include "dtk_gstreamer.h"
 
 #ifndef MAX_MIPMAP
 #define MAX_MIPMAP	10
@@ -182,22 +181,23 @@ void free_texture(struct dtk_texture* tex)
 {
 	unsigned int i;
 
+        if (tex->destroyfn)
+                tex->destroyfn(tex);
+
 	if (tex->id)
 		glDeleteTextures(1, &(tex->id));
 
 	if (tex->data) {
-		for (i=0; i<=tex->mxlvl; i++)
-			free(tex->data[i]);
+		if(tex->mxlvl)
+                        for (i=0; i<=tex->mxlvl; i++)
+			        free(tex->data[i]);
 		free(tex->data);
 	}
 
-	free(tex->sizes);
-	pthread_mutex_destroy(&(tex->lock));
+        free(tex->sizes);
+        pthread_mutex_destroy(&(tex->lock));
 
-	if (tex->destroyfn)
-		tex->destroyfn(tex);
-	else
-		free(tex);
+        free(tex);
 }
 
 /* Allocate ressources to hold image data until mipmap level mxlvl. On the
@@ -269,6 +269,39 @@ void load_gl_texture(struct dtk_texture* tex)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+static
+void load_video_texture(struct dtk_texture* tex)
+{
+        if( tex->id == 0)
+        {
+                // creation of the GL texture Object
+                glGenTextures(1,&(tex->id));
+
+                glBindTexture(GL_TEXTURE_2D, tex->id);
+
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, tex->mxlvl);
+
+                glPixelStorei(GL_UNPACK_ALIGNMENT, sizeof(char));
+
+                //printf("Tex id: %d  - Tex size: %d %d\n",tex->id,tex->sizes[0].w,tex->sizes[0].h);
+        }
+
+        // store GL texture parameters
+        glBindTexture(GL_TEXTURE_2D, tex->id);
+
+        // load data into memory
+        glTexImage2D(GL_TEXTURE_2D, 0, tex->intfmt, tex->sizes[0].w, tex->sizes[0].h, 0,
+                tex->fmt, tex->type, (unsigned char*)tex->data);
+
+        // Wait the loading being performed
+        glFlush();
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        tex->isinit = 1;
+}
+
 
 API_EXPORTED
 void dtk_destroy_texture(struct dtk_texture* tex)
@@ -300,7 +333,11 @@ GLuint get_texture_id(struct dtk_texture* tex)
                 if(!tex->isinit)
                 {
                         if(tex->data)
-                                dtk_gst_update_texture(tex);
+                        {
+                                pthread_mutex_lock(&(tex->lock));
+                                load_video_texture(tex);
+                                pthread_mutex_unlock(&(tex->lock));
+                        }
                         else
                                 return 0;
                 }
