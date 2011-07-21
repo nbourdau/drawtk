@@ -357,7 +357,8 @@ void* run_pipeline_loop(void * pipe)
 
         while (canLoop && dtkPipe->status!=DTKV_STOPPED) {
 
-                pthread_mutex_lock(&(dtkPipe->status_lock));
+		if(pthread_mutex_trylock(&(dtkPipe->status_lock))==0)
+		{
 
                 //g_print("pipe status (loop) : %d (%d->%d)\n",dtkPipe->status,DTKV_READY,DTKV_PLAYING);
 
@@ -371,12 +372,12 @@ void* run_pipeline_loop(void * pipe)
                         gst_message_unref (msg);
                 }
 
-                // if the bus hasn't requested termination, unlock 
-                if(canLoop)
-                {
-                        pthread_mutex_unlock(&(dtkPipe->status_lock));
-                }
-        } 
+		// if the bus hasn't requested termination, unlock 
+		if (canLoop) {
+			pthread_mutex_unlock(&(dtkPipe->status_lock));
+		}
+		}
+	}
 
         // set status to STOPPED
         dtkPipe->status = DTKV_STOPPED;
