@@ -66,7 +66,7 @@ int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 }
 
 
-int main (int argc, char *argv[])
+int main(void)
 {
         struct dtk_timespec delay = {0, 5000000}; /* 5ms */
 	

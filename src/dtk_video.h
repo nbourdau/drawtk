@@ -20,41 +20,39 @@
 #define DTK_VIDEO_H
 
 #include <stdbool.h>
-
-#include "drawtk.h"
+#include <drawtk.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-        typedef struct dtk_pipeline* dtk_hpipe;
+typedef struct dtk_pipeline *dtk_hpipe;
 
-        enum dtk_video_feed {
-                DTKV_FEED_TEST = 0,
-                DTKV_FEED_FILE = 1,
-                DTKV_FEED_TCP  = 2,
-                DTKV_FEED_UDP  = 3
-        };
+enum dtk_video_feed {
+	DTKV_FEED_TEST = 0,
+	DTKV_FEED_FILE = 1,
+	DTKV_FEED_TCP = 2,
+	DTKV_FEED_UDP = 3
+};
 
-        enum dtk_video_status {
-                DTKV_STOPPED = 0,
-                DTKV_READY   = 1,
-                DTKV_PAUSED  = 2,
-                DTKV_PLAYING = 3
-        };
+enum dtk_video_status {
+	DTKV_STOPPED = 0,
+	DTKV_READY = 1,
+	DTKV_PAUSED = 2,
+	DTKV_PLAYING = 3
+};
 
-        enum dtk_video_cmd {
-                DTKV_CMD_PLAY  = 0,
-                DTKV_CMD_STOP  = 1,
-                DTKV_CMD_PAUSE = 2
-        };
+enum dtk_video_cmd {
+	DTKV_CMD_PLAY = 0,
+	DTKV_CMD_STOP = 1,
+	DTKV_CMD_PAUSE = 2
+};
 
-        dtk_htex dtk_create_video(int feed_type, bool autostart, ...);
-        bool dtk_video_exec(dtk_htex video, int command);
-        int dtk_video_getstate(dtk_htex video);
+dtk_htex dtk_create_video(int feed_type, bool autostart, ...);
+bool dtk_video_exec(dtk_htex video, int command);
+int dtk_video_getstate(dtk_htex video);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

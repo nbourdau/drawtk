@@ -1,5 +1,5 @@
 lib_LTLIBRARIES = libdrawtk.la
-include_HEADERS = drawtk.h dtk_colors.h dtk_event.h dtk_time.h dtk_video.h dtk_video_custom.h
+include_HEADERS = drawtk.h dtk_colors.h dtk_event.h dtk_time.h dtk_video.h
  
 libdrawtk_la_SOURCES = drawtk.h dtk_event.h		\
 			 shapes.c shapes.h		\

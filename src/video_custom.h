@@ -16,70 +16,56 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DTK_GSTREAMER_H
-#define DTK_GSTREAMER_H
+#ifndef VIDEO_CUSTOM_H
+#define VIDEO_CUSTOM_H
 
 #include <stdbool.h>
 
 #include "drawtk.h"
+#include "dtk_video.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-        typedef struct dtk_gst_pipeline* dtk_gst_hpipeline;
+	dtk_htex dtk_create_video_from_pipeline(dtk_hpipe customPipe);
+        dtk_hpipe dtk_create_video_pipeline(const char* name);
 
-        // CREATE AND INITIALIZE PIPELINE
-        dtk_gst_hpipeline dtk_gst_create_empty_pipeline(const char* name);
-        dtk_gst_hpipeline dtk_gst_create_tcp_pipeline(const char* name, const char* server, unsigned int port);
-        dtk_gst_hpipeline dtk_gst_create_udp_pipeline(const char* name, unsigned int port);
-        //dtk_gst_hpipeline dtk_gst_create_rtp_pipeline(const char* name, unsigned int port);
-        dtk_gst_hpipeline dtk_gst_create_file_pipeline(const char* name, const char* file);
-
-        // ADD ELEMENT TO PIPELINE
         // Elements are defined by Gstreamer factories
         // Name is a unique element identifier
         // Additional parameters are specified as NULL-terminated var-args
-        bool dtk_gst_add_element(
-                dtk_gst_hpipeline pipe,
+        bool dtk_pipe_add_element(
+                dtk_hpipe pipe,
                 const char* factory,
                 const char* name
                 );
 
-        bool dtk_gst_add_element_full(
-                dtk_gst_hpipeline pipe,
+        bool dtk_pipe_add_element_full(
+                dtk_hpipe pipe,
                 const char* factory,
                 const char* name,
                 const char* firstPropertyName,
                 ...
                 );
 
-        bool dtk_gst_add_element_full_valist(
-                dtk_gst_hpipeline dtkPipe,
+        bool dtk_pipe_add_element_full_valist(
+                dtk_hpipe pipe,
                 const char* factory,
                 const char* name,
                 const char* firstPropertyName,
                 va_list paramList
                 );
 
-        // START PIPELINE EXECUTION
-        dtk_htex dtk_gst_run_pipeline(dtk_gst_hpipeline pipe);
+/*        void dtk_set_last_element_caps(
+                dtk_hpipe pipe,
+                const char* mediaType,
+                const char* firstParam,
+                ...
+                );
 
-        // GET PIPELINE STATUS
-        bool dtk_gst_is_pipeline_running(dtk_gst_hpipeline pipe);
-
-	// STOP PIPELINE EXECUTIOn
-	void dtk_gst_stop_pipeline(dtk_gst_hpipeline pipe);
-
-        // GET TEXTURE HANDLE
-        dtk_htex dtk_gst_get_texture(dtk_gst_hpipeline pipe);
-
-        // UPDATE TEXTURE
-        void dtk_gst_update_texture(dtk_htex tex);
-
-#ifdef __cplusplus
-}
-#endif
+        void dtk_set_last_element_caps_valist(
+                dtk_hpipe pipe,
+                const char* mediaType,
+                const char* firstParam,
+                va_list paramList
+                );*/
 
 #endif
 

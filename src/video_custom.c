@@ -34,7 +34,7 @@
 
 #include "dtk_video.h"
 #include "video_structs.h"
-#include "dtk_video_custom.h"
+#include "video_custom.h"
 
 #include "drawtk.h"
 #include "texmanager.h"
