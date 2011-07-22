@@ -26,43 +26,33 @@
 
 #include "drawtk.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct dtk_pipe_element {
+	// gstreamer element
+	GstElement *gElement;
 
-        struct dtk_pipe_element
-        {
-                // gstreamer element
-                GstElement* gElement;
+	// source capabilities
+	GstCaps *gCaps;
 
-                // source capabilities
-                GstCaps* gCaps;
+	// previous & next element in doubly-linked list
+	struct dtk_pipe_element *prev;
+	struct dtk_pipe_element *next;
+};
 
-                // previous & next element in doubly-linked list
-                struct dtk_pipe_element* prev;
-                struct dtk_pipe_element* next;
-        };
+struct dtk_pipeline {
+	// pipeline object
+	GstElement *gPipe;
+	bool editLocked;
 
-        struct dtk_pipeline
-        {
-                // pipeline object
-                GstElement* gPipe;
-                bool editLocked;
+	// bus object
+	GstBus *gBus;
 
-                // bus object
-                GstBus* gBus;
+	// doubly linked list of elements in the pipeline
+	struct dtk_pipe_element *dtkElement;
 
-                // doubly linked list of elements in the pipeline
-                struct dtk_pipe_element* dtkElement;
-
-                // pipeline status
-                pthread_t thread;
-                int status;
-                pthread_mutex_t status_lock;
-        };
-
-#ifdef __cplusplus
-}
-#endif
+	// pipeline status
+	pthread_t thread;
+	int status;
+	pthread_mutex_t status_lock;
+};
 
 #endif // ifndef VIDEO_STRUCTS_H

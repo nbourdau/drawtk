@@ -25,47 +25,25 @@
 #include "dtk_video.h"
 
 
-	dtk_htex dtk_create_video_from_pipeline(dtk_hpipe customPipe);
-        dtk_hpipe dtk_create_video_pipeline(const char* name);
+LOCAL_FN dtk_htex dtk_create_video_from_pipeline(dtk_hpipe customPipe);
+LOCAL_FN dtk_hpipe dtk_create_video_pipeline(const char* name);
 
-        // Elements are defined by Gstreamer factories
-        // Name is a unique element identifier
-        // Additional parameters are specified as NULL-terminated var-args
-        bool dtk_pipe_add_element(
-                dtk_hpipe pipe,
-                const char* factory,
-                const char* name
-                );
-
-        bool dtk_pipe_add_element_full(
-                dtk_hpipe pipe,
-                const char* factory,
-                const char* name,
-                const char* firstPropertyName,
-                ...
-                );
-
-        bool dtk_pipe_add_element_full_valist(
-                dtk_hpipe pipe,
-                const char* factory,
-                const char* name,
-                const char* firstPropertyName,
-                va_list paramList
-                );
-
-/*        void dtk_set_last_element_caps(
-                dtk_hpipe pipe,
-                const char* mediaType,
-                const char* firstParam,
-                ...
-                );
-
-        void dtk_set_last_element_caps_valist(
-                dtk_hpipe pipe,
-                const char* mediaType,
-                const char* firstParam,
-                va_list paramList
-                );*/
-
+// Elements are defined by Gstreamer factories
+// Name is a unique element identifier
+// Additional parameters are specified as NULL-terminated var-args
+LOCAL_FN
+bool dtk_pipe_add_element(dtk_hpipe pipe, const char *factory,
+			  const char *name);
+LOCAL_FN
+bool dtk_pipe_add_element_full(dtk_hpipe pipe,
+			       const char *factory,
+			       const char *name,
+			       const char *firstPropertyName, ...);
+LOCAL_FN
+bool dtk_pipe_add_element_full_valist(dtk_hpipe pipe,
+				      const char *factory,
+				      const char *name,
+				      const char *firstPropertyName,
+				      va_list paramList);
 #endif
 
