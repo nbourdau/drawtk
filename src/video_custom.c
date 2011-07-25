@@ -167,7 +167,6 @@ void add_terminal_elements(dtk_hpipe pipe)
 	dtk_pipe_add_element_full(pipe, "videoflip", "flipper",
 				  "method", DTK_GST_VERTICAL_FLIP, NULL);
 
-	dtk_pipe_add_element(pipe, "identity", "buffer-reader");
 	dtk_pipe_add_element(pipe, "appsink", "drawtksink");
 }
 
@@ -308,8 +307,6 @@ LOCAL_FN
 dtk_htex dtk_create_video_from_pipeline(dtk_hpipe customPipe)
 {
 	dtk_htex tex;
-	GstElementFactory *factory;
-	const char *name;
 	GstAppSink* appsink;
 	GstAppSinkCallbacks callbacks = {
 		.new_buffer = newbuffer_callback
@@ -325,22 +322,9 @@ dtk_htex dtk_create_video_from_pipeline(dtk_hpipe customPipe)
 	// create video texture
 	tex = create_video_texture(customPipe);
 
-	// get the next to last element
-	GstElement *identityElem = customPipe->dtkElement->prev->gElement;
-
-	// assert the element is indeed identity
-	factory = gst_element_get_factory(identityElem);
-	name = gst_element_factory_get_longname(factory);
-	if (strcmp(name, "Identity"))
-		g_printerr("Pipeline does not end with an identity+sink "
-			   "combination. Next to last element: %s\n",
-			   name);
-	else {
-		//g_signal_connect(identityElem, "handoff",
-		//		 G_CALLBACK(handoff_callback), tex);
-		appsink = GST_APP_SINK(customPipe->dtkElement->gElement);
-		gst_app_sink_set_callbacks(appsink, &callbacks, tex, NULL);
-	}
+	// Install callback to the appsink
+	appsink = GST_APP_SINK(customPipe->dtkElement->gElement);
+	gst_app_sink_set_callbacks(appsink, &callbacks, tex, NULL);
 
 	tex->aux = (void *) customPipe;
 	tex->destroyfn = &(destroyPipeline);
