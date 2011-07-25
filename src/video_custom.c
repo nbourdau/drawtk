@@ -30,7 +30,6 @@
 
 #include <gst/gst.h>
 #include <glib.h>
-#include <gst/base/gstbasetransform.h>
 #include <gst/app/gstappsink.h>
 
 #include "dtk_video.h"
@@ -153,21 +152,20 @@ static
 void add_terminal_elements(dtk_hpipe pipe)
 {
 	GstCaps *caps;
-	// convert -> flip -> reader -> sink
+	// convert -> flip -> sink
 	dtk_pipe_add_element(pipe, "ffmpegcolorspace", "converter");
+
+	dtk_pipe_add_element_full(pipe, "videoflip", "flipper",
+				  "method", DTK_GST_VERTICAL_FLIP, NULL);
 
 	caps = gst_caps_new_simple("video/x-raw-rgb",
 				   "bpp", G_TYPE_INT, 24,
 				   "red_mask", G_TYPE_INT, 0xFF0000,
 				   "green_mask", G_TYPE_INT, 0x00FF00,
 				   "blue_mask", G_TYPE_INT, 0x0000FF, NULL);
-	dtk_pipe_add_element_full(pipe, "capsfilter", "rgb-filter",
-				  "caps", caps, NULL);
-
-	dtk_pipe_add_element_full(pipe, "videoflip", "flipper",
-				  "method", DTK_GST_VERTICAL_FLIP, NULL);
-
-	dtk_pipe_add_element(pipe, "appsink", "drawtksink");
+	dtk_pipe_add_element_full(pipe, "appsink", "drawtksink",
+	                                "caps", caps, NULL);
+	gst_caps_unref(caps);
 }
 
 
