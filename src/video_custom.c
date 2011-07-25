@@ -31,6 +31,7 @@
 #include <gst/gst.h>
 #include <glib.h>
 #include <gst/base/gstbasetransform.h>
+#include <gst/app/gstappsink.h>
 
 #include "dtk_video.h"
 #include "video_structs.h"
@@ -48,49 +49,48 @@
  *                         Gstreamer callbacks                            *
  **************************************************************************/
 static
-struct dtk_size *get_pad_size(GstPad * pad)
+struct dtk_size *get_pad_size(GstBuffer * buffer)
 {
 	GstCaps *caps;
 	GstStructure *structure;
 	int h, w;
 	struct dtk_size *size = malloc(sizeof(struct dtk_size));
 
-	caps = gst_pad_get_negotiated_caps(pad);
-	if (caps) {
-		structure = gst_caps_get_structure(caps, 0);
-		gst_structure_get_int(structure, "height", &h);
-		gst_structure_get_int(structure, "width", &w);
-		size->h = h;
-		size->w = w;
-
-		return size;
-	} else {
+	caps = gst_buffer_get_caps(buffer);
+	if (!caps) {
 		g_printerr
 		    ("get_pad_size - could not get caps for the pad\n");
 		return NULL;
 	}
+
+	structure = gst_caps_get_structure(caps, 0);
+	gst_structure_get_int(structure, "height", &h);
+	gst_structure_get_int(structure, "width", &w);
+	size->h = h;
+	size->w = w;
+	gst_caps_unref(caps);
+
+	return size;
 }
 
 
 static
-void handoff_callback(GstElement * sink, GstBuffer * buffer, gpointer data)
+GstFlowReturn newbuffer_callback(GstAppSink *sink,  gpointer data)
 {
-	assert(sink != NULL);
-	assert(buffer != NULL);
-
+	GstBuffer* buffer; 
 	dtk_htex tex = (dtk_htex) data;
 	dtk_hpipe pipe = (dtk_hpipe) tex->aux;
 
 	pthread_mutex_lock(&(tex->lock));
-
+	buffer = gst_app_sink_pull_buffer(sink);
 	if (tex->sizes == NULL) {
 		tex->mxlvl = 0;
 		tex->intfmt = GL_RGB;
 		tex->fmt = GL_RGB;
 		tex->type = GL_UNSIGNED_BYTE;
 
-		tex->sizes =
-		    get_pad_size(GST_BASE_TRANSFORM_SRC_PAD(sink));
+		//print_buffer(buffer, "buffer");
+		tex->sizes = get_pad_size(buffer);
 
 		tex->data = malloc(tex->sizes[0].w * tex->sizes[0].h * 3);
 		memset(tex->data, 130,
@@ -103,10 +103,11 @@ void handoff_callback(GstElement * sink, GstBuffer * buffer, gpointer data)
 	// load data into memory
 	memcpy(tex->data, (unsigned char *) GST_BUFFER_DATA(buffer),
 	       tex->sizes[0].w * tex->sizes[0].h * 3);
-
+	gst_buffer_unref(buffer);
 	tex->isinit = false;
 
 	pthread_mutex_unlock(&(tex->lock));
+	return GST_FLOW_OK;
 }
 
 
@@ -176,7 +177,7 @@ void add_terminal_elements(dtk_hpipe pipe)
 				  "method", DTK_GST_VERTICAL_FLIP, NULL);
 
 	dtk_pipe_add_element(pipe, "identity", "buffer-reader");
-	dtk_pipe_add_element(pipe, "fakesink", "fake-sink");
+	dtk_pipe_add_element(pipe, "appsink", "drawtksink");
 }
 
 
@@ -312,11 +313,16 @@ void destroyPipeline(dtk_htex tex)
 }
 
 
-LOCAL_FN dtk_htex dtk_create_video_from_pipeline(dtk_hpipe customPipe)
+LOCAL_FN
+dtk_htex dtk_create_video_from_pipeline(dtk_hpipe customPipe)
 {
 	dtk_htex tex;
 	GstElementFactory *factory;
 	const char *name;
+	GstAppSink* appsink;
+	GstAppSinkCallbacks callbacks = {
+		.new_buffer = newbuffer_callback
+	};
 
 	if (!customPipe)
 		return NULL;
@@ -338,9 +344,12 @@ LOCAL_FN dtk_htex dtk_create_video_from_pipeline(dtk_hpipe customPipe)
 		g_printerr("Pipeline does not end with an identity+sink "
 			   "combination. Next to last element: %s\n",
 			   name);
-	else
-		g_signal_connect(identityElem, "handoff",
-				 G_CALLBACK(handoff_callback), tex);
+	else {
+		//g_signal_connect(identityElem, "handoff",
+		//		 G_CALLBACK(handoff_callback), tex);
+		appsink = GST_APP_SINK(customPipe->dtkElement->gElement);
+		gst_app_sink_set_callbacks(appsink, &callbacks, tex, NULL);
+	}
 
 	tex->aux = (void *) customPipe;
 	tex->destroyfn = &(destroyPipeline);
