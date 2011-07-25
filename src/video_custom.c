@@ -81,16 +81,16 @@ GstFlowReturn newbuffer_callback(GstAppSink *sink,  gpointer data)
 	unsigned char *tdata, *bdata;
 	unsigned int tstride, bstride, h, i;
 	GstBuffer* buffer; 
-	dtk_htex tex = (dtk_htex) data;
-	dtk_hpipe pipe = (dtk_hpipe) tex->aux;
+	dtk_htex tex = data;
+	dtk_hpipe pl = tex->aux;
 
 	pthread_mutex_lock(&(tex->lock));
 	buffer = gst_app_sink_pull_buffer(sink);
 	if (tex->sizes == NULL) 
 		alloc_compatible_image(buffer, tex);
 
-	if (pipe->status == DTKV_READY)
-		pipe->status = DTKV_PLAYING;
+	if (pl->status == DTKV_READY)
+		pl->status = DTKV_PLAYING;
 
 	// load data into memory (gstreamer is flipped in GL conventions)
 	h = tex->sizes[0].h;
@@ -122,25 +122,25 @@ void newpad_callback(GstElement * element, GstPad * pad, gpointer data)
 	struct dtk_pipe_element *source = sink->prev;
 
 	// get source pad & sink-pad capabilities
-	sinkpad = gst_element_get_static_pad(sink->gElement, "sink");
+	sinkpad = gst_element_get_static_pad(sink->gstelt, "sink");
 	sourcecaps = gst_pad_get_caps(pad);
 	sinkcaps = gst_pad_get_caps(sinkpad);
 
 	// check that :
-	// source and source->gCaps are compatible
+	// source and source->caps are compatible
 	// source & sink caps are compatible
 
-	bool capsCompatible = (source->gCaps != NULL)
-	    && gst_caps_can_intersect(source->gCaps, sinkcaps);
-	bool capsCompatible2 = (source->gCaps == NULL)
+	bool capsCompatible = (source->caps != NULL)
+	    && gst_caps_can_intersect(source->caps, sinkcaps);
+	bool capsCompatible2 = (source->caps == NULL)
 	    && gst_caps_can_intersect(sourcecaps, sinkcaps);
 
 	bool isVideo =
 	    strstr(gst_caps_to_string(sourcecaps), "video") != NULL;
 
 	if (capsCompatible || capsCompatible2) {
-		if (source->gCaps)
-			gst_pad_set_caps(pad, source->gCaps);
+		if (source->caps)
+			gst_pad_set_caps(pad, source->caps);
 		gst_pad_link(pad, sinkpad);
 	} else if (isVideo) {
 		// output error and abort, only if we're trying to process
@@ -186,7 +186,7 @@ void link_pipe_elements(struct dtk_pipe_element *source,
 	GstPadTemplate *tpl;
 
 	// retrieve pad templates for source element
-	klass = (GstElementClass *) G_OBJECT_GET_CLASS(source->gElement);
+	klass = (GstElementClass *) G_OBJECT_GET_CLASS(source->gstelt);
 	padlist = gst_element_class_get_pad_template_list(klass);
 
 	// iterate over pad templates
@@ -200,17 +200,17 @@ void link_pipe_elements(struct dtk_pipe_element *source,
 
 		switch (tpl->presence) {
 		case GST_PAD_ALWAYS:
-			if (source->gCaps != NULL)
-				gst_element_link_filtered(source->gElement,
-							  sink->gElement,
-							  source->gCaps);
+			if (source->caps != NULL)
+				gst_element_link_filtered(source->gstelt,
+							  sink->gstelt,
+							  source->caps);
 			else
-				gst_element_link(source->gElement,
-						 sink->gElement);
+				gst_element_link(source->gstelt,
+						 sink->gstelt);
 			return;
 
 		case GST_PAD_SOMETIMES:
-			g_signal_connect(source->gElement, "pad-added",
+			g_signal_connect(source->gstelt, "pad-added",
 					 G_CALLBACK(newpad_callback),
 					 sink);
 			return;
@@ -222,9 +222,9 @@ void link_pipe_elements(struct dtk_pipe_element *source,
 
 
 static
-void setup_pipe_links(dtk_hpipe pipe)
+void setup_pipe_links(dtk_hpipe pl)
 {
-	struct dtk_pipe_element *curElement = pipe->dtkElement;
+	struct dtk_pipe_element *curElement = pl->elt;
 
 	while (curElement->prev != NULL) {
 		link_pipe_elements(curElement->prev, curElement);
@@ -234,13 +234,13 @@ void setup_pipe_links(dtk_hpipe pipe)
 
 
 static
-dtk_htex create_video_texture(dtk_hpipe pipe)
+dtk_htex create_video_texture(dtk_hpipe pl)
 {
 	dtk_htex tex = NULL;
 
 	// Get pipeline name
 	char stringid[256];
-	char *pipeName = gst_element_get_name(pipe->gPipe);
+	char *pipeName = gst_element_get_name(pl->pipe);
 	snprintf(stringid, sizeof(stringid), "PIPELINE:%s", pipeName);
 	g_free(pipeName);
 
@@ -259,38 +259,37 @@ dtk_htex create_video_texture(dtk_hpipe pipe)
 static
 void destroyPipeline(dtk_htex tex)
 {
-	dtk_hpipe dtkPipe = (dtk_hpipe) tex->aux;
+	struct dtk_pipe_element *cur;
+	dtk_hpipe pl = (dtk_hpipe) tex->aux;
 
 	// set pipeline status to dead
-	dtkPipe->status = DTKV_STOPPED;
+	pl->status = DTKV_STOPPED;
 
 	// join the threads
-	pthread_join(dtkPipe->thread, NULL);
+	pthread_join(pl->thread, NULL);
 
 	// lock status
-	//pthread_mutex_lock(&(dtkPipe->status_lock));
+	//pthread_mutex_lock(&(pl->status_lock));
 
 	// kill bus
-	gst_element_set_state(dtkPipe->gPipe, GST_STATE_NULL);
-	gst_object_unref(GST_OBJECT(dtkPipe->gBus));
+	gst_element_set_state(pl->pipe, GST_STATE_NULL);
+	gst_object_unref(GST_OBJECT(pl->bus));
 
 	// delete each dtk_pipe_element
-	while (dtkPipe->dtkElement != NULL) {
-		struct dtk_pipe_element *cur = dtkPipe->dtkElement;
-
-		dtkPipe->dtkElement = dtkPipe->dtkElement->prev;
-
-		if (cur->gCaps != NULL)
-			gst_object_unref(GST_OBJECT(cur->gCaps));
+	while (pl->elt != NULL) {
+		cur = pl->elt;
+		pl->elt = pl->elt->prev;
+		if (cur->caps != NULL)
+			gst_object_unref(GST_OBJECT(cur->caps));
 
 		free(cur);
 	}
 
 	// kill pipeline
-	gst_object_unref(GST_OBJECT(dtkPipe->gPipe));
+	gst_object_unref(GST_OBJECT(pl->pipe));
 
 	// unlock status
-	//pthread_mutex_unlock(&(dtkPipe->status_lock));
+	//pthread_mutex_unlock(&(pl->status_lock));
 
 	// delete dtk_pipeline
 	free(tex->aux);
@@ -300,7 +299,7 @@ void destroyPipeline(dtk_htex tex)
 
 
 LOCAL_FN
-dtk_htex dtk_create_video_from_pipeline(dtk_hpipe customPipe)
+dtk_htex dtk_create_video_from_pipeline(dtk_hpipe pl)
 {
 	dtk_htex tex;
 	GstAppSink* appsink;
@@ -308,21 +307,21 @@ dtk_htex dtk_create_video_from_pipeline(dtk_hpipe customPipe)
 		.new_buffer = newbuffer_callback
 	};
 
-	if (!customPipe)
+	if (!pl)
 		return NULL;
 
 	// complete the pipeline
-	add_terminal_elements(customPipe);
-	setup_pipe_links(customPipe);
+	add_terminal_elements(pl);
+	setup_pipe_links(pl);
 
 	// create video texture
-	tex = create_video_texture(customPipe);
+	tex = create_video_texture(pl);
 
 	// Install callback to the appsink
-	appsink = GST_APP_SINK(customPipe->dtkElement->gElement);
+	appsink = GST_APP_SINK(pl->elt->gstelt);
 	gst_app_sink_set_callbacks(appsink, &callbacks, tex, NULL);
 
-	tex->aux = (void *) customPipe;
+	tex->aux = (void *) pl;
 	tex->destroyfn = &(destroyPipeline);
 	return tex;
 }
@@ -332,6 +331,8 @@ dtk_htex dtk_create_video_from_pipeline(dtk_hpipe customPipe)
 LOCAL_FN 
 dtk_hpipe dtk_create_video_pipeline(const char *name)
 {
+	dtk_hpipe pl;
+
 	// INITIALIZATION
 	static bool is_initialized = false;
 	if (!is_initialized) {
@@ -345,45 +346,43 @@ dtk_hpipe dtk_create_video_pipeline(const char *name)
 		is_initialized = true;
 	}
 	// CREATE PIPELINE
-	dtk_hpipe dtkPipeline = malloc(sizeof(struct dtk_pipeline));
-	dtkPipeline->gPipe = gst_pipeline_new(name);
-	dtkPipeline->gBus = NULL;
-	dtkPipeline->dtkElement = NULL;
-	dtkPipeline->editLocked = false;
+	pl = malloc(sizeof(struct dtk_pipeline));
+	pl->pipe = gst_pipeline_new(name);
+	pl->bus = NULL;
+	pl->elt = NULL;
 
 	// check for errors in pipeline creation
-	if (dtkPipeline->gPipe == NULL) {
-		free(dtkPipeline);
+	if (pl->pipe == NULL) {
+		free(pl);
 		return NULL;
 	}
 	// add bus to pipeline
-	dtkPipeline->gBus =
-	    gst_pipeline_get_bus(GST_PIPELINE(dtkPipeline->gPipe));
+	pl->bus = gst_pipeline_get_bus(GST_PIPELINE(pl->pipe));
 
 	// add pipeline status
-	dtkPipeline->thread = (pthread_t) NULL;
-	dtkPipeline->status = DTKV_STOPPED;
+	pl->thread = (pthread_t) NULL;
+	pl->status = DTKV_STOPPED;
 	// .. and status mutex
 	pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-	dtkPipeline->status_lock = mutex;
+	pl->status_lock = mutex;
 
-	return dtkPipeline;
+	return pl;
 }
 
 
 LOCAL_FN
-    bool dtk_pipe_add_element(dtk_hpipe pipe, const char *fact,
-			      const char *nam)
+bool dtk_pipe_add_element(dtk_hpipe pipe, const char *fact,
+			  const char *nam)
 {
 	return dtk_pipe_add_element_full(pipe, fact, nam, NULL);
 }
 
 
 LOCAL_FN
-    bool dtk_pipe_add_element_full(dtk_hpipe pipe,
-				   const char *factory,
-				   const char *name,
-				   const char *firstPropertyName,...)
+bool dtk_pipe_add_element_full(dtk_hpipe pipe,
+				const char *factory,
+				const char *name,
+				const char *firstPropertyName,...)
 {
 	bool retValue;
 	va_list paramList;
@@ -399,11 +398,11 @@ LOCAL_FN
 
 
 LOCAL_FN
-    bool dtk_pipe_add_element_full_valist(dtk_hpipe dtkPipe,
-					  const char *factory,
-					  const char *name,
-					  const char *firstPropertyName,
-					  va_list paramList)
+bool dtk_pipe_add_element_full_valist(dtk_hpipe pl,
+					const char *factory,
+					const char *name,
+					const char *firstPropertyName,
+					va_list paramList)
 {
 	struct dtk_pipe_element *elem;
 	GstElement *gstelem;
@@ -424,20 +423,20 @@ LOCAL_FN
 				    paramList);
 
 	// add object to global bin
-	gst_bin_add(GST_BIN(dtkPipe->gPipe), gstelem);
+	gst_bin_add(GST_BIN(pl->pipe), gstelem);
 
 	// create & fill dtk_pipe_element structure
 	elem = malloc(sizeof(struct dtk_pipe_element));
-	elem->gElement = gstelem;
-	elem->prev = dtkPipe->dtkElement;
+	elem->gstelt = gstelem;
+	elem->prev = pl->elt;
 	elem->next = NULL;
-	elem->gCaps = NULL;
+	elem->caps = NULL;
 
 	// fill previous dtk_pipe_element.next field
-	if (dtkPipe->dtkElement != NULL)
-		dtkPipe->dtkElement->next = elem;
+	if (pl->elt != NULL)
+		pl->elt->next = elem;
 	// put element on top
-	dtkPipe->dtkElement = elem;
+	pl->elt = elem;
 
 	return true;
 }

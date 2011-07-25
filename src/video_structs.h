@@ -22,16 +22,14 @@
 #include <pthread.h>
 
 #include <gst/gst.h>
+#include <gst/app/gstappsink.h>
 #include <glib.h>
 
 #include "drawtk.h"
 
 struct dtk_pipe_element {
-	// gstreamer element
-	GstElement *gElement;
-
-	// source capabilities
-	GstCaps *gCaps;
+	GstElement *gstelt;
+	GstCaps *caps;
 
 	// previous & next element in doubly-linked list
 	struct dtk_pipe_element *prev;
@@ -40,14 +38,12 @@ struct dtk_pipe_element {
 
 struct dtk_pipeline {
 	// pipeline object
-	GstElement *gPipe;
-	bool editLocked;
-
-	// bus object
-	GstBus *gBus;
+	GstElement *pipe;
+	GstBus *bus;
+	GstAppSink* sink;
 
 	// doubly linked list of elements in the pipeline
-	struct dtk_pipe_element *dtkElement;
+	struct dtk_pipe_element *elt;
 
 	// pipeline status
 	pthread_t thread;
