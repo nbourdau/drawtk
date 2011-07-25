@@ -124,12 +124,11 @@ bool bus_callback(GstMessage * msg)
 
 	switch (GST_MESSAGE_TYPE(msg)) {
 	case GST_MESSAGE_EOS:
-		g_print("End of stream\n");
 		return false;
 
 	case GST_MESSAGE_ERROR:
 		gst_message_parse_error(msg, &error, NULL);
-		g_printerr("Error: %s\n", error->message);
+		fprintf(stderr, "Error: %s\n", error->message);
 		g_error_free(error);
 		return false;
 
@@ -140,42 +139,34 @@ bool bus_callback(GstMessage * msg)
 
 
 static
-void *run_pipeline_loop(void *pipe)
+void *run_pipeline_loop(void *arg)
 {
 	GstMessage *msg = NULL;
-	dtk_hpipe dtkPipe = (dtk_hpipe) pipe;
+	dtk_hpipe pipe = arg;
 
 	// main loop
-	bool canLoop = true;
-
-	while (canLoop && dtkPipe->status != DTKV_STOPPED) {
-
-		if (pthread_mutex_trylock(&(dtkPipe->status_lock)) == 0) {
+	bool loop = true;
+	while (loop && pipe->status != DTKV_STOPPED) {
+		if (pthread_mutex_trylock(&(pipe->status_lock)) == 0) {
 			// Read new messages from bus
-			while (canLoop && (msg = gst_bus_pop(dtkPipe->gBus))) {
-				// Call the bus callback for each new message
-				canLoop = bus_callback(msg);
-
-				// Clean the message
+			while (loop && (msg = gst_bus_pop(pipe->gBus))) {
+				loop = bus_callback(msg);
 				gst_message_unref(msg);
 			}
 
 			// if the bus hasn't requested termination, unlock 
-			if (canLoop)
-				pthread_mutex_unlock(&(dtkPipe-> status_lock));
+			if (loop)
+				pthread_mutex_unlock(&(pipe->status_lock));
 		}
 	}
 
 	// set status to STOPPED
-	dtkPipe->status = DTKV_STOPPED;
-
-	// disable pipeline
-	g_print("Set pipeline to READY\n");
-	gst_element_set_state(dtkPipe->gPipe, GST_STATE_READY);
+	pipe->status = DTKV_STOPPED;
+	gst_element_set_state(pipe->gPipe, GST_STATE_READY);
 
 	// if the bus HAS requested termination, unlock only now
-	if (!canLoop)
-		pthread_mutex_unlock(&(dtkPipe->status_lock));
+	if (!loop)
+		pthread_mutex_unlock(&(pipe->status_lock));
 
 	return NULL;
 }
@@ -208,8 +199,8 @@ bool run_pipeline(dtk_hpipe pipe)
 
 	// handle failure
 	if (ret == GST_STATE_CHANGE_FAILURE) {
-		g_print("failed to run pipeline\n");
 		pthread_mutex_unlock(&(pipe->status_lock));
+		fprintf(stderr, "failed to run pipeline\n");
 		return false;
 	}
 	// handle case in which pipeline was simply paused

@@ -134,9 +134,9 @@ void newpad_callback(GstElement * element, GstPad * pad, gpointer data)
 	} else if (isVideo) {
 		// output error and abort, only if we're trying to process
 		// video... audio is ignored
-		g_printerr
-		    ("Source (%s) and sink pads could not be connected - incompatible caps.\n",
-		     gst_element_get_name(element));
+		fprintf(stderr, "Source (%s) and sink pads could not be "
+		                "connected - incompatible caps.\n",
+		                gst_element_get_name(element));
 	}
 	// unreference data
 	gst_caps_unref(sourcecaps);
@@ -176,10 +176,6 @@ void link_pipe_elements(struct dtk_pipe_element *source,
 	GstElementClass *klass;
 	GList *padlist;
 	GstPadTemplate *tpl;
-
-	g_print("link_pipe_elements : %s => %s\n",
-		gst_element_get_name(source->gElement),
-		gst_element_get_name(sink->gElement));
 
 	// retrieve pad templates for source element
 	klass = (GstElementClass *) G_OBJECT_GET_CLASS(source->gElement);
@@ -266,15 +262,11 @@ void destroyPipeline(dtk_htex tex)
 	// lock status
 	//pthread_mutex_lock(&(dtkPipe->status_lock));
 
-	g_print("Set pipeline to NULL\n");
-	gst_element_set_state(dtkPipe->gPipe, GST_STATE_NULL);
-
 	// kill bus
-	g_print("Deleting bus\n");
+	gst_element_set_state(dtkPipe->gPipe, GST_STATE_NULL);
 	gst_object_unref(GST_OBJECT(dtkPipe->gBus));
 
 	// delete each dtk_pipe_element
-	g_print("Deleting dtk_pipe_elements\n");
 	while (dtkPipe->dtkElement != NULL) {
 		struct dtk_pipe_element *cur = dtkPipe->dtkElement;
 
@@ -287,14 +279,12 @@ void destroyPipeline(dtk_htex tex)
 	}
 
 	// kill pipeline
-	g_print("Deleting pipeline\n");
 	gst_object_unref(GST_OBJECT(dtkPipe->gPipe));
 
 	// unlock status
 	//pthread_mutex_unlock(&(dtkPipe->status_lock));
 
 	// delete dtk_pipeline
-	g_print("Deleting dtk_pipeline\n");
 	free(tex->aux);
 
 	tex->aux = NULL;
@@ -331,15 +321,15 @@ dtk_htex dtk_create_video_from_pipeline(dtk_hpipe customPipe)
 
 
 // OUTPUT TEXTURE CREATION
-LOCAL_FN dtk_hpipe dtk_create_video_pipeline(const char *name)
+LOCAL_FN 
+dtk_hpipe dtk_create_video_pipeline(const char *name)
 {
 	// INITIALIZATION
 	static bool is_initialized = false;
 	if (!is_initialized) {
 		// initialize glib threading
-		if (!g_thread_supported()) {
+		if (!g_thread_supported()) 
 			g_thread_init(NULL);
-		}
 		// initialize gstreamer
 		gst_init(NULL, NULL);
 
@@ -409,23 +399,16 @@ LOCAL_FN
 {
 	struct dtk_pipe_element *elem;
 	GstElement *gstelem;
-	assert(dtkPipe != NULL);
 
-	if (dtkPipe->editLocked) {
-		g_printerr
-		    ("Pipeline is completed and editLocked. New elements cannot be added.");
-		return true;
-	}
 	// create element
 	gstelem = gst_element_factory_make(factory, name);
 
 	// abort on failure
 	if (gstelem == NULL) {
-		g_printerr("Failed on creating element : %s - %s\n",
+		fprintf(stderr,"Failed on creating element : %s - %s\n",
 			   factory, name);
 		return false;
-	} else
-		g_print("dtk_pipe_add_element : %s \n", name);
+	}
 
 	// if properties are defined, set element properties
 	if (firstPropertyName != NULL)
@@ -441,11 +424,6 @@ LOCAL_FN
 	elem->prev = dtkPipe->dtkElement;
 	elem->next = NULL;
 	elem->gCaps = NULL;
-
-	// check if new element is a terminal element
-	if (!strcmp(factory, "fakesink")
-	    || !strcmp(factory, "autovideosink"))
-		dtkPipe->editLocked = true;
 
 	// fill previous dtk_pipe_element.next field
 	if (dtkPipe->dtkElement != NULL)
