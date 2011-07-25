@@ -78,6 +78,8 @@ int alloc_compatible_image(GstBuffer* buffer, struct dtk_texture* tex)
 static
 GstFlowReturn newbuffer_callback(GstAppSink *sink,  gpointer data)
 {
+	unsigned char *tdata, *bdata;
+	unsigned int tstride, bstride, h, i;
 	GstBuffer* buffer; 
 	dtk_htex tex = (dtk_htex) data;
 	dtk_hpipe pipe = (dtk_hpipe) tex->aux;
@@ -90,9 +92,18 @@ GstFlowReturn newbuffer_callback(GstAppSink *sink,  gpointer data)
 	if (pipe->status == DTKV_READY)
 		pipe->status = DTKV_PLAYING;
 
-	// load data into memory
-	memcpy(tex->data[0], (unsigned char *) GST_BUFFER_DATA(buffer),
-	       tex->sizes[0].w * tex->sizes[0].h * 3);
+	// load data into memory (gstreamer is flipped in GL conventions)
+	h = tex->sizes[0].h;
+	tstride = tex->sizes[0].stride;
+	bstride = tex->sizes[0].w*3;
+	tdata = tex->data[0];
+	bdata = GST_BUFFER_DATA(buffer) + (h-1)*bstride;
+	for (i=0; i<h; i++) {
+		memcpy(tdata, bdata, bstride);
+		tdata += tstride;
+		bdata -= bstride;
+	}
+
 	gst_buffer_unref(buffer);
 	tex->isinit = false;
 
@@ -152,11 +163,8 @@ static
 void add_terminal_elements(dtk_hpipe pipe)
 {
 	GstCaps *caps;
-	// convert -> flip -> sink
-	dtk_pipe_add_element(pipe, "ffmpegcolorspace", "converter");
 
-	dtk_pipe_add_element_full(pipe, "videoflip", "flipper",
-				  "method", DTK_GST_VERTICAL_FLIP, NULL);
+	dtk_pipe_add_element(pipe, "ffmpegcolorspace", "converter");
 
 	caps = gst_caps_new_simple("video/x-raw-rgb",
 				   "bpp", G_TYPE_INT, 24,
