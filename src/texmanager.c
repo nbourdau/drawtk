@@ -237,11 +237,11 @@ int alloc_image_data(struct dtk_texture* tex,
 }
 
 
-/* Load the texture into the video memory
+/* Create the GL texture and load the image data into the video memory
  * Assume that tex->lock is hold
  */
 static
-void load_gl_texture(struct dtk_texture* tex)
+void create_gl_texture(struct dtk_texture* tex)
 {
 	unsigned int lvl; 
 
@@ -264,6 +264,27 @@ void load_gl_texture(struct dtk_texture* tex)
 
 	// Wait the loading being performed
 	glFlush();
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+
+/* Update the image data in the GL texture
+ * Assume that tex->lock is hold
+ */
+static
+void update_gl_texture(struct dtk_texture* tex)
+{
+	unsigned int lvl; 
+
+	glBindTexture(GL_TEXTURE_2D, tex->id);
+	// Load each mipmap in video memory 
+	for (lvl=0; lvl<=tex->mxlvl; lvl++) {
+		glTexSubImage2D(GL_TEXTURE_2D, lvl, 0, 0,
+		        tex->sizes[lvl].w, tex->sizes[lvl].h,
+			tex->fmt, tex->type, tex->data[lvl]);
+	}
+
+	// Wait the loading being performed
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -298,7 +319,10 @@ GLuint get_texture_id(struct dtk_texture *tex)
 		if (!tex->isinit) {
 			if (tex->data) {
 				pthread_mutex_lock(&(tex->lock));
-				load_gl_texture(tex);
+				if (tex->id)
+					update_gl_texture(tex);
+				else
+					create_gl_texture(tex);
         			tex->isinit = 1;
 				pthread_mutex_unlock(&(tex->lock));
 			} else
@@ -315,7 +339,7 @@ GLuint get_texture_id(struct dtk_texture *tex)
 
 	pthread_mutex_lock(&(tex->lock));
 	if (tex->id == 0)
-		load_gl_texture(tex);
+		create_gl_texture(tex);
 	pthread_mutex_unlock(&(tex->lock));
 
 	return tex->id;
