@@ -49,28 +49,30 @@
  *                         Gstreamer callbacks                            *
  **************************************************************************/
 static
-struct dtk_size *get_pad_size(GstBuffer * buffer)
+int alloc_compatible_image(GstBuffer* buffer, struct dtk_texture* tex)
 {
 	GstCaps *caps;
 	GstStructure *structure;
 	int h, w;
-	struct dtk_size *size = malloc(sizeof(struct dtk_size));
 
 	caps = gst_buffer_get_caps(buffer);
 	if (!caps) {
-		g_printerr
-		    ("get_pad_size - could not get caps for the pad\n");
-		return NULL;
+		fprintf(stderr, "could not get caps for the buffer\n");
+		return -1;
 	}
 
 	structure = gst_caps_get_structure(caps, 0);
 	gst_structure_get_int(structure, "height", &h);
 	gst_structure_get_int(structure, "width", &w);
-	size->h = h;
-	size->w = w;
+
+	tex->intfmt = GL_RGB;
+	tex->fmt = GL_RGB;
+	tex->type = GL_UNSIGNED_BYTE;
+	alloc_image_data(tex, w, h, 0, 24);
+
 	gst_caps_unref(caps);
 
-	return size;
+	return 0;
 }
 
 
@@ -83,25 +85,14 @@ GstFlowReturn newbuffer_callback(GstAppSink *sink,  gpointer data)
 
 	pthread_mutex_lock(&(tex->lock));
 	buffer = gst_app_sink_pull_buffer(sink);
-	if (tex->sizes == NULL) {
-		tex->mxlvl = 0;
-		tex->intfmt = GL_RGB;
-		tex->fmt = GL_RGB;
-		tex->type = GL_UNSIGNED_BYTE;
-
-		//print_buffer(buffer, "buffer");
-		tex->sizes = get_pad_size(buffer);
-
-		tex->data = malloc(tex->sizes[0].w * tex->sizes[0].h * 3);
-		memset(tex->data, 130,
-		       tex->sizes[0].w * tex->sizes[0].h * 3);
-	}
+	if (tex->sizes == NULL) 
+		alloc_compatible_image(buffer, tex);
 
 	if (pipe->status == DTKV_READY)
 		pipe->status = DTKV_PLAYING;
 
 	// load data into memory
-	memcpy(tex->data, (unsigned char *) GST_BUFFER_DATA(buffer),
+	memcpy(tex->data[0], (unsigned char *) GST_BUFFER_DATA(buffer),
 	       tex->sizes[0].w * tex->sizes[0].h * 3);
 	gst_buffer_unref(buffer);
 	tex->isinit = false;
@@ -167,9 +158,9 @@ void add_terminal_elements(dtk_hpipe pipe)
 
 	caps = gst_caps_new_simple("video/x-raw-rgb",
 				   "bpp", G_TYPE_INT, 24,
-				   "red_mask", G_TYPE_INT, 16711680,
-				   "green_mask", G_TYPE_INT, 65280,
-				   "blue_mask", G_TYPE_INT, 255, NULL);
+				   "red_mask", G_TYPE_INT, 0xFF0000,
+				   "green_mask", G_TYPE_INT, 0x00FF00,
+				   "blue_mask", G_TYPE_INT, 0x0000FF, NULL);
 	dtk_pipe_add_element_full(pipe, "capsfilter", "rgb-filter",
 				  "caps", caps, NULL);
 
