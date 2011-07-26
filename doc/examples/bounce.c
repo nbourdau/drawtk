@@ -20,11 +20,15 @@
  *
  * This program demonstrates how to perform a simple animation (bouncing box).
  * A box is bouncing in an area limited by coordinates (-1,-1) and (1,1).
+ * A video is displayed in the background. This is specified by command line
+ * or a test video is used if none are provided
  * Arrow keys stop and enable vertical and horizontal movement
  * Pressing the ESC key close the demo.
+ * s, p, q respectively starts, stops, pauses the video
  * This shows how to:
  *	- do minimalist drawings
  *      - use the timing functions
+ *	- use a video texture
  *	- use the events
  */
 
@@ -33,6 +37,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <drawtk.h>
+#include <dtk_video.h>
 #include <dtk_colors.h>
 #include <dtk_event.h>
 #include <dtk_time.h>
@@ -50,6 +55,8 @@
 
 dtk_hwnd wnd = NULL;
 dtk_hshape obj = NULL;
+dtk_hshape vidshp = NULL;
+dtk_htex video = NULL;
 
 int dirx = 1, diry = 1;
 float x = 0.1f, y = 0.0f;
@@ -59,8 +66,16 @@ struct dtk_timespec ts;
 static
 void setup_shapes(void)
 {
+	unsigned int h, w;
+	float wid;
+
 	obj = dtk_create_rectangle_hw(NULL, 0.0f, 0.0f,
 	                           HEIGHT, WIDTH, 1, dtk_white);
+
+	/* Create an image shape with the same aspect ratio as the video */
+	dtk_texture_getsize(video, &w, &h);
+	wid = 2.0*((float)h / (float)w);
+	vidshp = dtk_create_image(NULL, 0.0,0.0, 2.0,wid, dtk_white, video);
 }
 
 
@@ -68,6 +83,7 @@ static
 void cleanup_shapes(void)
 {
 	dtk_destroy_shape(obj);
+	dtk_destroy_shape(vidshp);
 }
 
 
@@ -77,6 +93,9 @@ void redraw(dtk_hwnd wnd)
 	/* Erase previous draw
 	 This is necessary since a redraw does not cover the whole window */
 	dtk_clear_screen(wnd);
+
+	/* Draw the current video frame */
+	dtk_draw_shape(vidshp);
 
 	/* Draw the rectangle on the window */
 	dtk_draw_shape(obj);
@@ -151,6 +170,12 @@ int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 			else if (evt->key.sym == DTKK_LEFT)
 				dirx = dirx <= -1 ? -1 : dirx-1;
 		}
+                else if(evt->key.sym == DTKK_s)
+                        dtk_video_exec(video,DTKV_CMD_PLAY);
+                else if(evt->key.sym == DTKK_p)
+                        dtk_video_exec(video,DTKV_CMD_PAUSE);
+                else if(evt->key.sym == DTKK_q)
+                        dtk_video_exec(video,DTKV_CMD_STOP);
 		break;
 	}
 
@@ -158,9 +183,15 @@ int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 }
 
 
-int main(void)
+int main(int argc, char* argv[])
 {
 	struct dtk_timespec delay = {0, 5000000}; /* 5ms */
+
+	/* Load the video into a texture and start playing immediately */
+	if (argc >= 2)
+		video = dtk_load_video_file(DTK_AUTOSTART, argv[1]);
+	else
+		video = dtk_load_video_test(DTK_AUTOSTART);
 	
 	/* Setup a a window to performe the drawings and 
 	   register its event handling function */
@@ -181,6 +212,7 @@ int main(void)
 
 	/* Cleanup all created resources */
 	cleanup_shapes();
+	dtk_destroy_texture(video);
 	dtk_close(wnd);
 
 	return 0;

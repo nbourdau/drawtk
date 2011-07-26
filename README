@@ -7,16 +7,16 @@ Presentation
 
 This package provides an C library to perform efficient 2D drawings. The
 drawing is done by OpenGL which allow us fast and nice rendering of basic
-shapes, text and images (and more in future). It has been implemented as a
-thin layer that hides the complexity of the OpenGL library.
+shapes, text, images and video. It has been implemented as a thin layer that
+hides the complexity of the OpenGL library.
 
 
 Supported platforms
 ===================
 
-Any platforms supported by SDL, freetype 2, fontconfig and freeimage should
-be able to compile, and run this library. However it has been tested only
-on GNU/Linux and Win32 (using MinGW)
+Any platforms supported by SDL, freetype 2, gstreamer, fontconfig and
+freeimage should be able to compile, and run this library. However it has
+been tested only on GNU/Linux and Win32 (using MinGW)
 
 
 Compilation

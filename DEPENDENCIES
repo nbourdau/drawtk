@@ -2,4 +2,4 @@ sdl 1.2
 freeimage
 freetype
 fontconfig
-
+gstreamer 0.10

@@ -1,16 +1,29 @@
+/*
+    Copyright (C) 2011  EPFL (Ecole Polytechnique Fédérale de Lausanne)
+    Pierluca Borsò <pierluca.borso@epfl.ch>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <stdlib.h>
-#include <stdio.h>
-
 #include <stdbool.h>
-
-#include <gst/gst.h>
-#include <glib.h>
-
-#include "dtk_video.h"
-#include "drawtk.h"
-#include "dtk_event.h"
-#include "dtk_time.h"
-#include "dtk_colors.h"
+#include <stdio.h>
+#include <dtk_video.h>
+#include <drawtk.h>
+#include <dtk_event.h>
+#include <dtk_time.h>
+#include <dtk_colors.h>
 
 static dtk_hwnd wnd = NULL;
 static dtk_htex video1 = NULL;
