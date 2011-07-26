@@ -11,6 +11,10 @@ dist_man_MANS = dtk_move_shape.3 dtk_relmove_shape.3			\
 		dtk_destroy_shape.3					\
 		dtk_load_image.3 dtk_destroy_texture.3			\
 		dtk_texture_getsize.3					\
+		dtk_load_video_file.3 dtk_load_video_test.3		\
+		dtk_load_video_tcp.3 dtk_load_video_udp.3		\
+		dtk_load_video_gst.3					\
+		dtk_video_exec.3 dtk_video_getstate.3			\
 		dtk_load_font.3 dtk_destroy_font.3			\
 		dtk_create_window.3 dtk_close.3				\
 		dtk_make_current_window.3 dtk_window_getsize.3		\

@@ -1,0 +1,55 @@
+.\"Copyright 2011 (c) EPFL
+.TH DTK_LOAD_VIDEO_GST 3 2010 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_load_video_gst - Load the sink of gstreamer pipeline as a texture
+.SH SYNOPSIS
+.LP
+.B #include <dtk_video.h>
+.sp
+.BI "dtk_htex dtk_load_video_gst(int " flags ", const char *" desc ");"
+.br
+.SH DESCRIPTION
+.LP
+This function loads as a dynamic texture the video stream arriving into the 
+sink of a gstreamer pipeline. The pipeline description \fIdesc\fP should
+follows the syntax used in the \fBgst-launch\fP(1) utility and it must
+contains an video sink of type \fBappsink\fP named \fBdtksink\fP that will
+be used to get the data for the dynamic texture. The texture will then been
+tracked by an internal texture manager so that the next call using the same 
+\fIdesc\fP argument will return the same texture handle, thus sparing the
+ressources of the system. If not specified by \fIflags\fP the video will not
+be played immediately and \fBdtk_video_exec\fP(3) should be called to do
+start playing.
+.LP
+The argument \fIflags\fP is used to modify the creation. It should contains
+a bitwise OR combination of the following flags:
+.IP
+\fBDTKV_AUTOSTART\fP : Indicates that the video should start immediately
+after creation.
+.LP
+A dynamic texture can be used the same way as a static texture (for example
+image file). The only difference is that the content of the texture changes
+automatically with the stream of video. This means that every time a shape
+using this texture is drawn, the latest frame available from the video
+stream will be mapped on the shape.
+.LP
+There is no need for a valid window to create successfully a texture, i.e.
+creation of textures are completely decoupled from the creation of others
+ressources and can even be created in one thread to be used in another one.
+.LP
+Once a the texture is stopped being used, it should be destroyed by
+\fBdtk_destroy_texture\fP(3).
+.SH "RETURN VALUE"
+.LP
+In case of success, the function returns the handle to the created texture.
+In case of failure, \fINULL\fP is returned.
+.SH "THREAD SAFETY"
+.LP
+\fBdtk_load_video_gst\fP() is thread-safe.
+.SH "SEE ALSO"
+.BR gst-launch (1),
+.BR dtk_destroy_texture (3),
+.BR dtk_video_exec (3),
+.BR dtk_video_getstate (3)
+
+

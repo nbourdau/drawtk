@@ -1,0 +1,29 @@
+.\"Copyright 2011 (c) EPFL
+.TH DTK_VIDEO_GETSTATE 3 2011 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_video_getstate - returns the current state of a video texture
+.SH SYNOPSIS
+.LP
+.B #include <dtk_video.h>
+.sp
+.BI "int dtk_video_getstate(dtk_htex " vid ");"
+.br
+.SH DESCRIPTION
+.LP
+This function returns the state of a video texture referenced by \fIvid\fP
+and will be on of these values: \fBDTKV_CMD_PLAY\fP, \fBDTKV_CMD_PAUSED\fP,
+\fBDTKV_CMD_STOP\fP. \fIvid\fP must be a dynamic texture created by one of
+the functions \fBdtk_create_video_*\fP(3).
+.SH "RETURN VALUE"
+.LP
+This function returns the state of the video in case of success,
+-1 otherwise.
+.SH "SEE ALSO"
+.BR dtk_load_video_file (3),
+.BR dtk_load_video_gst (3),
+.BR dtk_load_video_test (3),
+.BR dtk_load_video_udp (3),
+.BR dtk_load_video_tcp (3),
+.BR dtk_video_exec (3)
+
+
