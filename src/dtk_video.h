@@ -45,6 +45,7 @@ dtk_htex dtk_create_video_tcp(int flags, const char *server, int port);
 dtk_htex dtk_create_video_udp(int flags, int port);
 dtk_htex dtk_create_video_file(int flags, const char *file);
 dtk_htex dtk_create_video_test(int flags);
+dtk_htex dtk_create_video_custom(int flags, const char* desc);
 bool dtk_video_exec(dtk_htex video, int command);
 int dtk_video_getstate(dtk_htex video);
 

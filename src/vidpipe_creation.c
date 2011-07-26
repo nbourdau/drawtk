@@ -76,8 +76,8 @@ void newpad_callback(GstElement * elt, GstPad * pad, gpointer data)
 	} else if (isvid) {
 		// output error and abort, only if we're trying to process
 		// video... audio is ignored
-		fprintf(stderr, "Source (%s) and sink pads could not be "
-		                "connected - incompatible caps.\n",
+		fprintf(stderr, "drawtk: Source (%s) and sink pads could "
+		                "not be connected - incompatible caps.\n",
 		                gst_element_get_name(elt));
 	}
 	// unreference data
@@ -105,7 +105,7 @@ bool pipe_add_element_full_valist(struct pipeline* pl,
 
 	// abort on failure
 	if (gstelem == NULL) {
-		fprintf(stderr,"Failed on creating element : %s - %s\n",
+		fprintf(stderr,"drawtk: fails creating element : %s - %s\n",
 			   factory, name);
 		return false;
 	}
@@ -164,18 +164,8 @@ bool pipe_add_element(struct pipeline* pipe, const char *fact,
 static
 void add_terminal_elements(struct pipeline* pipe)
 {
-	GstCaps *caps;
-
 	pipe_add_element(pipe, "ffmpegcolorspace", "converter");
-
-	caps = gst_caps_new_simple("video/x-raw-rgb",
-				   "bpp", G_TYPE_INT, 24,
-				   "red_mask", G_TYPE_INT, 0xFF0000,
-				   "green_mask", G_TYPE_INT, 0x00FF00,
-				   "blue_mask", G_TYPE_INT, 0x0000FF, NULL);
-	pipe_add_element_full(pipe, "appsink", "dtksink",
-	                                "caps", caps, NULL);
-	gst_caps_unref(caps);
+	pipe_add_element_full(pipe, "appsink", "dtksink", NULL);
 }
 
 
@@ -246,7 +236,17 @@ void free_element_list(struct pipeline* pl)
 LOCAL_FN
 GstElement* create_pipeline(const struct pipeline_opt* opt)
 {
+	GError* error = NULL;
 	struct pipeline pl;
+
+	if (opt->type == VCUSTOM) {
+		pl.pipe = gst_parse_launch(opt->str, &error);
+		if (error) {
+			fprintf(stderr, "drawtk: %s\n", error->message);
+			g_error_free(error);
+		}
+		return pl.pipe;
+	}
 
 	pl.pipe = gst_pipeline_new("pipeline");
 	pl.elt = NULL;

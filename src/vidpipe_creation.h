@@ -32,6 +32,7 @@ struct pipeline_opt
 #define VUDP	1
 #define VFILE	2
 #define VTEST	3
+#define VCUSTOM	4
 
 LOCAL_FN GstElement* create_pipeline(const struct pipeline_opt* opt);
 

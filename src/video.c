@@ -83,7 +83,7 @@ int alloc_compatible_image(GstBuffer* buffer, struct dtk_texture* tex)
 
 	caps = gst_buffer_get_caps(buffer);
 	if (!caps) {
-		fprintf(stderr, "could not get caps for the buffer\n");
+		fprintf(stderr, "drawtk: could not get caps for the buffer\n");
 		return -1;
 	}
 
@@ -179,6 +179,7 @@ int init_video_tex(dtk_htex tex, GstElement* pipe)
 {
 	struct dtk_pipeline* pl;
 	GstAppSink* sink;
+	GstCaps* caps;
 	GstAppSinkCallbacks callbacks = {
 		.new_buffer = newbuffer_callback
 	};
@@ -190,6 +191,13 @@ int init_video_tex(dtk_htex tex, GstElement* pipe)
 	pthread_mutex_init(&(pl->status_lock), NULL);
 
 	sink = GST_APP_SINK(gst_bin_get_by_name(GST_BIN(pipe), "dtksink"));
+	caps = gst_caps_new_simple("video/x-raw-rgb",
+				   "bpp", G_TYPE_INT, 24,
+				   "red_mask", G_TYPE_INT, 0xFF0000,
+				   "green_mask", G_TYPE_INT, 0x00FF00,
+				   "blue_mask", G_TYPE_INT, 0x0000FF, NULL);
+	gst_app_sink_set_caps(sink, caps);
+	gst_caps_unref(caps);
 	gst_app_sink_set_callbacks(sink, &callbacks, tex, NULL);
 	pl->sink = sink;
 
@@ -242,7 +250,7 @@ bool bus_callback(GstMessage * msg)
 
 	case GST_MESSAGE_ERROR:
 		gst_message_parse_error(msg, &error, NULL);
-		fprintf(stderr, "Error: %s\n", error->message);
+		fprintf(stderr, "drawtk: %s\n", error->message);
 		g_error_free(error);
 		return false;
 
@@ -314,7 +322,7 @@ bool run_pipeline(struct dtk_pipeline* pl)
 	// handle failure
 	if (ret == GST_STATE_CHANGE_FAILURE) {
 		pthread_mutex_unlock(&(pl->status_lock));
-		fprintf(stderr, "failed to run pipeline\n");
+		fprintf(stderr, "drawtk: failed to run pipeline\n");
 		return false;
 	}
 	// handle case in which pipeline was simply paused
@@ -424,6 +432,20 @@ dtk_htex dtk_create_video_file(int flags, const char *file)
 
 
 API_EXPORTED
+dtk_htex dtk_create_video_custom(int flags, const char* desc)
+{
+	struct pipeline_opt opt = {.type=VCUSTOM, .str=desc};
+	char stringid[255];
+
+	if (!desc)
+		return NULL;
+
+	sprintf(stringid, "CUSTOM:%s", desc);
+	return create_video_any(&opt, stringid, flags);
+}
+
+
+API_EXPORTED
 dtk_htex dtk_create_video_test(int flags)
 {
 	struct pipeline_opt opt = {.type=VTEST};
@@ -460,3 +482,4 @@ bool dtk_video_exec(dtk_htex video, int command)
 		return false;
 	}
 }
+
