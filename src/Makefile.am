@@ -9,8 +9,7 @@ libdrawtk_la_SOURCES = drawtk.h dtk_event.h		\
 			 window.h window.c events.c	\
 			 dtk_colors.h colors.c		\
 			 dtk_time.h time.c              \
-			 video_structs.h            \
-			 video_custom.c dtk_video_custom.h \
+			 vidpipe_creation.c vidpipe_creation.h \
 			 video.c dtk_video.h
 
 libdrawtk_la_LIBADD = $(LTLIBOBJS)

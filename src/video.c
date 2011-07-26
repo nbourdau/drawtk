@@ -30,12 +30,12 @@
 #include <gst/gst.h>
 #include <glib.h>
 #include <gst/base/gstbasetransform.h>
+#include <gst/app/gstappsink.h>
 
 #include <SDL/SDL.h>
 
 #include "dtk_video.h"
-#include "video_structs.h"
-#include "video_custom.h"
+#include "vidpipe_creation.h"
 
 #include "drawtk.h"
 #include "texmanager.h"
@@ -44,76 +44,187 @@
 #include "dtk_time.h"
 
 
+struct dtk_pipeline {
+	// pipeline object
+	GstElement *pipe;
+	GstBus *bus;
+	GstAppSink* sink;
+
+	// pipeline status
+	pthread_t thread;
+	int status;
+	pthread_mutex_t status_lock;
+};
+
+
+static
+void init_gstreamer(void)
+{
+	static bool is_initialized = false;
+	if (!is_initialized) {
+		// initialize glib threading
+		if (!g_thread_supported()) 
+			g_thread_init(NULL);
+		// initialize gstreamer
+		gst_init(NULL, NULL);
+
+		// set sentinel
+		is_initialized = true;
+	}
+}
+
+
+static
+int alloc_compatible_image(GstBuffer* buffer, struct dtk_texture* tex)
+{
+	GstCaps *caps;
+	GstStructure *structure;
+	int h, w;
+
+	caps = gst_buffer_get_caps(buffer);
+	if (!caps) {
+		fprintf(stderr, "could not get caps for the buffer\n");
+		return -1;
+	}
+
+	structure = gst_caps_get_structure(caps, 0);
+	gst_structure_get_int(structure, "height", &h);
+	gst_structure_get_int(structure, "width", &w);
+
+	tex->intfmt = GL_RGB;
+	tex->fmt = GL_RGB;
+	tex->type = GL_UNSIGNED_BYTE;
+	alloc_image_data(tex, w, h, 0, 24);
+
+	gst_caps_unref(caps);
+
+	return 0;
+}
+
+
+static
+GstFlowReturn newbuffer_callback(GstAppSink *sink,  gpointer data)
+{
+	unsigned char *tdata, *bdata;
+	unsigned int tstride, bstride, h, i;
+	GstBuffer* buffer; 
+	dtk_htex tex = data;
+	struct dtk_pipeline* pl = tex->aux;
+
+	pthread_mutex_lock(&(tex->lock));
+	buffer = gst_app_sink_pull_buffer(sink);
+	if (tex->sizes == NULL) 
+		alloc_compatible_image(buffer, tex);
+
+	if (pl->status == DTKV_READY)
+		pl->status = DTKV_PLAYING;
+
+	// load data into memory (gstreamer is flipped in GL conventions)
+	h = tex->sizes[0].h;
+	tstride = tex->sizes[0].stride;
+	bstride = tex->sizes[0].w*3;
+	tdata = tex->data[0];
+	bdata = GST_BUFFER_DATA(buffer) + (h-1)*bstride;
+	for (i=0; i<h; i++) {
+		memcpy(tdata, bdata, bstride);
+		tdata += tstride;
+		bdata -= bstride;
+	}
+
+	gst_buffer_unref(buffer);
+	tex->isinit = false;
+
+	pthread_mutex_unlock(&(tex->lock));
+	return GST_FLOW_OK;
+}
+
+
 /**************************************************************************
  *                           Pipeline creation                            *
  **************************************************************************/
 static
-dtk_hpipe dtk_create_tcp_pipeline(const char *server, int port)
+void destroyPipeline(dtk_htex tex)
 {
-	char pipeName[255];
-	dtk_hpipe pl;
+	struct dtk_pipeline* pl = tex->aux;
 
-	if (port < 1 || strlen(server) == 0)
-		return NULL;
+	// set pipeline status to dead
+	pl->status = DTKV_STOPPED;
 
-	sprintf(pipeName, "TCP:%s:%d", server, port);
-	pl = dtk_create_video_pipeline(pipeName);
-	dtk_pipe_add_element_full(pl, "tcpclientsrc", "tcp-src",
-				  "host", server, "port", port, NULL);
-	dtk_pipe_add_element(pl, "queue", "queue");
-	dtk_pipe_add_element(pl, "decodebin2", "decoder-bin");
+	// join the threads
+	pthread_join(pl->thread, NULL);
 
-	return pl;
+	// lock status
+	//pthread_mutex_lock(&(pl->status_lock));
+
+	// kill bus
+	gst_element_set_state(pl->pipe, GST_STATE_NULL);
+	gst_object_unref(GST_OBJECT(pl->bus));
+
+	// kill pipeline
+	gst_object_unref(GST_OBJECT(pl->pipe));
+
+	// unlock status
+	//pthread_mutex_unlock(&(pl->status_lock));
+
+	// delete dtk_pipeline
+	pthread_mutex_destroy(&(pl->status_lock));
+	free(tex->aux);
+
+	tex->aux = NULL;
 }
 
 
 static
-dtk_hpipe dtk_create_udp_pipeline(int port)
+int init_video_tex(dtk_htex tex, GstElement* pipe)
 {
-	char pipeName[255];
-	dtk_hpipe pl;
+	struct dtk_pipeline* pl;
+	GstAppSink* sink;
+	GstAppSinkCallbacks callbacks = {
+		.new_buffer = newbuffer_callback
+	};
 
-	if (port < 1)
-		return NULL;
+	pl = malloc(sizeof(*pl));
+	pl->pipe = pipe;
+	pl->bus = gst_pipeline_get_bus(GST_PIPELINE(pipe));
+	pl->status = DTKV_STOPPED;
+	pthread_mutex_init(&(pl->status_lock), NULL);
 
-	sprintf(pipeName, "UDP:%d", port);
-	pl = dtk_create_video_pipeline(pipeName);
-	dtk_pipe_add_element_full(pl, "udpsrc", "udp-src",
-				  "port", port, NULL);
-	dtk_pipe_add_element(pl, "queue", "data-queue");
-	dtk_pipe_add_element(pl, "decodebin2", "decoder-bin");
+	sink = GST_APP_SINK(gst_bin_get_by_name(GST_BIN(pipe), "dtksink"));
+	gst_app_sink_set_callbacks(sink, &callbacks, tex, NULL);
+	pl->sink = sink;
 
-	return pl;
+	tex->id = 0;
+	tex->isvideo = true;
+	tex->sizes = NULL;
+	tex->aux = pl;
+	tex->destroyfn = &(destroyPipeline);
+
+	return 0;
 }
 
 
 static
-dtk_hpipe dtk_create_file_pipeline(const char *file)
+dtk_htex create_video_any(const struct pipeline_opt* opt,
+                          const char* stringid, int flags)
 {
-	char pipeName[255];
-	dtk_hpipe pl;
+	dtk_htex tex;
+	GstElement* pipe;
 
-	if (strlen(file) == 0)
+	if ((tex = get_texture(stringid)) == NULL)
 		return NULL;
 
-	sprintf(pipeName, "FILE:%s", file);
-	pl = dtk_create_video_pipeline(pipeName);
-	dtk_pipe_add_element_full(pl, "filesrc", "file-src",
-				  "location", file, NULL);
-	dtk_pipe_add_element(pl, "queue", "queue");
-	dtk_pipe_add_element(pl, "decodebin2", "decoder-bin");
+	pthread_mutex_lock(&(tex->lock));
+	if (!tex->isinit) {
+		init_gstreamer();
+		pipe = create_pipeline(opt);
+		init_video_tex(tex, pipe);
+	}
+	pthread_mutex_unlock(&(tex->lock));
 
-	return pl;
-}
-
-
-static
-dtk_hpipe dtk_create_test_pipeline(void)
-{
-	dtk_hpipe pl = dtk_create_video_pipeline("test-pipe");
-	dtk_pipe_add_element(pl, "videotestsrc", "test-src");
-
-	return pl;
+	if (tex && (flags & DTK_AUTOSTART))
+		dtk_video_exec(tex, DTKV_CMD_PLAY);
+		
+	return tex;
 }
 
 
@@ -145,7 +256,7 @@ static
 void *run_pipeline_loop(void *arg)
 {
 	GstMessage *msg = NULL;
-	dtk_hpipe pl = arg;
+	struct dtk_pipeline* pl = arg;
 
 	// main loop
 	bool loop = true;
@@ -176,7 +287,7 @@ void *run_pipeline_loop(void *arg)
 
 
 static
-bool run_pipeline(dtk_hpipe pl)
+bool run_pipeline(struct dtk_pipeline* pl)
 {
 	bool paused;
 	GstStateChangeReturn ret;
@@ -227,7 +338,7 @@ bool run_pipeline(dtk_hpipe pl)
 
 
 static
-void stop_pipeline(dtk_hpipe pl)
+void stop_pipeline(struct dtk_pipeline* pl)
 {
 	pthread_mutex_lock(&(pl->status_lock));
 
@@ -239,7 +350,7 @@ void stop_pipeline(dtk_hpipe pl)
 
 
 static
-bool pause_pipeline(dtk_hpipe pl)
+bool pause_pipeline(struct dtk_pipeline* pl)
 {
 	GstStateChangeReturn ret;
 	pthread_mutex_lock(&(pl->status_lock));
@@ -271,45 +382,59 @@ bool pause_pipeline(dtk_hpipe pl)
  *                    Video related API implementation                    *
  **************************************************************************/
 API_EXPORTED
-dtk_htex dtk_create_video(int feed_type, bool autostart,...)
+dtk_htex dtk_create_video_tcp(int flags, const char *server, int port)
 {
-	dtk_hpipe pl = NULL;
-	dtk_htex tex = NULL;
-	va_list args;
+	struct pipeline_opt opt = {.type=VTCP, .str = server, .port = port};
+	char stringid[255];
 
-	va_start(args, autostart);
-	switch (feed_type) {
-	case DTKV_FEED_TCP:
-		pl = dtk_create_tcp_pipeline(va_arg(args, const char *),
-		                             va_arg(args, int));
-		break;
+	if (port < 1 || !server)
+		return NULL;
 
-	case DTKV_FEED_UDP:
-		pl = dtk_create_udp_pipeline(va_arg(args, int));
-		break;
+	sprintf(stringid, "TCP:%s:%d", server, port);
+	return create_video_any(&opt, stringid, flags);
+}
 
-	case DTKV_FEED_FILE:
-		pl = dtk_create_file_pipeline(va_arg(args, const char *));
-		break;
 
-	case DTKV_FEED_TEST:
-		pl = dtk_create_test_pipeline();
-		break;
-	}
-	va_end(args);
+API_EXPORTED
+dtk_htex dtk_create_video_udp(int flags, int port)
+{
+	struct pipeline_opt opt = {.type=VUDP, .port = port};
+	char stringid[255];
 
-	tex = dtk_create_video_from_pipeline(pl);
-	if (autostart && tex)
-		dtk_video_exec(tex, DTKV_CMD_PLAY);
+	if (port < 1)
+		return NULL;
 
-	return tex;
+	sprintf(stringid, "UDP:%d", port);
+	return create_video_any(&opt, stringid, flags);
+}
+
+
+API_EXPORTED
+dtk_htex dtk_create_video_file(int flags, const char *file)
+{
+	struct pipeline_opt opt = {.type=VFILE, .str=file};
+	char stringid[255];
+
+	if (!file)
+		return NULL;
+
+	sprintf(stringid, "FILE:%s", file);
+	return create_video_any(&opt, stringid, flags);
+}
+
+
+API_EXPORTED
+dtk_htex dtk_create_video_test(int flags)
+{
+	struct pipeline_opt opt = {.type=VTEST};
+	return create_video_any(&opt, "TESTPIPE", flags);
 }
 
 
 API_EXPORTED
 int dtk_video_getstate(dtk_htex video)
 {
-	dtk_hpipe pl = video->aux;
+	struct dtk_pipeline* pl = video->aux;
 
 	return pl->status;
 }
@@ -318,7 +443,7 @@ int dtk_video_getstate(dtk_htex video)
 API_EXPORTED
 bool dtk_video_exec(dtk_htex video, int command)
 {
-	dtk_hpipe pl = (dtk_hpipe) video->aux;
+	struct dtk_pipeline* pl = video->aux;
 
 	switch (command) {
 	case DTKV_CMD_STOP:

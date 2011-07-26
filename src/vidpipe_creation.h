@@ -16,39 +16,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VIDEO_STRUCTS_H
-#define VIDEO_STRUCTS_H
-
-#include <pthread.h>
+#ifndef VIDPIPE_CREATION_H
+#define VIDPIPE_CREATION_H
 
 #include <gst/gst.h>
-#include <gst/app/gstappsink.h>
-#include <glib.h>
 
-#include "drawtk.h"
-
-struct dtk_pipe_element {
-	GstElement *gstelt;
-	GstCaps *caps;
-
-	// previous & next element in doubly-linked list
-	struct dtk_pipe_element *prev;
-	struct dtk_pipe_element *next;
+struct pipeline_opt
+{
+	int type;
+	const char* str;
+	int port;
 };
 
-struct dtk_pipeline {
-	// pipeline object
-	GstElement *pipe;
-	GstBus *bus;
-	GstAppSink* sink;
+#define VTCP	0
+#define VUDP	1
+#define VFILE	2
+#define VTEST	3
 
-	// doubly linked list of elements in the pipeline
-	struct dtk_pipe_element *elt;
+LOCAL_FN GstElement* create_pipeline(const struct pipeline_opt* opt);
 
-	// pipeline status
-	pthread_t thread;
-	int status;
-	pthread_mutex_t status_lock;
-};
+#endif
 
-#endif // ifndef VIDEO_STRUCTS_H

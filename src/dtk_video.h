@@ -26,15 +26,6 @@
 extern "C" {
 #endif
 
-typedef struct dtk_pipeline *dtk_hpipe;
-
-enum dtk_video_feed {
-	DTKV_FEED_TEST = 0,
-	DTKV_FEED_FILE = 1,
-	DTKV_FEED_TCP = 2,
-	DTKV_FEED_UDP = 3
-};
-
 enum dtk_video_status {
 	DTKV_STOPPED = 0,
 	DTKV_READY = 1,
@@ -48,7 +39,12 @@ enum dtk_video_cmd {
 	DTKV_CMD_PAUSE = 2
 };
 
-dtk_htex dtk_create_video(int feed_type, bool autostart, ...);
+#define DTK_AUTOSTART	0x01
+
+dtk_htex dtk_create_video_tcp(int flags, const char *server, int port);
+dtk_htex dtk_create_video_udp(int flags, int port);
+dtk_htex dtk_create_video_file(int flags, const char *file);
+dtk_htex dtk_create_video_test(int flags);
 bool dtk_video_exec(dtk_htex video, int command);
 int dtk_video_getstate(dtk_htex video);
 

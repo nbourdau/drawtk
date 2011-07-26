@@ -338,7 +338,7 @@ GLuint get_texture_id(struct dtk_texture *tex)
 	}
 
 	pthread_mutex_lock(&(tex->lock));
-	if (tex->id == 0)
+	if (tex->id == 0) 
 		create_gl_texture(tex);
 	pthread_mutex_unlock(&(tex->lock));
 
