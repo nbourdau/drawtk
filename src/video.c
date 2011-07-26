@@ -390,7 +390,7 @@ bool pause_pipeline(struct dtk_pipeline* pl)
  *                    Video related API implementation                    *
  **************************************************************************/
 API_EXPORTED
-dtk_htex dtk_create_video_tcp(int flags, const char *server, int port)
+dtk_htex dtk_load_video_tcp(int flags, const char *server, int port)
 {
 	struct pipeline_opt opt = {.type=VTCP, .str = server, .port = port};
 	char stringid[255];
@@ -404,7 +404,7 @@ dtk_htex dtk_create_video_tcp(int flags, const char *server, int port)
 
 
 API_EXPORTED
-dtk_htex dtk_create_video_udp(int flags, int port)
+dtk_htex dtk_load_video_udp(int flags, int port)
 {
 	struct pipeline_opt opt = {.type=VUDP, .port = port};
 	char stringid[255];
@@ -418,7 +418,7 @@ dtk_htex dtk_create_video_udp(int flags, int port)
 
 
 API_EXPORTED
-dtk_htex dtk_create_video_file(int flags, const char *file)
+dtk_htex dtk_load_video_file(int flags, const char *file)
 {
 	struct pipeline_opt opt = {.type=VFILE, .str=file};
 	char stringid[255];
@@ -432,7 +432,7 @@ dtk_htex dtk_create_video_file(int flags, const char *file)
 
 
 API_EXPORTED
-dtk_htex dtk_create_video_custom(int flags, const char* desc)
+dtk_htex dtk_load_video_custom(int flags, const char* desc)
 {
 	struct pipeline_opt opt = {.type=VCUSTOM, .str=desc};
 	char stringid[255];
@@ -446,7 +446,7 @@ dtk_htex dtk_create_video_custom(int flags, const char* desc)
 
 
 API_EXPORTED
-dtk_htex dtk_create_video_test(int flags)
+dtk_htex dtk_load_video_test(int flags)
 {
 	struct pipeline_opt opt = {.type=VTEST};
 	return create_video_any(&opt, "TESTPIPE", flags);

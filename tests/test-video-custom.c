@@ -83,7 +83,7 @@ int main(void)
 	dtk_make_current_window(wnd);
 	dtk_set_event_handler(wnd, event_handler);
 
-        video = dtk_create_video_custom(DTK_AUTOSTART, desc);
+        video = dtk_load_video_custom(DTK_AUTOSTART, desc);
 
         shape = dtk_create_image(NULL, 0.0f, 0.4f, 1.0f, 0.8f, dtk_white, video);
 
