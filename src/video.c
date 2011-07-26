@@ -295,7 +295,7 @@ void *run_pipeline_loop(void *arg)
 
 
 static
-bool run_pipeline(struct dtk_pipeline* pl)
+int run_pipeline(struct dtk_pipeline* pl)
 {
 	bool paused;
 	GstStateChangeReturn ret;
@@ -305,7 +305,7 @@ bool run_pipeline(struct dtk_pipeline* pl)
 
 	if (pl->status == DTKV_PLAYING) {
 		pthread_mutex_unlock(&(pl->status_lock));
-		return true;
+		return 0;
 	}
 
 	paused = (pl->status == DTKV_PAUSED);
@@ -329,7 +329,7 @@ bool run_pipeline(struct dtk_pipeline* pl)
 	if (paused) {
 		pl->status = DTKV_PLAYING;
 		pthread_mutex_unlock(&(pl->status_lock));
-		return true;
+		return 0;
 	}
 
 	pthread_mutex_unlock(&(pl->status_lock));
@@ -341,7 +341,7 @@ bool run_pipeline(struct dtk_pipeline* pl)
 	while (pl->status == DTKV_READY)
 		dtk_nanosleep(0, &delay, NULL);
 
-	return (pl->status == DTKV_PLAYING);
+	return (pl->status == DTKV_PLAYING) ? 0 : -1;
 }
 
 
@@ -358,14 +358,14 @@ void stop_pipeline(struct dtk_pipeline* pl)
 
 
 static
-bool pause_pipeline(struct dtk_pipeline* pl)
+int pause_pipeline(struct dtk_pipeline* pl)
 {
 	GstStateChangeReturn ret;
 	pthread_mutex_lock(&(pl->status_lock));
 
 	if (pl->status != DTKV_PLAYING) {
 		pthread_mutex_unlock(&(pl->status_lock));
-		return false;
+		return -1;
 	}
 	// Change state and wait for state change to take effect
 	ret = gst_element_set_state(pl->pipe, GST_STATE_PAUSED);
@@ -375,14 +375,14 @@ bool pause_pipeline(struct dtk_pipeline* pl)
 
 	if (ret == GST_STATE_CHANGE_FAILURE) {
 		pthread_mutex_unlock(&(pl->status_lock));
-		return false;
+		return -1;
 	}
 	// set pipeline status to paused
 	pl->status = DTKV_PAUSED;
 
 	pthread_mutex_unlock(&(pl->status_lock));
 
-	return true;
+	return 0;
 }
 
 
@@ -463,14 +463,14 @@ int dtk_video_getstate(dtk_htex video)
 
 
 API_EXPORTED
-bool dtk_video_exec(dtk_htex video, int command)
+int dtk_video_exec(dtk_htex video, int command)
 {
 	struct dtk_pipeline* pl = video->aux;
 
 	switch (command) {
 	case DTKV_CMD_STOP:
 		stop_pipeline(pl);
-		return true;
+		return 0;
 
 	case DTKV_CMD_PLAY:
 		return run_pipeline(pl);
@@ -479,7 +479,7 @@ bool dtk_video_exec(dtk_htex video, int command)
 		return pause_pipeline(pl);
 
 	default:
-		return false;
+		return -1;
 	}
 }
 
