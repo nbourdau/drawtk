@@ -432,7 +432,7 @@ dtk_htex dtk_load_video_file(int flags, const char *file)
 
 
 API_EXPORTED
-dtk_htex dtk_load_video_custom(int flags, const char* desc)
+dtk_htex dtk_load_video_gst(int flags, const char* desc)
 {
 	struct pipeline_opt opt = {.type=VCUSTOM, .str=desc};
 	char stringid[255];
