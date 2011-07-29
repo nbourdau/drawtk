@@ -300,11 +300,14 @@ API_EXPORTED
 void dtk_texture_getsize(struct dtk_texture* tex, unsigned int* w,
                                                   unsigned int* h)
 {
-	if (tex == NULL || w==NULL || h==NULL)
+	if (!tex || !w || !h)
 		return;
-
-	*w = tex->sizes[0].w;
-	*h = tex->sizes[0].h;
+	
+	if (tex->sizes) {
+		*w = tex->sizes[0].w;
+		*h = tex->sizes[0].h;
+	} else
+		*w = *h = 0;
 }
 
 

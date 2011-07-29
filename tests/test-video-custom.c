@@ -75,6 +75,7 @@ int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 
 int main(void)
 {
+	unsigned int h,w;
         struct dtk_timespec delay = {0, 20000000}; /* 20ms */
         char desc[] = "videotestsrc ! clockoverlay font-desc=\"arial 30\"! decodebin2 ! ffmpegcolorspace ! appsink name=dtksink";
 	
@@ -83,7 +84,9 @@ int main(void)
 	dtk_make_current_window(wnd);
 	dtk_set_event_handler(wnd, event_handler);
 
-        video = dtk_load_video_gst(DTK_AUTOSTART, desc);
+        video = dtk_load_video_gst(0, desc);
+	dtk_texture_getsize(video, &w, &h);
+	printf("video size: w=%u  h=%u\n", w, h);
 
         shape = dtk_create_image(NULL, 0.0f, 0.4f, 1.0f, 0.8f, dtk_white, video);
 

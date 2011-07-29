@@ -29,7 +29,6 @@
 
 #include <gst/gst.h>
 #include <glib.h>
-#include <gst/base/gstbasetransform.h>
 #include <gst/app/gstappsink.h>
 
 #include <SDL/SDL.h>
@@ -58,6 +57,20 @@ struct dtk_pipeline {
 
 
 static
+int change_pipeline_state(struct dtk_pipeline* pl, GstState state)
+{
+	GstStateChangeReturn ret;
+	GstClockTime timeout = 500 * GST_MSECOND;
+
+	ret = gst_element_set_state(pl->pipe, state);
+	while (ret == GST_STATE_CHANGE_ASYNC)
+		ret = gst_element_get_state(pl->pipe, NULL, NULL, timeout);
+	
+	return (ret != GST_STATE_CHANGE_FAILURE) ? 0 : -1;
+}
+
+
+static
 void init_gstreamer(void)
 {
 	static bool is_initialized = false;
@@ -75,28 +88,26 @@ void init_gstreamer(void)
 
 
 static
-int alloc_compatible_image(GstBuffer* buffer, struct dtk_texture* tex)
+int alloc_compatible_image(struct dtk_pipeline* pl, struct dtk_texture* tex)
 {
-	GstCaps *caps;
-	GstStructure *structure;
-	int h, w;
+	int h,w;
+	GstPad* pad;
+	GstStructure* structure;
 
-	caps = gst_buffer_get_caps(buffer);
-	if (!caps) {
-		fprintf(stderr, "drawtk: could not get caps for the buffer\n");
+	// Get size of the image
+	pad = gst_element_get_static_pad(GST_ELEMENT(pl->sink), "sink");
+	if (!GST_PAD_CAPS(pad))
 		return -1;
-	}
-
-	structure = gst_caps_get_structure(caps, 0);
+	structure = gst_caps_get_structure(GST_PAD_CAPS(pad), 0);
 	gst_structure_get_int(structure, "height", &h);
 	gst_structure_get_int(structure, "width", &w);
+	g_object_unref(G_OBJECT(pad));
 
+	// Allocate image data
 	tex->intfmt = GL_RGB;
 	tex->fmt = GL_RGB;
 	tex->type = GL_UNSIGNED_BYTE;
 	alloc_image_data(tex, w, h, 0, 24);
-
-	gst_caps_unref(caps);
 
 	return 0;
 }
@@ -113,12 +124,13 @@ GstFlowReturn newbuffer_callback(GstAppSink *sink,  gpointer data)
 
 	pthread_mutex_lock(&(tex->lock));
 	buffer = gst_app_sink_pull_buffer(sink);
-	if (tex->sizes == NULL) 
-		alloc_compatible_image(buffer, tex);
 
 	if (pl->status == DTKV_READY)
 		pl->status = DTKV_PLAYING;
-
+	
+	if (!tex->data)
+		alloc_compatible_image(pl, tex);
+	
 	// load data into memory (gstreamer is flipped in GL conventions)
 	h = tex->sizes[0].h;
 	tstride = tex->sizes[0].stride;
@@ -207,6 +219,13 @@ int init_video_tex(dtk_htex tex, GstElement* pipe)
 	tex->aux = pl;
 	tex->destroyfn = &(destroyPipeline);
 
+	if (change_pipeline_state(pl, GST_STATE_READY))
+		return -1;
+
+	if (change_pipeline_state(pl, GST_STATE_PAUSED))
+		return 0;
+
+	alloc_compatible_image(pl, tex);
 	return 0;
 }
 
@@ -298,7 +317,7 @@ static
 int run_pipeline(struct dtk_pipeline* pl)
 {
 	bool paused;
-	GstStateChangeReturn ret;
+	int ret = 0;
 	struct dtk_timespec delay = { 0, 50000000 };	// 50 ms
 
 	pthread_mutex_lock(&(pl->status_lock));
@@ -312,26 +331,11 @@ int run_pipeline(struct dtk_pipeline* pl)
 
 	// prepare pipeline status
 	pl->status = DTKV_READY;
-
-	// execute state change and wait for state change to take effect
-	ret = gst_element_set_state(pl->pipe, GST_STATE_PLAYING);
-	while (ret == GST_STATE_CHANGE_ASYNC)
-		ret = gst_element_get_state(pl->pipe, NULL, NULL,
-					  500 * GST_MSECOND);
-
-	// handle failure
-	if (ret == GST_STATE_CHANGE_FAILURE) {
-		pthread_mutex_unlock(&(pl->status_lock));
+	if (change_pipeline_state(pl, GST_STATE_PLAYING)) {
 		fprintf(stderr, "drawtk: failed to run pipeline\n");
-		return false;
-	}
-	// handle case in which pipeline was simply paused
-	if (paused) {
+		ret = -1;
+	} else if (paused)
 		pl->status = DTKV_PLAYING;
-		pthread_mutex_unlock(&(pl->status_lock));
-		return 0;
-	}
-
 	pthread_mutex_unlock(&(pl->status_lock));
 
 	// launch execution thread
@@ -341,7 +345,7 @@ int run_pipeline(struct dtk_pipeline* pl)
 	while (pl->status == DTKV_READY)
 		dtk_nanosleep(0, &delay, NULL);
 
-	return (pl->status == DTKV_PLAYING) ? 0 : -1;
+	return ret;
 }
 
 
@@ -360,28 +364,16 @@ void stop_pipeline(struct dtk_pipeline* pl)
 static
 int pause_pipeline(struct dtk_pipeline* pl)
 {
-	GstStateChangeReturn ret;
+	int ret = 0;
+
 	pthread_mutex_lock(&(pl->status_lock));
-
-	if (pl->status != DTKV_PLAYING) {
-		pthread_mutex_unlock(&(pl->status_lock));
-		return -1;
-	}
-	// Change state and wait for state change to take effect
-	ret = gst_element_set_state(pl->pipe, GST_STATE_PAUSED);
-	while (ret == GST_STATE_CHANGE_ASYNC)
-		ret = gst_element_get_state(pl->pipe, NULL, NULL,
-					    500 * GST_MSECOND);
-
-	if (ret == GST_STATE_CHANGE_FAILURE) {
-		pthread_mutex_unlock(&(pl->status_lock));
-		return -1;
-	}
-	// set pipeline status to paused
-	pl->status = DTKV_PAUSED;
-
+	if (pl->status != DTKV_PLAYING
+	    || change_pipeline_state(pl, GST_STATE_PAUSED))
+		ret = -1;
+	else
+		pl->status = DTKV_PAUSED;
 	pthread_mutex_unlock(&(pl->status_lock));
-
+	
 	return 0;
 }
 
