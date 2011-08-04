@@ -53,16 +53,13 @@ static
 int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 {
 	int retcode = 1;
+	(void) wnd;
 
 	switch (type) {
 	case DTK_EVT_QUIT:
 		retcode = 0;
 		break;
 
-	case DTK_EVT_REDRAW:
-		redraw(wnd);
-		break;
-	
 	case DTK_EVT_KEYBOARD:
 		if (evt->key.sym == DTKK_ESCAPE)
 			retcode = 0;
@@ -81,7 +78,7 @@ int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 
 int main(void)
 {
-        struct dtk_timespec delay = {0, 5000000}; /* 5ms */
+        struct dtk_timespec delay = {0, 20000000}; /* 20ms ie 50Hz */
 	
 	// Setup window
 	wnd = dtk_create_window(1024, 768, 0, 0, 16, "hello");

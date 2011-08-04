@@ -31,43 +31,24 @@
 #include <glib.h>
 #include <gst/app/gstappsink.h>
 
-#include <SDL/SDL.h>
-
-#include "dtk_video.h"
 #include "vidpipe_creation.h"
-
-#include "drawtk.h"
 #include "texmanager.h"
-#include "shapes.h"
-#include "window.h"
-#include "dtk_time.h"
+#include "dtk_video.h"
 
-
-struct dtk_pipeline {
-	// pipeline object
-	GstElement *pipe;
-	GstBus *bus;
-	GstAppSink* sink;
-
-	// pipeline status
-	pthread_t thread;
-	int status;
-	pthread_mutex_t status_lock;
+struct async_alloc_data
+{
+	pthread_mutex_t lock;
+	pthread_cond_t cond;
+	struct dtk_texture* tex;
+	bool isalloc;
 };
 
 
-static
-int change_pipeline_state(struct dtk_pipeline* pl, GstState state)
-{
-	GstStateChangeReturn ret;
-	GstClockTime timeout = 500 * GST_MSECOND;
+static GstFlowReturn newbuffer_callback(GstAppSink *sink,  gpointer data);
 
-	ret = gst_element_set_state(pl->pipe, state);
-	while (ret == GST_STATE_CHANGE_ASYNC)
-		ret = gst_element_get_state(pl->pipe, NULL, NULL, timeout);
-	
-	return (ret != GST_STATE_CHANGE_FAILURE) ? 0 : -1;
-}
+static GstAppSinkCallbacks sink_callbacks = {
+	.new_buffer = newbuffer_callback
+};
 
 
 static
@@ -87,21 +68,74 @@ void init_gstreamer(void)
 }
 
 
+/**************************************************************************
+ *                          Pipeline execution                            *
+ **************************************************************************/
 static
-int alloc_compatible_image(struct dtk_pipeline* pl, struct dtk_texture* tex)
+int change_pipeline_state(GstElement* pipe, GstState state)
+{
+	GstStateChangeReturn ret;
+	GstClockTime timeout = 500 * GST_MSECOND;
+
+	ret = gst_element_set_state(pipe, state);
+	while (ret == GST_STATE_CHANGE_ASYNC)
+		ret = gst_element_get_state(pipe, NULL, NULL, timeout);
+	
+	return (ret != GST_STATE_CHANGE_FAILURE) ? 0 : -1;
+}
+
+
+static
+GstFlowReturn newbuffer_callback(GstAppSink *sink,  gpointer data)
+{
+	unsigned char *tdata, *bdata;
+	unsigned int tstride, bstride, h, i;
+	GstBuffer* buffer; 
+	dtk_htex tex = data;
+
+	buffer = gst_app_sink_pull_buffer(sink);
+
+	// load data into memory (gstreamer is flipped in GL conventions)
+	h = tex->sizes[0].h;
+	tstride = tex->sizes[0].stride;
+	bstride = tex->sizes[0].w*3;
+	tdata = tex->data[0];
+	bdata = GST_BUFFER_DATA(buffer) + (h-1)*bstride;
+
+	pthread_mutex_lock(&(tex->lock));
+	for (i=0; i<h; i++) {
+		memcpy(tdata, bdata, bstride);
+		tdata += tstride;
+		bdata -= bstride;
+	}
+	tex->isinit = false;
+	pthread_mutex_unlock(&(tex->lock));
+
+	gst_buffer_unref(buffer);
+
+	return GST_FLOW_OK;
+}
+
+
+/**************************************************************************
+ *                           Pipeline creation                            *
+ **************************************************************************/
+static
+int alloc_compatible_image(GstAppSink* sink, struct dtk_texture* tex)
 {
 	int h,w;
-	GstPad* pad;
+	GstCaps* caps;
 	GstStructure* structure;
 
-	// Get size of the image
-	pad = gst_element_get_static_pad(GST_ELEMENT(pl->sink), "sink");
-	if (!GST_PAD_CAPS(pad))
+	// Get negotiated caps (NULL if not negotiated yet)
+	caps = GST_PAD_CAPS(GST_BASE_SINK_PAD(sink));
+	if (!caps)
 		return -1;
-	structure = gst_caps_get_structure(GST_PAD_CAPS(pad), 0);
+
+	// Get negotiated frame size
+	structure = gst_caps_get_structure(caps, 0);
 	gst_structure_get_int(structure, "height", &h);
 	gst_structure_get_int(structure, "width", &w);
-	g_object_unref(G_OBJECT(pad));
 
 	// Allocate image data
 	tex->intfmt = GL_RGB;
@@ -114,94 +148,45 @@ int alloc_compatible_image(struct dtk_pipeline* pl, struct dtk_texture* tex)
 
 
 static
-GstFlowReturn newbuffer_callback(GstAppSink *sink,  gpointer data)
+GstFlowReturn async_image_alloc(GstAppSink *sink,  gpointer data)
 {
-	unsigned char *tdata, *bdata;
-	unsigned int tstride, bstride, h, i;
-	GstBuffer* buffer; 
-	dtk_htex tex = data;
-	struct dtk_pipeline* pl = tex->aux;
+	struct async_alloc_data* asdat = data;
 
-	pthread_mutex_lock(&(tex->lock));
-	buffer = gst_app_sink_pull_buffer(sink);
-
-	if (pl->status == DTKV_READY)
-		pl->status = DTKV_PLAYING;
+	alloc_compatible_image(sink, asdat->tex);
 	
-	if (!tex->data)
-		alloc_compatible_image(pl, tex);
-	
-	// load data into memory (gstreamer is flipped in GL conventions)
-	h = tex->sizes[0].h;
-	tstride = tex->sizes[0].stride;
-	bstride = tex->sizes[0].w*3;
-	tdata = tex->data[0];
-	bdata = GST_BUFFER_DATA(buffer) + (h-1)*bstride;
-	for (i=0; i<h; i++) {
-		memcpy(tdata, bdata, bstride);
-		tdata += tstride;
-		bdata -= bstride;
-	}
+	// Signal that everything is ready
+	pthread_mutex_lock(&asdat->lock);
+	asdat->isalloc = true;
+	pthread_cond_signal(&asdat->cond);
+	pthread_mutex_unlock(&asdat->lock);
 
-	gst_buffer_unref(buffer);
-	tex->isinit = false;
-
-	pthread_mutex_unlock(&(tex->lock));
 	return GST_FLOW_OK;
 }
 
 
-/**************************************************************************
- *                           Pipeline creation                            *
- **************************************************************************/
 static
 void destroyPipeline(dtk_htex tex)
 {
-	struct dtk_pipeline* pl = tex->aux;
+	GstElement* pipe = tex->aux;
 
 	// set pipeline status to dead
-	pl->status = DTKV_STOPPED;
+	gst_element_set_state(pipe, GST_STATE_READY);
+	gst_element_set_state(pipe, GST_STATE_NULL);
 
-	// join the threads
-	pthread_join(pl->thread, NULL);
-
-	// lock status
-	//pthread_mutex_lock(&(pl->status_lock));
-
-	// kill bus
-	gst_element_set_state(pl->pipe, GST_STATE_NULL);
-	gst_object_unref(GST_OBJECT(pl->bus));
-
-	// kill pipeline
-	gst_object_unref(GST_OBJECT(pl->pipe));
-
-	// unlock status
-	//pthread_mutex_unlock(&(pl->status_lock));
-
-	// delete dtk_pipeline
-	pthread_mutex_destroy(&(pl->status_lock));
-	free(tex->aux);
-
+	gst_object_unref(GST_OBJECT(pipe));
 	tex->aux = NULL;
 }
 
 
 static
-int init_video_tex(dtk_htex tex, GstElement* pipe)
+int init_video_tex(struct dtk_texture* tex, GstElement* pipe)
 {
-	struct dtk_pipeline* pl;
+	struct async_alloc_data asdata = { .tex = tex, .isalloc = false };
+	GstAppSinkCallbacks tmp_cb = { .new_buffer = async_image_alloc };
 	GstAppSink* sink;
 	GstCaps* caps;
-	GstAppSinkCallbacks callbacks = {
-		.new_buffer = newbuffer_callback
-	};
 
-	pl = malloc(sizeof(*pl));
-	pl->pipe = pipe;
-	pl->bus = gst_pipeline_get_bus(GST_PIPELINE(pipe));
-	pl->status = DTKV_STOPPED;
-	pthread_mutex_init(&(pl->status_lock), NULL);
-
+	// Configure sink
 	sink = GST_APP_SINK(gst_bin_get_by_name(GST_BIN(pipe), "dtksink"));
 	caps = gst_caps_new_simple("video/x-raw-rgb",
 				   "bpp", G_TYPE_INT, 24,
@@ -210,22 +195,41 @@ int init_video_tex(dtk_htex tex, GstElement* pipe)
 				   "blue_mask", G_TYPE_INT, 0x0000FF, NULL);
 	gst_app_sink_set_caps(sink, caps);
 	gst_caps_unref(caps);
-	gst_app_sink_set_callbacks(sink, &callbacks, tex, NULL);
-	pl->sink = sink;
+	gst_app_sink_set_callbacks(sink, &sink_callbacks, tex, NULL);
 
 	tex->id = 0;
 	tex->isvideo = true;
-	tex->sizes = NULL;
-	tex->aux = pl;
+	tex->aux = pipe;
 	tex->destroyfn = &(destroyPipeline);
-
-	if (change_pipeline_state(pl, GST_STATE_READY))
+	
+	// Prepare pipeline execution
+	if (change_pipeline_state(pipe, GST_STATE_READY)
+	    || change_pipeline_state(pipe, GST_STATE_PAUSED))
 		return -1;
-
-	if (change_pipeline_state(pl, GST_STATE_PAUSED))
+	
+	// Try to allocate image without touching the gstreamer pipeline
+	if (!alloc_compatible_image(sink, tex))
 		return 0;
 
-	alloc_compatible_image(pl, tex);
+	// Previous failed so start the pipeline and allocate
+	// asynchronously when the first image is available
+	pthread_mutex_init(&asdata.lock, NULL);
+	pthread_cond_init(&asdata.cond, NULL);
+	gst_app_sink_set_callbacks(sink, &tmp_cb, &asdata, NULL);
+	change_pipeline_state(pipe, GST_STATE_PLAYING);
+
+	// Wait the first buffer to arrive and allocate the image ressource
+	pthread_mutex_lock(&asdata.lock);
+	while (!asdata.isalloc)
+		pthread_cond_wait(&asdata.cond, &asdata.lock);
+	pthread_mutex_unlock(&asdata.lock);
+	
+	// Reset everything
+	change_pipeline_state(pipe, GST_STATE_PAUSED);
+	gst_app_sink_set_callbacks(sink, &sink_callbacks, tex, NULL);
+	pthread_mutex_destroy(&asdata.lock);
+	pthread_cond_destroy(&asdata.cond);
+
 	return 0;
 }
 
@@ -252,129 +256,6 @@ dtk_htex create_video_any(const struct pipeline_opt* opt,
 		dtk_video_exec(tex, DTKV_CMD_PLAY);
 		
 	return tex;
-}
-
-
-/**************************************************************************
- *                           Pipeline execution                           *
- **************************************************************************/
-static
-bool bus_callback(GstMessage * msg)
-{
-	GError *error;
-
-	switch (GST_MESSAGE_TYPE(msg)) {
-	case GST_MESSAGE_EOS:
-		return false;
-
-	case GST_MESSAGE_ERROR:
-		gst_message_parse_error(msg, &error, NULL);
-		fprintf(stderr, "drawtk: %s\n", error->message);
-		g_error_free(error);
-		return false;
-
-	default:
-		return true;
-	}
-}
-
-
-static
-void *run_pipeline_loop(void *arg)
-{
-	GstMessage *msg = NULL;
-	struct dtk_pipeline* pl = arg;
-
-	// main loop
-	bool loop = true;
-	while (loop && pl->status != DTKV_STOPPED) {
-		if (pthread_mutex_trylock(&(pl->status_lock)) == 0) {
-			// Read new messages from bus
-			while (loop && (msg = gst_bus_pop(pl->bus))) {
-				loop = bus_callback(msg);
-				gst_message_unref(msg);
-			}
-
-			// if the bus hasn't requested termination, unlock 
-			if (loop)
-				pthread_mutex_unlock(&(pl->status_lock));
-		}
-	}
-
-	// set status to STOPPED
-	pl->status = DTKV_STOPPED;
-	gst_element_set_state(pl->pipe, GST_STATE_READY);
-
-	// if the bus HAS requested termination, unlock only now
-	if (!loop)
-		pthread_mutex_unlock(&(pl->status_lock));
-
-	return NULL;
-}
-
-
-static
-int run_pipeline(struct dtk_pipeline* pl)
-{
-	bool paused;
-	int ret = 0;
-	struct dtk_timespec delay = { 0, 50000000 };	// 50 ms
-
-	pthread_mutex_lock(&(pl->status_lock));
-
-	if (pl->status == DTKV_PLAYING) {
-		pthread_mutex_unlock(&(pl->status_lock));
-		return 0;
-	}
-
-	paused = (pl->status == DTKV_PAUSED);
-
-	// prepare pipeline status
-	pl->status = DTKV_READY;
-	if (change_pipeline_state(pl, GST_STATE_PLAYING)) {
-		fprintf(stderr, "drawtk: failed to run pipeline\n");
-		ret = -1;
-	} else if (paused)
-		pl->status = DTKV_PLAYING;
-	pthread_mutex_unlock(&(pl->status_lock));
-
-	// launch execution thread
-	pthread_create(&(pl->thread), NULL, run_pipeline_loop, pl);
-
-	// wait till the state changes
-	while (pl->status == DTKV_READY)
-		dtk_nanosleep(0, &delay, NULL);
-
-	return ret;
-}
-
-
-static
-void stop_pipeline(struct dtk_pipeline* pl)
-{
-	pthread_mutex_lock(&(pl->status_lock));
-
-	pl->status = DTKV_STOPPED;
-	pthread_join(pl->thread, NULL);
-
-	pthread_mutex_unlock(&(pl->status_lock));
-}
-
-
-static
-int pause_pipeline(struct dtk_pipeline* pl)
-{
-	int ret = 0;
-
-	pthread_mutex_lock(&(pl->status_lock));
-	if (pl->status != DTKV_PLAYING
-	    || change_pipeline_state(pl, GST_STATE_PAUSED))
-		ret = -1;
-	else
-		pl->status = DTKV_PAUSED;
-	pthread_mutex_unlock(&(pl->status_lock));
-	
-	return 0;
 }
 
 
@@ -448,27 +329,38 @@ dtk_htex dtk_load_video_test(int flags)
 API_EXPORTED
 int dtk_video_getstate(dtk_htex video)
 {
-	struct dtk_pipeline* pl = video->aux;
+	GstState state;
+	int status;
+	GstElement* pipe;
+	
+	pipe = video->aux;
+	gst_element_get_state(pipe, &state, NULL, GST_CLOCK_TIME_NONE);
 
-	return pl->status;
+	if (state == GST_STATE_PLAYING)
+		status = DTKV_PLAYING;
+	else if (state == GST_STATE_PAUSED)
+		status = DTKV_PAUSED;
+	else
+		status = DTKV_STOPPED;
+
+	return status;
 }
 
 
 API_EXPORTED
 int dtk_video_exec(dtk_htex video, int command)
 {
-	struct dtk_pipeline* pl = video->aux;
+	GstElement* pipe = video->aux;
 
 	switch (command) {
 	case DTKV_CMD_STOP:
-		stop_pipeline(pl);
-		return 0;
+		return change_pipeline_state(pipe, GST_STATE_READY);
 
 	case DTKV_CMD_PLAY:
-		return run_pipeline(pl);
+		return change_pipeline_state(pipe, GST_STATE_PLAYING);
 
 	case DTKV_CMD_PAUSE:
-		return pause_pipeline(pl);
+		return change_pipeline_state(pipe, GST_STATE_PAUSED);
 
 	default:
 		return -1;
