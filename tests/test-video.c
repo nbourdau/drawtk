@@ -67,8 +67,8 @@ int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
                         dtk_video_exec(video2,DTKV_CMD_PLAY);
                 else if(evt->key.sym == DTKK_p)
                         dtk_video_exec(video2,DTKV_CMD_PAUSE);
-                else if(evt->key.sym == DTKK_q)
-                        dtk_video_exec(video2,DTKV_CMD_STOP);
+                else if(evt->key.sym == DTKK_r)
+                        dtk_video_exec(video2,DTKV_CMD_REWIND);
 		break;
 	}
 
@@ -98,7 +98,7 @@ int main(void)
         shape2 = dtk_create_image(NULL,  0.5f, 0.3f, 0.5f, 0.5f, dtk_white, video2);
 
         dtk_hfont font = dtk_load_font(fontfilename);
-        text = dtk_create_string(NULL,"ESC-Quit, S-Play, Q-Stop, P-Pause",0.1f,-0.9f,-0.5f,DTK_LEFT,dtk_white,font);
+        text = dtk_create_string(NULL,"ESC-Quit, S-Play, R-Rewind, P-Pause",0.1f,-0.9f,-0.5f,DTK_LEFT,dtk_white,font);
 
         // Main loop
 	while (dtk_process_events(wnd) && dtk_video_getstate(video1)==DTKV_PLAYING) {

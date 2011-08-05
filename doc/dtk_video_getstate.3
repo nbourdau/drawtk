@@ -11,9 +11,12 @@ dtk_video_getstate - returns the current state of a video texture
 .SH DESCRIPTION
 .LP
 This function returns the state of a video texture referenced by \fIvid\fP
-and will be on of these values: \fBDTKV_CMD_PLAY\fP, \fBDTKV_CMD_PAUSED\fP,
-\fBDTKV_CMD_STOP\fP. \fIvid\fP must be a dynamic texture created by one of
-the functions \fBdtk_create_video_*\fP(3).
+created by one of the functions \fBdtk_create_video_*\fP(3) and is a BITOR
+combination of the following flags:
+.TP
+\fBDTKV_PLAYING\fP : Indicates whether the video is paused or playing
+.TP
+\fBDTKV_EOS\fP : Indicates that the end of the video stream has been reached
 .SH "RETURN VALUE"
 .LP
 This function returns the state of the video in case of success,

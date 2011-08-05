@@ -10,11 +10,15 @@ dtk_video_exec - Start/stop/pause a video texture
 .br
 .SH DESCRIPTION
 .LP
-This function changes the state of a video texture referenced by \fIvid\fP
-according to the value of \fIcommand\fP: \fBDTKV_CMD_PLAY\fP,
-\fBDTKV_CMD_PAUSED\fP, \fBDTKV_CMD_STOP\fP. \fIvid\fP must be a dynamic
-texture created by one of the functions \fBdtk_create_video_*\fP(3). If the
-video was already in the requested state, the function will do nothing.
+This function changes the state (or playing position) of a video texture
+referenced by \fIvid\fP according to the value of \fIcommand\fP:
+\fBDTKV_CMD_PLAY\fP, \fBDTKV_CMD_PAUSE\fP, \fBDTKV_CMD_REWIND\fP.
+\fIvid\fP must be a dynamic texture created by one of the functions 
+\fBdtk_create_video_*\fP(3). If the video was already in the requested
+state, the function will do nothing.
+.LP
+If the video is created from the live source (webcam, network broadcast...),
+executing \fBDTKV_CMD_REWIND\fP will fail.
 .SH "RETURN VALUE"
 .LP
 0 if the state has been changed or was already the one requested, -1 otherwise.

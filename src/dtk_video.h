@@ -25,17 +25,14 @@
 extern "C" {
 #endif
 
-enum dtk_video_status {
-	DTKV_STOPPED = 0,
-	DTKV_READY = 1,
-	DTKV_PAUSED = 2,
-	DTKV_PLAYING = 3
-};
+#define	DTKV_PLAYING	0x01
+#define DTKV_EOS	0x02
+
 
 enum dtk_video_cmd {
 	DTKV_CMD_PLAY = 0,
-	DTKV_CMD_STOP = 1,
-	DTKV_CMD_PAUSE = 2
+	DTKV_CMD_PAUSE,
+	DTKV_CMD_REWIND,
 };
 
 #define DTK_AUTOSTART	0x01

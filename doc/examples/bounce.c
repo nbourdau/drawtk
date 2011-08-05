@@ -24,7 +24,7 @@
  * or a test video is used if none are provided
  * Arrow keys stop and enable vertical and horizontal movement
  * Pressing the ESC key close the demo.
- * s, p, q respectively starts, stops, pauses the video
+ * s, p, r respectively starts, pauses and rewind the video
  * This shows how to:
  *	- do minimalist drawings
  *      - use the timing functions
@@ -174,8 +174,8 @@ int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
                         dtk_video_exec(video,DTKV_CMD_PLAY);
                 else if(evt->key.sym == DTKK_p)
                         dtk_video_exec(video,DTKV_CMD_PAUSE);
-                else if(evt->key.sym == DTKK_q)
-                        dtk_video_exec(video,DTKV_CMD_STOP);
+                else if(evt->key.sym == DTKK_r)
+                        dtk_video_exec(video,DTKV_CMD_REWIND);
 		break;
 	}
 
