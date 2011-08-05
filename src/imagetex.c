@@ -61,6 +61,9 @@ int find_dib_color_settings(FIBITMAP *dib, GLint* intfmt,
 		type = GL_UNSIGNED_BYTE;
 		internalformat = GL_COMPRESSED_RGBA;
 		break;
+
+	default:
+		return -1;
 	}
 	
 	*intfmt = internalformat;
@@ -80,7 +83,7 @@ int load_texture_from_file(struct dtk_texture* tex, const char* filename,
 {
 	unsigned int w, h, bpp;
 	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
-	FIBITMAP *dib;
+	FIBITMAP *dib = NULL;
 	int retcode = 0;
 
 	// check the file signature and deduce its format
@@ -116,8 +119,6 @@ int load_texture_from_file(struct dtk_texture* tex, const char* filename,
 	                       bpp, tex->rmsk, tex->gmsk, tex->bmsk, FALSE);
 	compute_mipmaps(tex);
 
-	tex->isinit = 1;
-
 out:
 	// Free temporary resources
 	FreeImage_Unload(dib);
@@ -139,7 +140,7 @@ struct dtk_texture* dtk_load_image(const char* filename, unsigned int mxlvl)
 
 	// Load the image file
 	pthread_mutex_lock(&(tex->lock));
-	if (!tex->isinit) 
+	if (!tex->data) 
 		fail = load_texture_from_file(tex, filename, mxlvl);
 	pthread_mutex_unlock(&(tex->lock));
 

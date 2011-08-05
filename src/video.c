@@ -115,7 +115,7 @@ void update_texture_image(GstBuffer* buffer, struct dtk_texture* tex)
 		tdata += tstride;
 		bdata -= bstride;
 	}
-	tex->isinit = false;
+	tex->outdated = true;
 	pthread_mutex_unlock(&(tex->lock));
 }
 
@@ -299,7 +299,7 @@ dtk_htex create_video_any(int type, const union pipeopt* opt,
 		return NULL;
 
 	pthread_mutex_lock(&(tex->lock));
-	if (!tex->isinit) {
+	if (!tex->data) {
 		init_gstreamer();
 		pipe = create_pipeline(type, opt);
 		init_video_tex(tex, pipe);

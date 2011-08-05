@@ -20,6 +20,7 @@
 
 #include <SDL/SDL_opengl.h>
 #include <pthread.h>
+#include <stdbool.h>
 #include "drawtk.h"
 
 #define DTK_PALIGN	(sizeof(int))
@@ -50,7 +51,6 @@ struct dtk_texture
 	GLuint id;
 	unsigned int nused;
 	char string_id[256];
-	int isinit;
 
 	// update lock
 	pthread_mutex_t lock;
@@ -58,11 +58,10 @@ struct dtk_texture
 	// Destroy function
 	destroyproc destroyfn;
 
+        bool outdated, isvideo;
+
 	// To be used in a linked list
 	struct dtk_texture* next_tex;
-
-        // video
-        int isvideo;
 };
 
 

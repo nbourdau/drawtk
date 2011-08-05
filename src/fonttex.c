@@ -72,7 +72,7 @@ static
 void render_char(FT_Face face, uint8_t* bits, unsigned ic,
                  struct dtk_font* font, unsigned int ppem, unsigned int lvl)
 {
-	int j, imin, w, jmax, h, cm_w, cm_h, ch_h, ch_w;
+	int j, imin, w, jmax, h, cm_w, ch_h, ch_w;
 	FT_Bitmap* bitmap;
 	FT_BitmapGlyph bmglyph;
 	FT_Glyph glyph;
@@ -82,7 +82,6 @@ void render_char(FT_Face face, uint8_t* bits, unsigned ic,
 	unsigned int sc = 0x01 << lvl;
 	unsigned int currppem = ppem / (float)sc ;
 	cm_w = MAPWIDTH / sc;
-	cm_h = MAPHEIGHT / sc;
 	ch_w = CHWIDTH / sc;
 	ch_h = CHHEIGHT / sc;
 
@@ -253,7 +252,7 @@ struct dtk_font* dtk_load_font(const char* fontname)
 
 	// Load the font bitmap
 	pthread_mutex_lock(&(tex->lock));
-	if (!tex->isinit) {
+	if (!tex->data) {
 		if ( ((font = malloc(sizeof(struct dtk_font))) == NULL)
 		    || alloc_image_data(tex, MAPWIDTH, MAPHEIGHT,
 		                             FONT_MXLVL, 8) )
@@ -263,7 +262,6 @@ struct dtk_font* dtk_load_font(const char* fontname)
 		if (load_glyph(tex->data, tex->aux, fontname, FONT_MXLVL))
 			fail = 1;
 		tex->destroyfn = font_destroy;
-		tex->isinit = 1;
 
 		tex->fmt = GL_ALPHA;
 		tex->type = GL_UNSIGNED_BYTE;

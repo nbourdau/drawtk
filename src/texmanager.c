@@ -119,7 +119,6 @@ struct dtk_texture* get_texture(const char *desc)
 		strncpy(tex->string_id, desc, 255);
 		tex->aux = NULL;
 		tex->data = NULL;
-                tex->isvideo = 0;
 		
 		// append at the end of the list
 		*last = tex;
@@ -184,12 +183,16 @@ void free_texture(struct dtk_texture* tex)
         if (tex->destroyfn)
                 tex->destroyfn(tex);
 
-	if (tex->id)
+	if (tex->id) {
 		glDeleteTextures(1, &(tex->id));
+		tex->id = 0;
+	}
 
 	if (tex->data) {
 		for (i=0; i<=tex->mxlvl; i++)
 		        free(tex->data[i]);
+		free(tex->data);
+		tex->data = NULL;
 	}
 
         free(tex->sizes);
@@ -214,7 +217,7 @@ int alloc_image_data(struct dtk_texture* tex,
 	tex->bpp = bpp;
 	if (!(tex->data = calloc((mxlvl+1), sizeof(*(tex->data))))
 	    || !(tex->sizes = malloc((mxlvl+1)*sizeof(*(tex->sizes)))))
-		return 1;	
+		goto fail;
 
 	// setup mipmap sizes and allocate bitmaps
 	for (i=0; i<=mxlvl; i++) {
@@ -228,12 +231,22 @@ int alloc_image_data(struct dtk_texture* tex,
 		tex->sizes[i].h = h;
 		tex->sizes[i].w = w;
 		tex->sizes[i].stride = stride;
-		tex->data[i] = calloc(w,stride);
+		if (!(tex->data[i] = calloc(w,stride)))
+			goto fail;
 		w /= 2;
 		h /= 2;
 	}
 
 	return 0;
+
+fail:
+	for (i=0; i<=mxlvl && tex->data; i++)
+		free(tex->data[i]);
+	free(tex->data);
+	free(tex->sizes);
+	tex->data = NULL;
+	tex->sizes = NULL;
+	return 1;
 }
 
 
@@ -262,9 +275,8 @@ void create_gl_texture(struct dtk_texture* tex)
 			tex->fmt, tex->type, tex->data[lvl]);
 	}
 
-	// Wait the loading being performed
-	glFlush();
 	glBindTexture(GL_TEXTURE_2D, 0);
+	tex->outdated = false;
 }
 
 
@@ -284,8 +296,8 @@ void update_gl_texture(struct dtk_texture* tex)
 			tex->fmt, tex->type, tex->data[lvl]);
 	}
 
-	// Wait the loading being performed
 	glBindTexture(GL_TEXTURE_2D, 0);
+	tex->outdated = false;
 }
 
 
@@ -317,32 +329,16 @@ GLuint get_texture_id(struct dtk_texture *tex)
 	if (!tex)
 		return 0;
 
-	// updating stuff
-	if (tex->isvideo) {
-		if (!tex->isinit) {
-			if (tex->data) {
-				pthread_mutex_lock(&(tex->lock));
-				if (tex->id)
-					update_gl_texture(tex);
-				else
-					create_gl_texture(tex);
-        			tex->isinit = 1;
-				pthread_mutex_unlock(&(tex->lock));
-			} else
-				return 0;
-		}
-
-		return tex->id;
-	}
 	// This allows to return quickly since once the texture has been
 	// loaded, it won't change until tex is destroyed
-	if (tex->id) {
+	if (tex->id && !tex->isvideo)
 		return tex->id;
-	}
 
 	pthread_mutex_lock(&(tex->lock));
 	if (tex->id == 0) 
 		create_gl_texture(tex);
+	if (tex->outdated)
+		update_gl_texture(tex);
 	pthread_mutex_unlock(&(tex->lock));
 
 	return tex->id;
