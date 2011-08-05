@@ -21,11 +21,10 @@
 
 #include <gst/gst.h>
 
-struct pipeline_opt
+union pipeopt
 {
-	int type;
-	const char* str;
-	int port;
+	int intval;
+	const char* strval;
 };
 
 #define VTCP	0
@@ -34,7 +33,7 @@ struct pipeline_opt
 #define VTEST	3
 #define VCUSTOM	4
 
-LOCAL_FN GstElement* create_pipeline(const struct pipeline_opt* opt);
+LOCAL_FN GstElement* create_pipeline(int type, const union pipeopt* opt);
 
 #endif
 

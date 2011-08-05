@@ -289,7 +289,7 @@ int init_video_tex(struct dtk_texture* tex, GstElement* pipe)
 
 
 static
-dtk_htex create_video_any(const struct pipeline_opt* opt,
+dtk_htex create_video_any(int type, const union pipeopt* opt,
                           const char* stringid, int flags)
 {
 	dtk_htex tex;
@@ -301,7 +301,7 @@ dtk_htex create_video_any(const struct pipeline_opt* opt,
 	pthread_mutex_lock(&(tex->lock));
 	if (!tex->isinit) {
 		init_gstreamer();
-		pipe = create_pipeline(opt);
+		pipe = create_pipeline(type, opt);
 		init_video_tex(tex, pipe);
 	}
 	pthread_mutex_unlock(&(tex->lock));
@@ -319,64 +319,63 @@ dtk_htex create_video_any(const struct pipeline_opt* opt,
 API_EXPORTED
 dtk_htex dtk_load_video_tcp(int flags, const char *server, int port)
 {
-	struct pipeline_opt opt = {.type=VTCP, .str = server, .port = port};
+	union pipeopt opt[] = {{.strval = server}, {.intval = port}};
 	char stringid[255];
 
 	if (port < 1 || !server)
 		return NULL;
 
 	sprintf(stringid, "TCP:%s:%d", server, port);
-	return create_video_any(&opt, stringid, flags);
+	return create_video_any(VTCP, opt, stringid, flags);
 }
 
 
 API_EXPORTED
 dtk_htex dtk_load_video_udp(int flags, int port)
 {
-	struct pipeline_opt opt = {.type=VUDP, .port = port};
+	union pipeopt opt = {.intval = port};
 	char stringid[255];
 
 	if (port < 1)
 		return NULL;
 
 	sprintf(stringid, "UDP:%d", port);
-	return create_video_any(&opt, stringid, flags);
+	return create_video_any(VUDP, &opt, stringid, flags);
 }
 
 
 API_EXPORTED
 dtk_htex dtk_load_video_file(int flags, const char *file)
 {
-	struct pipeline_opt opt = {.type=VFILE, .str=file};
+	union pipeopt opt = {.strval=file};
 	char stringid[255];
 
 	if (!file)
 		return NULL;
 
 	sprintf(stringid, "FILE:%s", file);
-	return create_video_any(&opt, stringid, flags);
+	return create_video_any(VFILE, &opt, stringid, flags);
 }
 
 
 API_EXPORTED
 dtk_htex dtk_load_video_gst(int flags, const char* desc)
 {
-	struct pipeline_opt opt = {.type=VCUSTOM, .str=desc};
+	union pipeopt opt = {.strval=desc};
 	char stringid[255];
 
 	if (!desc)
 		return NULL;
 
 	sprintf(stringid, "CUSTOM:%s", desc);
-	return create_video_any(&opt, stringid, flags);
+	return create_video_any(VCUSTOM, &opt, stringid, flags);
 }
 
 
 API_EXPORTED
 dtk_htex dtk_load_video_test(int flags)
 {
-	struct pipeline_opt opt = {.type=VTEST};
-	return create_video_any(&opt, "TESTPIPE", flags);
+	return create_video_any(VTEST, NULL, "TESTPIPE", flags);
 }
 
 

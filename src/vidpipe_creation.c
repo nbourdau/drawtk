@@ -234,13 +234,13 @@ void free_element_list(struct pipeline* pl)
 
 
 LOCAL_FN
-GstElement* create_pipeline(const struct pipeline_opt* opt)
+GstElement* create_pipeline(int type, const union pipeopt* opt)
 {
 	GError* error = NULL;
 	struct pipeline pl;
 
-	if (opt->type == VCUSTOM) {
-		pl.pipe = gst_parse_launch(opt->str, &error);
+	if (type == VCUSTOM) {
+		pl.pipe = gst_parse_launch(opt[0].strval, &error);
 		if (error) {
 			fprintf(stderr, "drawtk: %s\n", error->message);
 			g_error_free(error);
@@ -251,17 +251,17 @@ GstElement* create_pipeline(const struct pipeline_opt* opt)
 	pl.pipe = gst_pipeline_new("pipeline");
 	pl.elt = NULL;
 
-	if (opt->type == VTCP)
+	if (type == VTCP)
 		pipe_add_element_full(&pl, "tcpclientsrc", "tcp-src",
-				           "host", opt->str, 
-				           "port", opt->port, NULL);
-	else if (opt->type == VUDP)
+				           "host", opt[0].strval, 
+				           "port", opt[0].intval, NULL);
+	else if (type == VUDP)
 		pipe_add_element_full(&pl, "udpsrc", "udp-src",
-		                           "port", opt->port, NULL);
-	else if (opt->type == VFILE)
+		                           "port", opt[0].intval, NULL);
+	else if (type == VFILE)
 		pipe_add_element_full(&pl, "filesrc", "file-src",
-		                           "location", opt->str, NULL);
-	else if (opt->type == VTEST)
+		                           "location", opt[0].strval, NULL);
+	else if (type == VTEST)
 		pipe_add_element(&pl, "videotestsrc", "test-src");
 	
 	pipe_add_element(&pl, "queue", "queue");
