@@ -162,14 +162,6 @@ bool pipe_add_element(struct pipeline* pipe, const char *fact,
 
 
 static
-void add_terminal_elements(struct pipeline* pipe)
-{
-	pipe_add_element(pipe, "ffmpegcolorspace", "converter");
-	pipe_add_element_full(pipe, "appsink", "dtksink", NULL);
-}
-
-
-static
 void link_pipe_elements(struct dtk_pipe_element *source,
 			struct dtk_pipe_element *sink)
 {
@@ -264,9 +256,9 @@ GstElement* create_pipeline(int type, const union pipeopt* opt)
 	else if (type == VTEST)
 		pipe_add_element(&pl, "videotestsrc", "test-src");
 	
-	pipe_add_element(&pl, "queue", "queue");
 	pipe_add_element(&pl, "decodebin2", "decoder-bin");
-	add_terminal_elements(&pl);
+	pipe_add_element(&pl, "ffmpegcolorspace", "converter");
+	pipe_add_element_full(&pl, "appsink", "dtksink", NULL);
 
 	setup_pipe_links(&pl);
 	free_element_list(&pl);
