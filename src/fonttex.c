@@ -142,13 +142,15 @@ int load_glyph(void **bits, struct dtk_font *font, const char *fname,
 		FcResult result;
 
 		pat = FcNameParse((unsigned char*)fname);
-		match = FcFontMatch(0, pat, &result);
+		FcConfigSubstitute( 0, pat, FcMatchPattern);
+		FcDefaultSubstitute(pat);
 
-		if ( FcPatternGetString(match, FC_FILE, 0, &fn)
+		match = FcFontMatch(0, pat, &result);
+		if ( !match || FcPatternGetString(match, FC_FILE, 0, &fn)
 		  || FcPatternGetInteger(match, FC_INDEX, 0, &id)
 		  || FT_New_Face(library, (char*)fn, id, &face))
 			error = 1;
-	
+
 		FcPatternDestroy(pat);
 		FcPatternDestroy(match);
 	}
