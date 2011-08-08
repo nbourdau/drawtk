@@ -22,7 +22,6 @@
 #include <SDL/SDL_opengl.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <time.h>
 #include "drawtk.h"
 #include "shapes.h"
@@ -339,8 +338,6 @@ dtk_hshape dtk_create_composite_shape(struct dtk_shape* shp,
 API_EXPORTED
 void dtk_draw_shape(struct dtk_shape* shp)
 {
-	assert(shp != NULL);
-
 	glPushMatrix();
 
 	// Translate to the reference point
@@ -357,7 +354,6 @@ void dtk_draw_shape(struct dtk_shape* shp)
 API_EXPORTED
 void dtk_move_shape(dtk_hshape shp, float x, float y)
 {
-	assert(shp != NULL);
 	shp->pos[0] = x;
 	shp->pos[1] = y;
 } 
@@ -366,7 +362,6 @@ void dtk_move_shape(dtk_hshape shp, float x, float y)
 API_EXPORTED
 void dtk_relmove_shape(dtk_hshape shp, float dx, float dy)
 {
-	assert(shp != NULL);
 	shp->pos[0] += dx;
 	shp->pos[1] += dy;
 }
@@ -375,7 +370,6 @@ void dtk_relmove_shape(dtk_hshape shp, float dx, float dy)
 API_EXPORTED
 void dtk_rotate_shape(dtk_hshape shp, float deg)
 {
-	assert(shp != NULL);
 	shp->Rot = deg;
 }
 
@@ -383,7 +377,6 @@ void dtk_rotate_shape(dtk_hshape shp, float deg)
 API_EXPORTED
 void dtk_relrotate_shape(dtk_hshape shp, float ddeg)
 {
-	assert(shp != NULL);
 	shp->Rot += ddeg;
 }
 

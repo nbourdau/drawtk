@@ -19,6 +19,10 @@
 # include <config.h>
 #endif
 
+#ifndef G_DISABLE_CAST_CHECKS
+#define G_DISABLE_CAST_CHECKS	1
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
