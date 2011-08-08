@@ -28,6 +28,11 @@ libdrawtk.so.0 libdrawtk0 #MINVER#
  dtk_gettime@Base 0.0
  dtk_load_font@Base 0.0
  dtk_load_image@Base 0.0
+ dtk_load_video_file@Base 1.0
+ dtk_load_video_gst@Base 1.0
+ dtk_load_video_tcp@Base 1.0
+ dtk_load_video_test@Base 1.0
+ dtk_load_video_udp@Base 1.0
  dtk_make_current_window@Base 0.0
  dtk_move_shape@Base 0.0
  dtk_nanosleep@Base 0.0
@@ -38,4 +43,6 @@ libdrawtk.so.0 libdrawtk0 #MINVER#
  dtk_set_event_handler@Base 0.0
  dtk_texture_getsize@Base 0.0
  dtk_update_screen@Base 0.0
+ dtk_video_exec@Base 1.0
+ dtk_video_getstate@Base 1.0
  dtk_window_getsize@Base 0.0

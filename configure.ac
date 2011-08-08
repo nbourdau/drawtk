@@ -7,9 +7,9 @@
 # - If any interfaces have been removed since the last public release, then
 # set age to 0.
 
-m4_define([lib_current],0)
+m4_define([lib_current],1)
 m4_define([lib_revision],0)
-m4_define([lib_age],0)
+m4_define([lib_age],1)
 
 
 # Setup Automake
@@ -46,10 +46,10 @@ AC_REPLACE_FUNCS([clock_gettime clock_nanosleep])
 
 
 # Checks for libraries.
-PKG_CHECK_MODULES(FREETYPE2, freetype2)
-PKG_CHECK_MODULES(FONTCONFIG, fontconfig)
-PKG_CHECK_MODULES(GST, [gstreamer-0.10])
-PKG_CHECK_MODULES(GSTAPP, [gstreamer-app-0.10])
+PKG_CHECK_CUSTOM(FREETYPE2, freetype2)
+PKG_CHECK_CUSTOM(FONTCONFIG, fontconfig)
+PKG_CHECK_CUSTOM(GSTAPP, [gstreamer-app-0.10])
+
 AC_SEARCH_LIBS([pthread_create], [pthread posix4], 
                [], AC_MSG_ERROR([The pthread library has not been found]))
 AC_SEARCH_LIBS([cos], [m], [], AC_MSG_ERROR([The libm cannot be found.]))
@@ -62,9 +62,9 @@ AC_SEARCH_LIBS_FNARG([glEnable], [GL opengl32],
 	[], AC_MSG_ERROR([The openGL library cannot be found.]))
 
 
-LIBS="$LIBS $FREETYPE2_LIBS $FONTCONFIG_LIBS $GST_LIBS $GSTAPP_LIBS"
-AC_SUBST(AM_CPPFLAGS, "$CPPFLAGS $FREETYPE2_CFLAGS $GST_CFLAGS $GSTAPP_CFLAGS $FONTCONFIG_FLAGS")
-AC_SUBST(AM_LDFLAGS, "$LDFLAGS $FREETYPE2_LDFLAGS $GST_LDFLAGS $GSTAPP_LDFLAGS $FONTCONFIG_FLAGS")
+LIBS="$LIBS $FREETYPE2_LIBS $FONTCONFIG_LIBS -lgstapp-0.10 -lgstreamer-0.10 -lgobject-2.0 -lglib-2.0"
+AC_SUBST(AM_CPPFLAGS, "$CPPFLAGS $FREETYPE2_CFLAGS $GSTAPP_CFLAGS $FONTCONFIG_FLAGS")
+AC_SUBST(AM_LDFLAGS, "$LDFLAGS $FREETYPE2_LDFLAGS $GSTAPP_LDFLAGS $FONTCONFIG_FLAGS")
 
 AC_SUBST([CURRENT],[lib_current])
 AC_SUBST([REVISION],[lib_revision])

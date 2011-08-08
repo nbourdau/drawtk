@@ -1,6 +1,19 @@
+Overview of Changes from drawtk0.0 to drawtk1.0
+===============================================
 
-Overview of Changes from libfeedback to drawtk0.0.0
-===================================================
+Relicense the library into LGPL3+
+
+* New features
+	- Support for video
+	- Use hash for faster texture lookup
+	- New example: errmon.c
+
+* Bug fixes
+	- Font search now returns a real match to the pattern
+
+
+Overview of Changes from libfeedback to drawtk0.0
+=================================================
 
 * New features
 	- Improved texture loading:

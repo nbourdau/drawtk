@@ -1,3 +1,418 @@
+2011-08-08 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* NEWS, configure.ac, debian/changelog, debian/control,
+	debian/symbols, m4/pkg-custom.m4: Release drawtk1.0
+
+	* commit 3c9f43d5a464cf979cc0d867092d30692a51dab1
+
+2011-08-13 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/texmanager.c, src/texmanager.h: Hash the string_id of
+	texture
+
+	This leads to a faster search when several texture has been
+	already loaded
+
+	* commit 625a4a8ef3a2c65d13d51d0058685bfad840ddf9
+
+2011-08-13 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/dtk_load_video_file.3, doc/dtk_load_video_gst.3,
+	doc/dtk_load_video_tcp.3, doc/dtk_load_video_test.3,
+	doc/dtk_load_video_udp.3, doc/dtk_video_exec.3, src/dtk_video.h,
+	src/texmanager.c, src/video.c, tests/test-video.c: video: allow
+	creation of pipeline asynchronously
+
+	* commit 834dc7816773964593b016a4ae531959a9253fb2
+
+2011-08-12 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/texmanager.c, src/video.c: Make initialization of Freeimage
+	and gstreamer safer
+
+	* commit 020aebe8c56692801bad7957680361f38823ade3
+
+2011-08-11 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/dtk_video_exec.3, doc/examples/bounce.c, src/dtk_video.h,
+	src/video.c, tests/test-video-custom.c, tests/test-video.c:
+	video: Change command DTK_CMD_REWIND to DTK_CMD_SEEK
+
+	The new command accept an optional seek position
+
+	* commit 32a69a9a598894429a1bc2d5fe2133a0efd845b6
+
+2011-08-10 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/texmanager.c, src/texmanager.h, src/video.c: Use Pixel
+	Buffer Object for updating dynamic texture
+
+	* commit fd6c1adce8840abe99132fac787d91f4b03fb642
+
+2011-08-09 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/video.c: video: sink can drop buffers if running slow
+
+	* commit 9ef876fc6664be185b325799f64a7122ab3a0fa0
+
+2011-08-09 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/fonttex.c, src/imagetex.c, src/texmanager.c,
+	src/texmanager.h, src/video.c: merge mipmap data and size into
+	one structure
+
+	* commit 20965b6636dfb3a7fa4cd9719b75b5433fd08249
+
+2011-08-08 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/shapes.c, src/video.c, src/vidpipe_creation.c: remove
+	useless assert and checks
+
+	* commit a4ff24357786212b46088fd9cbdc056144c14474
+
+2011-08-08 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/video.c: video: adds check for dtk_video_{exec|getstate}
+
+	* commit 235d012f46ab5dd58504dd0e9342543d897a8928
+
+2011-08-07 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/fonttex.c: fonts bugfix: font search is incrorrect
+
+	When supplying a font pattern instead of a font filename, the
+	selected font usually did not match the pattern. This commit
+	fix this.
+
+	* commit 8af72d1bcec90e94fe18ab8c625d5ac177694a22
+
+2011-08-05 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* COPYING, debian/copyright, lib/clock_gettime.c,
+	lib/clock_gettime.h, lib/clock_nanosleep.c, lib/clock_nanosleep.h,
+	lib/convfiletime.h, lib/timespec.h, src/colors.c,
+	src/create_shape.c, src/drawtk.h, src/dtk_colors.h,
+	src/dtk_event.h, src/dtk_time.h, src/dtk_video.h, src/events.c,
+	src/fonttex.c, src/fonttex.h, src/imagetex.c, src/shapes.c,
+	src/shapes.h, src/texmanager.c, src/texmanager.h, src/time.c,
+	src/video.c, src/vidpipe_creation.c, src/vidpipe_creation.h,
+	src/window.c, src/window.h: Relicense the library into LGPL3+
+
+	* commit 46604561b6d3396e067abd98443a1649e22c5863
+
+2011-08-05 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/fonttex.c, src/imagetex.c, src/texmanager.c,
+	src/texmanager.h, src/video.c: Change slightly GL texture creation
+	and get_texture_id
+
+	* commit 3ad98e77c778f631e4da1dd1313b628434716102
+
+2011-08-05 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/vidpipe_creation.c: video: remove queue element
+
+	This fix the bug of rewind video
+
+	* commit 4971401e2bd03de30f309fb057f79fbe61be70f3
+
+2011-08-05 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/video.c, src/vidpipe_creation.c, src/vidpipe_creation.h:
+	video: pass option to pipeline creaion through union
+
+	* commit c622bb6738290d522a7afded07e22be1305eb0ae
+
+2011-08-05 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/dtk_video_exec.3, doc/dtk_video_getstate.3,
+	doc/examples/bounce.c, src/dtk_video.h, src/video.c,
+	tests/test-video-custom.c, tests/test-video.c: video: Replace
+	stop command by rewind
+
+	In practice, there is no need to reinitialize a pipeline. So
+	now, videos can only be played or paused and we have added a
+	rewind command. As a consequence, the getstate function can also
+	indicate if the end of stream has been reached.
+
+	* commit 39ca980254207ff21d090e4aa9cf9bb51dbccebc
+
+2011-08-04 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/video.c, tests/test-video-custom.c, tests/test-video.c:
+	video: Simplify the code in video.c and handle live sources
+
+	The information in dtk_pipeline structure was not necessary. So
+	remove it completely. Now we just keep in the texture structure
+	the pointer to the pipeline. Live source are also played a little
+	bit before returning from creation so that dtk_texture_getsize
+	on live source works.
+
+	* commit 7d3094bc0db5f9cb0eac8317d0bd392da7ec8240
+
+2011-08-02 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* m4/funcarg.m4: Make m4 macros compatible with new autoconf
+
+	* commit d005f1e915057c1954a0fd90705fbab96a0c9560
+
+2011-07-29 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/texmanager.c, src/video.c, tests/test-video-custom.c:
+	video: set video initially in paused mode
+
+	This allows to allocate image date at the creation of the
+	texture. Thus dtk_texture_getsize can be called immediately
+	after creation of the video
+
+	* commit 2b16e111646ebb4734290c7e79a2e017ddadb419
+
+2011-07-26 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* AUTHORS, DEPENDENCIES, README, doc/dtk_load_video_file.3,
+	doc/dtk_load_video_gst.3, doc/dtk_load_video_tcp.3,
+	doc/dtk_load_video_test.3, doc/dtk_load_video_udp.3,
+	doc/examples/bounce.c, tests/test-gst-dtk.c,
+	tests/test-gst-file.c, tests/test-gst-rtp.c, tests/test-gst-tcp.c,
+	tests/test-gst-udp.c, tests/test-gst.c, tests/test-video.c:
+	video: Cleanup leftovers and add video example (bounce)
+
+	* commit 8ca954f8a17ceefd17bfa02ddc30bfea68d7b747
+
+2011-07-26 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/Makefile.am, doc/dtk_load_video_file.3,
+	doc/dtk_load_video_gst.3, doc/dtk_load_video_tcp.3,
+	doc/dtk_load_video_test.3, doc/dtk_load_video_udp.3,
+	doc/dtk_video_exec.3, doc/dtk_video_getstate.3: video: add
+	manpages for video functions
+
+	* commit 2baa39326ccb66263f485d0d0d4f0eba8792f318
+
+2011-07-26 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/dtk_video.h, src/video.c: video: dtk_video_exec now
+	return int
+
+	* commit b2cbbb4fefca46189be03c548c7e0a7e0bc72e8b
+
+2011-07-26 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/dtk_video.h, src/video.c, tests/test-video-custom.c: video:
+	rename dtk_load_video_custom -> dtk_load_video_gst
+
+	* commit f09648a55d01c071b33337bb827788b190d1b9fe
+
+2011-07-26 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/dtk_video.h, src/video.c, tests/test-video-custom.c,
+	tests/test-video.c: video: rename dtk_create_video_* ->
+	dtk_load_video_*
+
+	This change is introduced to be consistent with dtk_load_image
+
+	* commit 5fd67cd064319339bfc2b53579da0d5808d46fa0
+
+2011-07-26 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/dtk_video.h, src/video.c, src/vidpipe_creation.c,
+	src/vidpipe_creation.h, tests/Makefile.am,
+	tests/test-video-custom.c: video: adds dtk_create_video_custom API
+
+	* commit c8126aa860cfe5da3c4c59392390e509eef18f3b
+
+2011-07-26 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/Makefile.am, src/dtk_video.h, src/texmanager.c, src/video.c,
+	src/video_custom.c, src/video_custom.h, src/video_structs.h,
+	src/vidpipe_creation.c, src/vidpipe_creation.h,
+	tests/test-video.c: video: separate video creation API functions
+
+	Now the API exposes
+	dtk_create_video_{tcp|udp|file|test}. Internally strict
+	separation of pipeline creation and video texture machinery has
+	been performed.
+
+	* commit f4bea97a7d55daf8924a5e0d182725b523068b60
+
+2011-07-25 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/video.c, src/video_custom.c, src/video_structs.h: video:
+	Change those long capital-embedded name
+
+	* commit f0392b83d343a5a23608e583bd1a070579815adf
+
+2011-07-25 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/texmanager.c: video: fix memory leak while playing video
+
+	* commit 5cfbae5c1380c53be718e974b0ffa128992e4853
+
+2011-07-25 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/video_custom.c: video: remove videoflip element
+
+	We now do the flip when loading gstreamer buffer into image
+	data. Doing by ourselves has 2 positive consequences:
+	 - it runs on lucid - the image stride can be aligned on sane
+	 values
+
+	* commit 21868309db556eb4b7b9db4b39a9d15cee7d4b2f
+
+2011-07-25 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/video.c, src/video_custom.c: video: use fprintf for error,
+	remove trace info
+
+	* commit e38fc15b239605d70d04bc3c0ef81e5dc6490343
+
+2011-07-25 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/video_custom.c: video: remove caps filter element
+
+	* commit a47c8b5a98fce37bc45bfe49d41d12c2c230b285
+
+2011-07-25 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/video_custom.c: video: Remove Identity element (useless
+	with appsink)
+
+	* commit b09ecc36b13a6b3af357daa1738cc768116fc046
+
+2011-07-25 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/texmanager.c, src/video_custom.c: video: Use the common
+	path to alloc/load image data
+
+	* commit d7c7cd85a3953dccf12c3df82679a39e22d396dc
+
+2011-07-25 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* configure.ac, src/video_custom.c: video: Use GstAppSink instead
+	of GstFakeSink
+
+	This fixes playing a video
+
+	* commit 9ecfc65d7bb13c220fafe632a014f60329ebfb62
+
+2011-07-22 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/video.c, src/video_custom.c, src/video_custom.h,
+	src/video_structs.h: video: Code makeup
+
+	Make the code more compliant with coding convention of the rest
+	of the library
+
+	* commit 66356f9e68af1c5f64c0aaef66207c9e5acbf442
+
+2011-07-22 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/Makefile.am, src/dtk_gstreamer.c, src/dtk_gstreamer.h,
+	src/dtk_video.h, src/dtk_video_custom.h, src/video.c,
+	src/video_custom.c, src/video_custom.h, tests/test-video.c:
+	video: remove dtk_gstreamer.* and fix exported headers
+
+	* commit 2abbb2ee339a85553f3280e25fa8f73fe43a1523
+
+2011-07-21 Pierluca Borso <pierluca.borso@epfl.ch>
+
+	* src/video.c: video: Fixed race condition while stopping
+	the pipe.
+
+	* commit 05af9a01e21a1feb9c2d5555f08e1d5588c75888
+
+2011-07-20 Pierluca Borsò <pierluca.borso@epfl.ch>
+
+	* src/Makefile.am, src/dtk_video.h, src/dtk_video_custom.h,
+	src/fonttex.c, src/texmanager.c, src/video.c, src/video_custom.c,
+	src/video_structs.h, tests/Makefile.am, tests/test-video.c,
+	tests/test.ogv: video: Refactoring completed.
+
+	Nasty stuff confined to video_custom. Test-video polished.
+
+	Signed-off-by: Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* commit 8e0d089af4b4ba6f27ade3acb6703a6717fa872a
+
+2011-07-12 Pierluca Borsò <pierluca.borso@epfl.ch>
+
+	* src/dtk_gstreamer.c, src/dtk_gstreamer.h, src/texmanager.c,
+	src/texmanager.h, tests/Makefile.am, tests/test-gst-dtk.c,
+	tests/test-gst-file.c, tests/test-gst-rtp.c, tests/test-gst-tcp.c,
+	tests/test-gst-udp.c, tests/test-gst.c: video: Fully working
+	gstreamer-drawtk integration.
+
+	Still requires heavy refactoring.
+
+	* commit 21def2fd90abb72eaf44432ed15e705915019f79
+
+2011-07-04 Pierluca Borsò <pierluca.borso@epfl.ch>
+
+	* configure.ac, src/Makefile.am, src/dtk_gstreamer.c,
+	src/dtk_gstreamer.h, tests/Makefile.am, tests/test-gst.c: Adds
+	foundations for video support in drawtk
+
+	Foundations for gstreamer-wrapper and future DrawTK/gstreamer
+	integration. Custom pipeline creation works.
+
+	* commit e22ddc02014a67284eed94c0ccda449aba9e79e0
+
+2011-07-11 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* Makefile.am, debian/libdrawtk0-dev.examples,
+	debian/libdrawtk0-dev.install: debian: Install examples in
+	/usr/share/doc/libdrawtk0-dev
+
+	* commit 33139e8ea3e930868ce936a2bf1ac1d48712e84b
+
+2011-07-11 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* Makefile.am, doc/Makefile.am, doc/examples/Makefile,
+	doc/examples/errormon.c: Adds errmon.c to the examples
+
+	* commit 7f88c079f334321e8c601da04614279c19550ed0
+
+2011-07-01 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* Makefile.am, debian/symbols: debian: package symbols file
+
+	* commit 65396b966d40009b0744ff8d117ab21b0a88b129
+
+2011-07-01 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* Makefile.am, debian/control, debian/docs,
+	debian/libdrawtk0-dev.install, debian/postinst.ex,
+	debian/postrm.ex, debian/preinst.ex, debian/prerm.ex,
+	debian/rules, debian/shlibs.local: debian: Stop using cdbs
+
+	* commit 2b298c0226cafc37c6d6ae7bbdd7de7dc7b49132
+
+2011-06-04 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* src/Makefile.am, src/exports.sym: remove useless exports.sym
+
+	* commit ab4f20ba4d3d6eee0868623e9e57aed417abbd04
+
+2011-05-18 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* debian/changelog, debian/rules: debian: remove dependency_libs
+	from *.la
+
+	* commit d583c18f7a928cdb5dcec3c83deae4d0b861fddd
+
+2011-05-11 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* doc/Makefile.am: fix package: missing bars.c example
+
+	* commit 0389bd8c657aae13bd2ac6f08425eb5936f558dd
+
+2011-05-11 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* ChangeLog, DEPENDENCIES, README, autogen.sh, debian/changelog,
+	lib/timespec.h: Release 0.0
+
+	* commit c2373e8df3aad389ff808b13ccb82b4163a2429d
+
 2011-05-11 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
 
 	* src/imagetex.c, src/texmanager.c, src/texmanager.h: bugfix:
