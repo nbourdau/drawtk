@@ -383,6 +383,9 @@ int dtk_video_getstate(dtk_htex video)
 {
 	int status;
 	struct videoaux* aux;
+
+	if (!video->isvideo)
+		return -1;
 	
 	aux = video->aux;
 	pthread_mutex_lock(&aux->lock);
@@ -401,6 +404,9 @@ int dtk_video_exec(dtk_htex video, int command)
 	struct videoaux* aux = video->aux;
 	int flag = GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT;
 
+	if (!video->isvideo)
+		return -1;
+	
 	switch (command) {
 	case DTKV_CMD_REWIND:
 		r = gst_element_seek_simple(aux->pipe, GST_FORMAT_TIME,
