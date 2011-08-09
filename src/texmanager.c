@@ -119,6 +119,7 @@ struct dtk_texture* get_texture(const char *desc)
 		strncpy(tex->string_id, desc, 255);
 		tex->aux = NULL;
 		tex->data = NULL;
+		tex->bmdata = NULL;
 		
 		// append at the end of the list
 		*last = tex;
@@ -178,8 +179,6 @@ void rem_texture(struct dtk_texture* tex)
 static
 void free_texture(struct dtk_texture* tex)
 {
-	unsigned int i;
-
         if (tex->destroyfn)
                 tex->destroyfn(tex);
 
@@ -188,14 +187,11 @@ void free_texture(struct dtk_texture* tex)
 		tex->id = 0;
 	}
 
-	if (tex->data) {
-		for (i=0; i<=tex->mxlvl; i++)
-		        free(tex->data[i]);
-		free(tex->data);
-		tex->data = NULL;
-	}
+	free(tex->bmdata);
+	free(tex->data);
+	tex->data = NULL;
+	tex->bmdata = NULL;
 
-        free(tex->sizes);
         pthread_mutex_destroy(&(tex->lock));
 
         free(tex);
@@ -210,13 +206,12 @@ int alloc_image_data(struct dtk_texture* tex,
 		     unsigned int w, unsigned int h,
 		     unsigned int mxlvl, unsigned int bpp)
 {
-	unsigned int i, stride;
+	unsigned int i, stride, offset = 0;
 	
 	// Allocate texture structure
 	tex->mxlvl = mxlvl;
 	tex->bpp = bpp;
-	if (!(tex->data = calloc((mxlvl+1), sizeof(*(tex->data))))
-	    || !(tex->sizes = malloc((mxlvl+1)*sizeof(*(tex->sizes)))))
+	if (!(tex->data = calloc((mxlvl+1), sizeof(*(tex->data)))))
 		goto fail;
 
 	// setup mipmap sizes and allocate bitmaps
@@ -228,24 +223,22 @@ int alloc_image_data(struct dtk_texture* tex,
 		// round up to the next DTK_ALIGN-byte boundary
 		stride = ((stride+DTK_PALIGN-1)/DTK_PALIGN) * DTK_PALIGN;
 
-		tex->sizes[i].h = h;
-		tex->sizes[i].w = w;
-		tex->sizes[i].stride = stride;
-		if (!(tex->data[i] = calloc(w,stride)))
-			goto fail;
+		tex->data[i].h = h;
+		tex->data[i].w = w;
+		tex->data[i].stride = stride;
+		tex->data[i].offset = offset;
+
+		offset += h*stride;
 		w /= 2;
 		h /= 2;
 	}
-
-	return 0;
+	tex->bmdata = calloc(1, offset);
+	if (tex->bmdata)
+		return 0;
 
 fail:
-	for (i=0; i<=mxlvl && tex->data; i++)
-		free(tex->data[i]);
 	free(tex->data);
-	free(tex->sizes);
 	tex->data = NULL;
-	tex->sizes = NULL;
 	return 1;
 }
 
@@ -257,6 +250,7 @@ static
 void create_gl_texture(struct dtk_texture* tex)
 {
 	unsigned int lvl; 
+	char* bm = tex->bmdata;
 
 	// creation of the GL texture Object
 	glGenTextures(1,&(tex->id));
@@ -271,8 +265,8 @@ void create_gl_texture(struct dtk_texture* tex)
 	// Load each mipmap in video memory 
 	for (lvl=0; lvl<=tex->mxlvl; lvl++) {
 		glTexImage2D(GL_TEXTURE_2D, lvl, tex->intfmt, 
-		        tex->sizes[lvl].w, tex->sizes[lvl].h, 0,
-			tex->fmt, tex->type, tex->data[lvl]);
+		        tex->data[lvl].w, tex->data[lvl].h, 0,
+			tex->fmt, tex->type, bm + tex->data[lvl].offset);
 	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -286,14 +280,15 @@ void create_gl_texture(struct dtk_texture* tex)
 static
 void update_gl_texture(struct dtk_texture* tex)
 {
-	unsigned int lvl; 
+	unsigned int lvl;
+	char* bm = tex->bmdata;
 
 	glBindTexture(GL_TEXTURE_2D, tex->id);
 	// Load each mipmap in video memory 
 	for (lvl=0; lvl<=tex->mxlvl; lvl++) {
 		glTexSubImage2D(GL_TEXTURE_2D, lvl, 0, 0,
-		        tex->sizes[lvl].w, tex->sizes[lvl].h,
-			tex->fmt, tex->type, tex->data[lvl]);
+		        tex->data[lvl].w, tex->data[lvl].h,
+			tex->fmt, tex->type, bm + tex->data[lvl].offset);
 	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -315,9 +310,9 @@ void dtk_texture_getsize(struct dtk_texture* tex, unsigned int* w,
 	if (!tex || !w || !h)
 		return;
 	
-	if (tex->sizes) {
-		*w = tex->sizes[0].w;
-		*h = tex->sizes[0].h;
+	if (tex->data) {
+		*w = tex->data[0].w;
+		*h = tex->data[0].h;
 	} else
 		*w = *h = 0;
 }
@@ -354,18 +349,19 @@ void compute_mipmaps(struct dtk_texture* tex)
 {
 	FIBITMAP *dib, *dib2;
 	unsigned int i;
+	BYTE* bm = tex->bmdata;
 	
-	dib = FreeImage_ConvertFromRawBits(tex->data[0], 
-	                tex->sizes[0].w, tex->sizes[0].h,
-			tex->sizes[0].stride, tex->bpp,
+	dib = FreeImage_ConvertFromRawBits(bm + tex->data[0].offset, 
+	                tex->data[0].w, tex->data[0].h,
+			tex->data[0].stride, tex->bpp,
 			tex->rmsk, tex->gmsk, tex->bmsk, FALSE);
 	
 	for (i=1; i<=tex->mxlvl; i++) {
 		dib2 = FreeImage_Rescale(dib, 
-				tex->sizes[i].w, tex->sizes[i].h,
+				tex->data[i].w, tex->data[i].h,
 				FILTER_BICUBIC);
-		FreeImage_ConvertToRawBits(tex->data[i], dib2,
-				tex->sizes[i].stride, tex->bpp,
+		FreeImage_ConvertToRawBits(bm + tex->data[i].offset, dib2,
+				tex->data[i].stride, tex->bpp,
 				tex->rmsk, tex->gmsk, tex->bmsk, FALSE);
 		FreeImage_Unload(dib2);
 	}

@@ -29,17 +29,17 @@ struct dtk_texture;
 typedef void (*destroyproc)(struct dtk_texture*);
 typedef struct dtk_texture* (*createproc)(const char*);
 
-struct dtk_size {
-	unsigned int w, h, stride;
+struct mipmapdata {
+	unsigned int offset, stride, h, w;
 };
 
 // Structure for textures
 struct dtk_texture
 {
 	// Bitmaps
-	struct dtk_size* sizes;
-	void** data;
+	struct mipmapdata* data;
 	unsigned int mxlvl;
+	void* bmdata;
 	void *aux;
 
 	// Pixel type

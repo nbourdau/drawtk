@@ -242,10 +242,11 @@ struct dtk_texture* dtk_get_fonttex(const struct dtk_font* font)
 API_EXPORTED
 struct dtk_font* dtk_load_font(const char* fontname)
 {
-	int fail = 0;
+	int i, fail = 0;
 	struct dtk_texture *tex = NULL;
 	struct dtk_font* font = NULL;
 	char stringid[256];
+	void* bits[FONT_MXLVL+1];
 	
 	// Get new/precreated texture
 	snprintf(stringid, sizeof(stringid), "FONT:%s", fontname);
@@ -261,7 +262,10 @@ struct dtk_font* dtk_load_font(const char* fontname)
 			fail = 1;
 		tex->aux = font;
 		font->tex = tex;
-		if (load_glyph(tex->data, tex->aux, fontname, FONT_MXLVL))
+
+		for (i=0; i<FONT_MXLVL+1; i++)
+			bits[i]	= ((char*)tex->bmdata)+tex->data[i].offset;
+		if (load_glyph(bits, tex->aux, fontname, FONT_MXLVL))
 			fail = 1;
 		tex->destroyfn = font_destroy;
 

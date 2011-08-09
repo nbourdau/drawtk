@@ -85,6 +85,7 @@ int load_texture_from_file(struct dtk_texture* tex, const char* filename,
 	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 	FIBITMAP *dib = NULL;
 	int retcode = 0;
+	BYTE* bm;
 
 	// check the file signature and deduce its format
 	fif = FreeImage_GetFileType(filename, 0);
@@ -115,8 +116,10 @@ int load_texture_from_file(struct dtk_texture* tex, const char* filename,
 	tex->bmsk = FreeImage_GetBlueMask(dib);
 
 	// Fill image data
-	FreeImage_ConvertToRawBits(tex->data[0], dib, tex->sizes[0].stride,
-	                       bpp, tex->rmsk, tex->gmsk, tex->bmsk, FALSE);
+	bm = tex->bmdata;
+	FreeImage_ConvertToRawBits(bm + tex->data[0].offset, dib,
+	                           tex->data[0].stride, bpp,
+				   tex->rmsk, tex->gmsk, tex->bmsk, FALSE);
 	compute_mipmaps(tex);
 
 out:
