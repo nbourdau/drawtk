@@ -248,6 +248,8 @@ int init_video_tex(struct dtk_texture* tex, GstElement* pipe)
 				   "blue_mask", G_TYPE_INT, 0x0000FF, NULL);
 	gst_app_sink_set_caps(sink, caps);
 	gst_caps_unref(caps);
+	gst_app_sink_set_max_buffers(sink, 2);
+	gst_app_sink_set_drop(sink, TRUE);
 	gst_app_sink_set_callbacks(sink, &sink_callbacks, tex, NULL);
 
 	aux = malloc(sizeof(*aux));
