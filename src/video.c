@@ -109,10 +109,10 @@ void update_texture_image(GstBuffer* buffer, struct dtk_texture* tex)
 	h = tex->data[0].h;
 	tstride = tex->data[0].stride;
 	bstride = tex->data[0].w*3;
-	tdata = tex->bmdata;
 	bdata = GST_BUFFER_DATA(buffer) + (h-1)*bstride;
 
 	pthread_mutex_lock(&(tex->lock));
+	tdata = tex->bmdata;
 	for (i=0; i<h; i++) {
 		memcpy(tdata, bdata, bstride);
 		tdata += tstride;

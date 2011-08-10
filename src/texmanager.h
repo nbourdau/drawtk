@@ -21,6 +21,7 @@
 #include <SDL/SDL_opengl.h>
 #include <pthread.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include "drawtk.h"
 
 #define DTK_PALIGN	(sizeof(int))
@@ -30,7 +31,8 @@ typedef void (*destroyproc)(struct dtk_texture*);
 typedef struct dtk_texture* (*createproc)(const char*);
 
 struct mipmapdata {
-	unsigned int offset, stride, h, w;
+	uintptr_t offset;
+	unsigned int stride, h, w;
 };
 
 // Structure for textures
@@ -48,6 +50,8 @@ struct dtk_texture
 	unsigned int bpp, rmsk, bmsk, gmsk;
 
 	// Texture usage
+	GLuint pbo[2];
+	int ipbo;
 	GLuint id;
 	unsigned int nused;
 	char string_id[256];

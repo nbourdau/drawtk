@@ -19,8 +19,11 @@
 # include <config.h>
 #endif
 
+#define GL_GLEXT_PROTOTYPES
+#define GL_GLXEXT_PROTOTYPES
+#include <GL/gl.h>
+
 #include <FreeImage.h>
-#include <SDL/SDL_opengl.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -120,6 +123,7 @@ struct dtk_texture* get_texture(const char *desc)
 		tex->aux = NULL;
 		tex->data = NULL;
 		tex->bmdata = NULL;
+		tex->ipbo = -1;
 		
 		// append at the end of the list
 		*last = tex;
@@ -187,6 +191,11 @@ void free_texture(struct dtk_texture* tex)
 		tex->id = 0;
 	}
 
+	if (tex->ipbo >= 0) {
+		glDeleteBuffers(2, tex->pbo);
+		tex->bmdata = NULL;
+	}
+
 	free(tex->bmdata);
 	free(tex->data);
 	tex->data = NULL;
@@ -244,13 +253,14 @@ fail:
 
 
 /* Create the GL texture and load the image data into the video memory
- * Assume that tex->lock is hold
+ * Assume that tex->lock is NOT hold
  */
 static
 void create_gl_texture(struct dtk_texture* tex)
 {
 	unsigned int lvl; 
 	char* bm = tex->bmdata;
+	GLsizeiptr dsize = 0;
 
 	// creation of the GL texture Object
 	glGenTextures(1,&(tex->id));
@@ -262,37 +272,80 @@ void create_gl_texture(struct dtk_texture* tex)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, tex->mxlvl);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, DTK_PALIGN);
 
+	pthread_mutex_lock(&tex->lock);
 	// Load each mipmap in video memory 
 	for (lvl=0; lvl<=tex->mxlvl; lvl++) {
 		glTexImage2D(GL_TEXTURE_2D, lvl, tex->intfmt, 
 		        tex->data[lvl].w, tex->data[lvl].h, 0,
 			tex->fmt, tex->type, bm + tex->data[lvl].offset);
 	}
+	tex->outdated = false;
 
 	glBindTexture(GL_TEXTURE_2D, 0);
-	tex->outdated = false;
+	
+	if (tex->isvideo) {
+		glGenBuffers(2, tex->pbo);
+		tex->ipbo = 0;
+		for (lvl=0; lvl<=tex->mxlvl; lvl++)
+			dsize += tex->data[lvl].h * tex->data[lvl].stride;
+	
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tex->pbo[1]);
+		glBufferData(GL_PIXEL_UNPACK_BUFFER, dsize, NULL,
+		                                            GL_STREAM_DRAW);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tex->pbo[0]);
+		glBufferData(GL_PIXEL_UNPACK_BUFFER, dsize, NULL,
+		                                            GL_STREAM_DRAW);
+
+		free(tex->bmdata);
+		tex->bmdata = glMapBuffer(GL_PIXEL_UNPACK_BUFFER,
+		                                             GL_WRITE_ONLY);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+	}
+
+	pthread_mutex_unlock(&tex->lock);
 }
 
 
 /* Update the image data in the GL texture
- * Assume that tex->lock is hold
+ * Assume that tex->lock is NOT hold
  */
 static
-void update_gl_texture(struct dtk_texture* tex)
+void update_dynamic_texture(struct dtk_texture* tex)
 {
 	unsigned int lvl;
-	char* bm = tex->bmdata;
+	int cpbo = tex->ipbo;
+	int npbo = (cpbo + 1) % 2;
+
+	pthread_mutex_lock(&tex->lock);
+	
+	if (!tex->outdated) {
+		pthread_mutex_unlock(&tex->lock);
+		return;
+	}
+
+	// Map the next buffer
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tex->pbo[npbo]);
+	tex->bmdata = glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
+	tex->outdated = false;
+
+	pthread_mutex_unlock(&tex->lock);
+
+	// Unmap the current one to perform texture update
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, tex->pbo[cpbo]);
+	glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+	tex->ipbo = npbo;
 
 	glBindTexture(GL_TEXTURE_2D, tex->id);
 	// Load each mipmap in video memory 
 	for (lvl=0; lvl<=tex->mxlvl; lvl++) {
 		glTexSubImage2D(GL_TEXTURE_2D, lvl, 0, 0,
 		        tex->data[lvl].w, tex->data[lvl].h,
-			tex->fmt, tex->type, bm + tex->data[lvl].offset);
+			tex->fmt, tex->type,
+			(const GLvoid*) tex->data[lvl].offset);
 	}
-
 	glBindTexture(GL_TEXTURE_2D, 0);
-	tex->outdated = false;
+
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
 
@@ -324,17 +377,10 @@ GLuint get_texture_id(struct dtk_texture *tex)
 	if (!tex)
 		return 0;
 
-	// This allows to return quickly since once the texture has been
-	// loaded, it won't change until tex is destroyed
-	if (tex->id && !tex->isvideo)
-		return tex->id;
-
-	pthread_mutex_lock(&(tex->lock));
 	if (tex->id == 0) 
 		create_gl_texture(tex);
-	if (tex->outdated)
-		update_gl_texture(tex);
-	pthread_mutex_unlock(&(tex->lock));
+	else if (tex->isvideo)
+		update_dynamic_texture(tex);
 
 	return tex->id;
 }
