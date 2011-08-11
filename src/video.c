@@ -312,7 +312,7 @@ dtk_htex create_video_any(int type, const union pipeopt* opt,
 	pthread_mutex_unlock(&(tex->lock));
 
 	if (tex && (flags & DTK_AUTOSTART))
-		dtk_video_exec(tex, DTKV_CMD_PLAY);
+		dtk_video_exec(tex, DTKV_CMD_PLAY, NULL);
 		
 	return tex;
 }
@@ -403,20 +403,23 @@ int dtk_video_getstate(dtk_htex video)
 
 
 API_EXPORTED
-int dtk_video_exec(dtk_htex video, int command)
+int dtk_video_exec(dtk_htex video, int command, const void* arg)
 {
 	bool r;
 	GstState gstate;
 	struct videoaux* aux = video->aux;
 	int flag = GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT;
+	gint64 seek_pos = 0;
 
 	if (!video->isvideo)
 		return -1;
 	
 	switch (command) {
-	case DTKV_CMD_REWIND:
+	case DTKV_CMD_SEEK:
+		if (arg != NULL)
+			seek_pos = *((const long*)arg) * GST_MSECOND;
 		r = gst_element_seek_simple(aux->pipe, GST_FORMAT_TIME,
-		                            flag, 0);
+		                            flag, seek_pos);
 		if (!r)
 			return -1;
 		pthread_mutex_lock(&aux->lock);

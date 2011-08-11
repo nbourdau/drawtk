@@ -61,14 +61,16 @@ int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 		break;
 
 	case DTK_EVT_KEYBOARD:
+		if (evt->key.state != DTK_KEY_PRESSED)
+			break;
 		if (evt->key.sym == DTKK_ESCAPE)
 			retcode = 0;
                 else if(evt->key.sym == DTKK_s)
-                        dtk_video_exec(video2,DTKV_CMD_PLAY);
+                        dtk_video_exec(video2,DTKV_CMD_PLAY, NULL);
                 else if(evt->key.sym == DTKK_p)
-                        dtk_video_exec(video2,DTKV_CMD_PAUSE);
+                        dtk_video_exec(video2,DTKV_CMD_PAUSE, NULL);
                 else if(evt->key.sym == DTKK_r)
-                        dtk_video_exec(video2,DTKV_CMD_REWIND);
+                        dtk_video_exec(video2,DTKV_CMD_SEEK, NULL);
 		break;
 	}
 

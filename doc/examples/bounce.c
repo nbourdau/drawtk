@@ -171,11 +171,11 @@ int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 				dirx = dirx <= -1 ? -1 : dirx-1;
 		}
                 else if(evt->key.sym == DTKK_s)
-                        dtk_video_exec(video,DTKV_CMD_PLAY);
+                        dtk_video_exec(video,DTKV_CMD_PLAY, NULL);
                 else if(evt->key.sym == DTKK_p)
-                        dtk_video_exec(video,DTKV_CMD_PAUSE);
+                        dtk_video_exec(video,DTKV_CMD_PAUSE, NULL);
                 else if(evt->key.sym == DTKK_r)
-                        dtk_video_exec(video,DTKV_CMD_REWIND);
+                        dtk_video_exec(video,DTKV_CMD_SEEK, NULL);
 		break;
 	}
 

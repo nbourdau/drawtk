@@ -47,6 +47,7 @@ static
 int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 {
 	int retcode = 1;
+	long seek_pos;
 	(void) wnd;
 
 	switch (type) {
@@ -55,14 +56,20 @@ int event_handler(dtk_hwnd wnd, int type, const union dtk_event* evt)
 		break;
 
 	case DTK_EVT_KEYBOARD:
+		if (evt->key.state != DTK_KEY_PRESSED)
+			break;
 		if (evt->key.sym == DTKK_ESCAPE)
 			retcode = 0;
                 else if(evt->key.sym == DTKK_s)
-                        dtk_video_exec(video, DTKV_CMD_PLAY);
+                        dtk_video_exec(video, DTKV_CMD_PLAY, NULL);
                 else if(evt->key.sym == DTKK_p)
-                        dtk_video_exec(video, DTKV_CMD_PAUSE);
+                        dtk_video_exec(video, DTKV_CMD_PAUSE, NULL);
                 else if(evt->key.sym == DTKK_r)
-                        dtk_video_exec(video, DTKV_CMD_REWIND);
+                        dtk_video_exec(video, DTKV_CMD_SEEK, NULL);
+                else if(evt->key.sym == DTKK_m) {
+			seek_pos = 10*1000;
+                        dtk_video_exec(video, DTKV_CMD_SEEK, &seek_pos);
+		}
 		break;
 	}
 
@@ -92,7 +99,7 @@ int main(void)
         shape = dtk_create_image(NULL, 0.0f, 0.4f, 1.0f, 0.8f, dtk_white, video);
 
         dtk_hfont font = dtk_load_font("arial");
-        text = dtk_create_string(NULL,"ESC-Quit, S-Play, R-Rewind, P-Pause",0.1f, 0.0f,-0.5f,DTK_HMID,dtk_white,font);
+        text = dtk_create_string(NULL,"ESC-Quit, S-Play, R-Rewind, M-Goto 10sec, P-Pause",0.1f, 0.0f,-0.5f,DTK_HMID,dtk_white,font);
 
         // Main loop
 	while (dtk_process_events(wnd)) {

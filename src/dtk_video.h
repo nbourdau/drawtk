@@ -32,7 +32,7 @@ extern "C" {
 enum dtk_video_cmd {
 	DTKV_CMD_PLAY = 0,
 	DTKV_CMD_PAUSE,
-	DTKV_CMD_REWIND,
+	DTKV_CMD_SEEK,
 };
 
 #define DTK_AUTOSTART	0x01
@@ -42,7 +42,7 @@ dtk_htex dtk_load_video_udp(int flags, int port);
 dtk_htex dtk_load_video_file(int flags, const char *file);
 dtk_htex dtk_load_video_test(int flags);
 dtk_htex dtk_load_video_gst(int flags, const char* desc);
-int dtk_video_exec(dtk_htex video, int command);
+int dtk_video_exec(dtk_htex video, int command, const void* arg);
 int dtk_video_getstate(dtk_htex video);
 
 #ifdef __cplusplus

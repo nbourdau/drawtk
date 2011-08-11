@@ -6,19 +6,29 @@ dtk_video_exec - Start/stop/pause a video texture
 .LP
 .B #include <dtk_video.h>
 .sp
-.BI "int dtk_video_exec(dtk_htex " vid ", int " command ");"
+.BI "int dtk_video_exec(dtk_htex " vid ", int " command ", const void* " arg ");"
 .br
 .SH DESCRIPTION
 .LP
 This function changes the state (or playing position) of a video texture
 referenced by \fIvid\fP according to the value of \fIcommand\fP:
-\fBDTKV_CMD_PLAY\fP, \fBDTKV_CMD_PAUSE\fP, \fBDTKV_CMD_REWIND\fP.
+.TP
+\fBDTKV_CMD_PLAY\fP: Set the video to play. \fIarg\fP is ignored.
+.TP
+\fBDTKV_CMD_PAUSE\fP: Set the video to pause. \fIarg\fP is ignored.
+.TP
+\fBDTKV_CMD_SEEK\fP: Seek the video to the position specified by \fIarg\fP
+which is then interpreted as a pointer to a value of type \fBlong\fP
+representing the position in milliseconds from the beginning of the video.
+\fIarg\fP is allowed to be NULL. In that case, the video will be positioned
+at its start.
+.LP
 \fIvid\fP must be a dynamic texture created by one of the functions 
 \fBdtk_create_video_*\fP(3). If the video was already in the requested
 state, the function will do nothing.
 .LP
 If the video is created from the live source (webcam, network broadcast...),
-executing \fBDTKV_CMD_REWIND\fP will fail.
+executing \fBDTKV_CMD_SEEK\fP will fail.
 .SH "RETURN VALUE"
 .LP
 0 if the state has been changed or was already the one requested, -1 otherwise.
