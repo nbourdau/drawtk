@@ -24,6 +24,8 @@
 #include <GL/gl.h>
 
 #include <FreeImage.h>
+#include <gst/gst.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -43,7 +45,7 @@ static void free_texture(struct dtk_texture* tex);
 struct dtk_texture_manager
 {
 	pthread_mutex_t lstlock;
-	unsigned int inuse;
+	unsigned int inuse, isinit;
 	struct dtk_texture* root;
 };
 
@@ -51,6 +53,7 @@ struct dtk_texture_manager
 static struct dtk_texture_manager texman = {
 	.lstlock = PTHREAD_MUTEX_INITIALIZER,
 	.inuse = 0,
+	.isinit = 0,
 	.root = NULL,
 };
 
@@ -59,12 +62,35 @@ static struct dtk_texture_manager texman = {
  *                      Texture manager functions                        *
  *                                                                       *
  *************************************************************************/
+static
+void deinit_texman(void)
+{
+	if (texman.isinit) {
+		gst_deinit();
+		FreeImage_DeInitialise();
+		texman.isinit = 0;
+	}
+}
+
+
+static
+void init_texman(void)
+{
+	if (!texman.isinit) {
+		gst_init(NULL, NULL);
+		FreeImage_Initialise(FALSE);
+		texman.isinit = 1;
+		atexit(deinit_texman);
+	}
+}
+
+
 LOCAL_FN
 void acquire_texture_manager(void)
 {
 	pthread_mutex_lock(&texman.lstlock);
-	if (texman.inuse == 0)
-		FreeImage_Initialise(FALSE);
+	if (!texman.isinit)
+		init_texman();
 	texman.inuse++;
 	pthread_mutex_unlock(&texman.lstlock);
 }
@@ -84,8 +110,8 @@ void release_texture_manager(void)
 			free_texture(curr_tex);
 			curr_tex = next_tex;
 		}
+		deinit_texman();
 
-		FreeImage_DeInitialise();
 	}
 	pthread_mutex_unlock(&texman.lstlock);
 }
@@ -101,6 +127,9 @@ struct dtk_texture* get_texture(const char *desc)
 	struct dtk_texture *tex, **last;
 
 	pthread_mutex_lock(&texman.lstlock);
+
+	if (!texman.isinit)
+		init_texman();
 
 	// Go through the linked list of textures to search
 	// for existing entry

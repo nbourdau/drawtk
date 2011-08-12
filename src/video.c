@@ -65,23 +65,6 @@ static GstAppSinkCallbacks sink_callbacks = {
 };
 
 
-static
-void init_gstreamer(void)
-{
-	static bool is_initialized = false;
-	if (!is_initialized) {
-		// initialize glib threading
-		if (!g_thread_supported()) 
-			g_thread_init(NULL);
-		// initialize gstreamer
-		gst_init(NULL, NULL);
-
-		// set sentinel
-		is_initialized = true;
-	}
-}
-
-
 /**************************************************************************
  *                          Pipeline execution                            *
  **************************************************************************/
@@ -305,7 +288,6 @@ dtk_htex create_video_any(int type, const union pipeopt* opt,
 
 	pthread_mutex_lock(&(tex->lock));
 	if (!tex->data) {
-		init_gstreamer();
 		pipe = create_pipeline(type, opt);
 		init_video_tex(tex, pipe);
 	}
