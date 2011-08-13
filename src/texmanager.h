@@ -44,17 +44,17 @@ struct dtk_texture
 	void* bmdata;
 	void *aux;
 
-	// Pixel type
+	// GL Info
+	GLuint pbo[2];
+	int ipbo;
+	GLuint id;
 	GLint intfmt;
 	GLenum fmt, type;
 	unsigned int bpp, rmsk, bmsk, gmsk;
 
 	// Texture usage
-	GLuint pbo[2];
-	int ipbo;
-	GLuint id;
 	unsigned int nused;
-	char string_id[256];
+	uint32_t hash;
 
 	// update lock
 	pthread_mutex_t lock;

@@ -117,6 +117,20 @@ void release_texture_manager(void)
 }
 
 
+static
+uint32_t djbhash(const char* string)
+{
+	uint32_t h = 5381;
+	unsigned char c;
+	const unsigned char *s = (const unsigned char*)string;
+
+        for (c = *s; c != '\0'; c = *++s)
+		h = h * 33 + c;
+
+	return h;
+}
+
+
 /* Get a texture identified by desc. If it exists, it increments its number 
  * of use. Otherwise it creates a minimal structure (init lock, and fill
  * string_id) with the flag tex->init set to 0.
@@ -125,6 +139,7 @@ LOCAL_FN
 struct dtk_texture* get_texture(const char *desc)
 {
 	struct dtk_texture *tex, **last;
+	uint32_t hash = djbhash(desc);
 
 	pthread_mutex_lock(&texman.lstlock);
 
@@ -135,7 +150,7 @@ struct dtk_texture* get_texture(const char *desc)
 	// for existing entry
 	last = &(texman.root);
 	while (*last != NULL) {
-		if (strcmp(desc, (*last)->string_id) == 0) 
+		if (hash == (*last)->hash) 
 			break;	
 		last = &((*last)->next_tex);
 	}
@@ -148,7 +163,7 @@ struct dtk_texture* get_texture(const char *desc)
 		
 		memset(tex, 0, sizeof(*tex));
 		pthread_mutex_init(&(tex->lock), NULL);
-		strncpy(tex->string_id, desc, 255);
+		tex->hash = hash;
 		tex->aux = NULL;
 		tex->data = NULL;
 		tex->bmdata = NULL;
