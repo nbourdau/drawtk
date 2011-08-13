@@ -38,6 +38,9 @@
 #include "texmanager.h"
 #include "dtk_video.h"
 
+#define DTK_CH_ASYNC	1
+#define DTK_NO_PREROLL	2
+
 struct videoaux
 {
 	GstElement* pipe;
@@ -54,8 +57,11 @@ struct async_alloc_data
 	bool isalloc;
 };
 
+static int alloc_compatible_image(GstAppSink* sink, struct dtk_texture* tex);
 static GstFlowReturn newbuffer_callback(GstAppSink *sink,  gpointer data);
 static GstFlowReturn preroll_callback(GstAppSink *sink,  gpointer data);
+static GstFlowReturn newbuffer_uninit_cb(GstAppSink *sink,  gpointer data);
+static GstFlowReturn preroll_uninit_cb(GstAppSink *sink,  gpointer data);
 static void eos_callback(GstAppSink *sink,  gpointer data);
 
 static GstAppSinkCallbacks sink_callbacks = {
@@ -64,19 +70,30 @@ static GstAppSinkCallbacks sink_callbacks = {
 	.new_buffer = newbuffer_callback
 };
 
+static GstAppSinkCallbacks sink_uninit_callbacks = {
+	.eos = eos_callback,
+	.new_preroll = preroll_uninit_cb,
+	.new_buffer = newbuffer_uninit_cb
+};
+
 
 /**************************************************************************
  *                          Pipeline execution                            *
  **************************************************************************/
 static
-int change_pipeline_state(struct videoaux* aux, GstState state)
+int set_pipe_state(struct videoaux* aux, GstState state, int noblock)
 {
 	GstStateChangeReturn ret;
-	GstClockTime timeout = 500 * GST_MSECOND;
+	GstClockTime timeout = noblock ? 0 : -1;
 
 	ret = gst_element_set_state(aux->pipe, state);
-	while (ret == GST_STATE_CHANGE_ASYNC)
+	if (ret == GST_STATE_CHANGE_ASYNC)
 		ret = gst_element_get_state(aux->pipe, NULL, NULL, timeout);
+
+	if (ret == GST_STATE_CHANGE_ASYNC)
+		return DTK_CH_ASYNC;
+	if (ret == GST_STATE_CHANGE_NO_PREROLL)
+		return DTK_NO_PREROLL;
 
 	return (ret != GST_STATE_CHANGE_FAILURE) ? 0 : -1;
 }
@@ -150,6 +167,83 @@ GstFlowReturn newbuffer_callback(GstAppSink *sink,  gpointer data)
 }
 
 
+static
+int try_alloc_image(GstAppSink *sink, struct dtk_texture* tex)
+{
+	int ret = 0;
+
+	pthread_mutex_lock(&tex->lock);
+	if (!tex->data) {
+		ret = alloc_compatible_image(sink, tex);
+		if (!ret)
+			gst_app_sink_set_callbacks(sink, &sink_callbacks,
+			                                         tex, NULL);
+	}
+	pthread_mutex_unlock(&tex->lock);
+
+	return ret;
+}
+
+
+static
+GstFlowReturn preroll_uninit_cb(GstAppSink *sink,  gpointer data)
+{
+	struct dtk_texture* tex = data;
+
+	if (try_alloc_image(sink, tex))
+		return GST_FLOW_OK;
+	return preroll_callback(sink, data);
+}
+
+
+static
+GstFlowReturn newbuffer_uninit_cb(GstAppSink *sink,  gpointer data)
+{
+	struct dtk_texture* tex = data;
+
+	if (try_alloc_image(sink, tex))
+		return GST_FLOW_OK;
+	return newbuffer_callback(sink, data);
+}
+
+
+static
+int pipeline_seek(struct videoaux* aux, gint64 pos)
+{
+	int flag = GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT;
+
+	if (!gst_element_seek_simple(aux->pipe, GST_FORMAT_TIME, flag, pos))
+		return -1;
+
+	pthread_mutex_lock(&aux->lock);
+	aux->state &= ~DTKV_EOS;
+	pthread_mutex_unlock(&aux->lock);
+	return 0;
+}
+
+
+static
+int pipeline_play_pause(struct videoaux* aux, int playing, int noblock)
+{
+	GstState gstate = GST_STATE_PAUSED;
+
+	if (playing)
+		gstate = GST_STATE_PLAYING;
+
+	if (set_pipe_state(aux, gstate, noblock) < 0)
+		return -1;
+
+	pthread_mutex_lock(&aux->lock);
+	if (playing)
+		aux->state |= DTKV_PLAYING;
+	else
+		aux->state &= ~DTKV_PLAYING;
+	pthread_mutex_unlock(&aux->lock);
+
+	return 0;
+}
+
+
 /**************************************************************************
  *                           Pipeline creation                            *
  **************************************************************************/
@@ -181,19 +275,23 @@ int alloc_compatible_image(GstAppSink* sink, struct dtk_texture* tex)
 
 
 static
-GstFlowReturn async_image_alloc(GstAppSink *sink,  gpointer data)
+void wait_for_data_alloc(struct dtk_texture* tex, int live)
 {
-	struct async_alloc_data* asdat = data;
+	pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 
-	alloc_compatible_image(sink, asdat->tex);
+	if (live)
+		set_pipe_state(tex->aux, GST_STATE_PLAYING, 0);
+
+	// Wait until the image data has been allocated
+	pthread_mutex_lock(&tex->lock);
+	while (!tex->data)
+		pthread_cond_wait(&cond, &tex->lock);
+	pthread_mutex_unlock(&tex->lock);
 	
-	// Signal that everything is ready
-	pthread_mutex_lock(&asdat->lock);
-	asdat->isalloc = true;
-	pthread_cond_signal(&asdat->cond);
-	pthread_mutex_unlock(&asdat->lock);
+	if (live)
+		set_pipe_state(tex->aux, GST_STATE_PAUSED, 0);
 
-	return GST_FLOW_OK;
+	pthread_cond_destroy(&cond);
 }
 
 
@@ -213,14 +311,14 @@ void destroyPipeline(dtk_htex tex)
 }
 
 
+// Assume holding tex->lock
 static
-int init_video_tex(struct dtk_texture* tex, GstElement* pipe)
+int init_video_tex(struct dtk_texture* tex, GstElement* pipe, int noblock)
 {
-	struct async_alloc_data asdata = { .tex = tex, .isalloc = false };
-	GstAppSinkCallbacks tmp_cb = { .new_buffer = async_image_alloc };
 	GstAppSink* sink;
 	GstCaps* caps;
 	struct videoaux* aux;
+	int r, retval = 0;
 
 	// Configure sink
 	sink = GST_APP_SINK(gst_bin_get_by_name(GST_BIN(pipe), "dtksink"));
@@ -233,7 +331,7 @@ int init_video_tex(struct dtk_texture* tex, GstElement* pipe)
 	gst_caps_unref(caps);
 	gst_app_sink_set_max_buffers(sink, 2);
 	gst_app_sink_set_drop(sink, TRUE);
-	gst_app_sink_set_callbacks(sink, &sink_callbacks, tex, NULL);
+	gst_app_sink_set_callbacks(sink, &sink_uninit_callbacks, tex, NULL);
 
 	aux = malloc(sizeof(*aux));
 	aux->pipe = pipe;
@@ -245,34 +343,15 @@ int init_video_tex(struct dtk_texture* tex, GstElement* pipe)
 	tex->destroyfn = &(destroyPipeline);
 	
 	// Prepare pipeline execution
-	if (change_pipeline_state(aux, GST_STATE_READY)
-	    || change_pipeline_state(aux, GST_STATE_PAUSED))
-		return -1;
-	
-	// Try to allocate image without touching the gstreamer pipeline
-	if (!alloc_compatible_image(sink, tex))
-		return 0;
+	pthread_mutex_unlock(&tex->lock);
+	if (set_pipe_state(aux, GST_STATE_READY, noblock) < 0
+	  || (r = set_pipe_state(aux, GST_STATE_PAUSED, noblock)) < 0) 
+	  	retval = -1;
+	else if (!noblock)
+		wait_for_data_alloc(tex, (r == DTK_NO_PREROLL));
+	pthread_mutex_lock(&tex->lock);
 
-	// Previous failed so start the pipeline and allocate
-	// asynchronously when the first image is available
-	pthread_mutex_init(&asdata.lock, NULL);
-	pthread_cond_init(&asdata.cond, NULL);
-	gst_app_sink_set_callbacks(sink, &tmp_cb, &asdata, NULL);
-	change_pipeline_state(aux, GST_STATE_PLAYING);
-
-	// Wait the first buffer to arrive and allocate the image ressource
-	pthread_mutex_lock(&asdata.lock);
-	while (!asdata.isalloc)
-		pthread_cond_wait(&asdata.cond, &asdata.lock);
-	pthread_mutex_unlock(&asdata.lock);
-	
-	// Reset everything
-	change_pipeline_state(aux, GST_STATE_PAUSED);
-	gst_app_sink_set_callbacks(sink, &sink_callbacks, tex, NULL);
-	pthread_mutex_destroy(&asdata.lock);
-	pthread_cond_destroy(&asdata.cond);
-
-	return 0;
+	return retval;
 }
 
 
@@ -282,19 +361,20 @@ dtk_htex create_video_any(int type, const union pipeopt* opt,
 {
 	dtk_htex tex;
 	GstElement* pipe;
+	int noblock = flags & DTK_NOBLOCKING;
 
 	if ((tex = get_texture(stringid)) == NULL)
 		return NULL;
 
 	pthread_mutex_lock(&(tex->lock));
-	if (!tex->data) {
+	if (!tex->aux) {
 		pipe = create_pipeline(type, opt);
-		init_video_tex(tex, pipe);
+		init_video_tex(tex, pipe, noblock);
 	}
 	pthread_mutex_unlock(&(tex->lock));
 
 	if (tex && (flags & DTK_AUTOSTART))
-		dtk_video_exec(tex, DTKV_CMD_PLAY, NULL);
+		pipeline_play_pause(tex->aux, 1, noblock);
 		
 	return tex;
 }
@@ -387,42 +467,25 @@ int dtk_video_getstate(dtk_htex video)
 API_EXPORTED
 int dtk_video_exec(dtk_htex video, int command, const void* arg)
 {
-	bool r;
-	GstState gstate;
-	struct videoaux* aux = video->aux;
-	int flag = GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT;
+	int playing;
 	gint64 seek_pos = 0;
+	int noblock = 0;
 
 	if (!video->isvideo)
 		return -1;
 	
 	switch (command) {
 	case DTKV_CMD_SEEK:
-		if (arg != NULL)
+		if (arg)
 			seek_pos = *((const long*)arg) * GST_MSECOND;
-		r = gst_element_seek_simple(aux->pipe, GST_FORMAT_TIME,
-		                            flag, seek_pos);
-		if (!r)
-			return -1;
-		pthread_mutex_lock(&aux->lock);
-		aux->state &= ~DTKV_EOS;
-		pthread_mutex_unlock(&aux->lock);
-		return 0;
+		return pipeline_seek(video->aux, seek_pos);
 
 	case DTKV_CMD_PLAY:
 	case DTKV_CMD_PAUSE:
-		gstate = (command == DTKV_CMD_PLAY) ? 
-		                     GST_STATE_PLAYING : GST_STATE_PAUSED;
-		if (change_pipeline_state(aux, gstate))
-			return -1;
-
-		pthread_mutex_lock(&aux->lock);
-		if (gstate == GST_STATE_PAUSED)
-			aux->state &= ~DTKV_PLAYING;
-		else if (gstate == GST_STATE_PLAYING)
-			aux->state |= DTKV_PLAYING;
-		pthread_mutex_unlock(&aux->lock);
-		return 0;
+		if (arg)
+			noblock = *((const int*)arg);
+		playing = (command == DTKV_CMD_PLAY); 
+		return pipeline_play_pause(video->aux, playing, noblock);
 
 	default:
 		return -1;

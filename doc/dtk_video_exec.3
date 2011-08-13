@@ -13,12 +13,18 @@ dtk_video_exec - Start/stop/pause a video texture
 This function changes the state (or playing position) of a video texture
 referenced by \fIvid\fP according to the value of \fIcommand\fP:
 .TP
-\fBDTKV_CMD_PLAY\fP: Set the video to play. \fIarg\fP is ignored.
+\fBDTKV_CMD_PLAY\fP: Set the video to play. \fIarg\fP is interpreted as a
+pointer to a variable of type \fBint\fP whose non zero value indicates that
+the state change is asynchronous and can be finished after the function
+returns. If \fIarg\fP is NULL, the change is performed synchronously.
 .TP
-\fBDTKV_CMD_PAUSE\fP: Set the video to pause. \fIarg\fP is ignored.
+\fBDTKV_CMD_PAUSE\fP: Set the video to pause. \fIarg\fP is interpreted as a
+pointer to a variable of type \fBint\fP whose non zero value indicates that
+the state change is asynchronous and can be finished after the function
+returns. If \fIarg\fP is NULL, the change is performed synchronously.
 .TP
 \fBDTKV_CMD_SEEK\fP: Seek the video to the position specified by \fIarg\fP
-which is then interpreted as a pointer to a value of type \fBlong\fP
+which is then interpreted as a pointer to a variable of type \fBlong\fP
 representing the position in milliseconds from the beginning of the video.
 \fIarg\fP is allowed to be NULL. In that case, the video will be positioned
 at its start.

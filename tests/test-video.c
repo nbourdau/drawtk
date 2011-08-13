@@ -93,7 +93,7 @@ int main(void)
         static char fontfilename[256];
         sprintf(fontfilename, "%s/test.ttf", getenv("srcdir"));
 
-        video1 = dtk_load_video_test(DTK_AUTOSTART);
+        video1 = dtk_load_video_test(DTK_AUTOSTART | DTK_NOBLOCKING);
         video2 = dtk_load_video_file(DTK_AUTOSTART, vidfilename);
 
         shape1 = dtk_create_image(NULL, -0.5f, 0.3f, 0.5f, 0.5f, dtk_white, video1);

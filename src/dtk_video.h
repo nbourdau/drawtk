@@ -36,6 +36,7 @@ enum dtk_video_cmd {
 };
 
 #define DTK_AUTOSTART	0x01
+#define DTK_NOBLOCKING	0x02
 
 dtk_htex dtk_load_video_tcp(int flags, const char *server, int port);
 dtk_htex dtk_load_video_udp(int flags, int port);

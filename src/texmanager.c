@@ -288,8 +288,15 @@ static
 void create_gl_texture(struct dtk_texture* tex)
 {
 	unsigned int lvl; 
-	char* bm = tex->bmdata;
+	char* bm;
 	GLsizeiptr dsize = 0;
+
+	pthread_mutex_lock(&tex->lock);
+	if (!tex->data) {
+		pthread_mutex_unlock(&tex->lock);
+		return;
+	}
+
 
 	// creation of the GL texture Object
 	glGenTextures(1,&(tex->id));
@@ -301,8 +308,8 @@ void create_gl_texture(struct dtk_texture* tex)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, tex->mxlvl);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, DTK_PALIGN);
 
-	pthread_mutex_lock(&tex->lock);
 	// Load each mipmap in video memory 
+	bm = tex->bmdata;
 	for (lvl=0; lvl<=tex->mxlvl; lvl++) {
 		glTexImage2D(GL_TEXTURE_2D, lvl, tex->intfmt, 
 		        tex->data[lvl].w, tex->data[lvl].h, 0,
