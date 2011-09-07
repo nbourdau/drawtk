@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011  EPFL (Ecole Polytechnique Fédérale de Lausanne)
+    Laboratory CNBI (Chair in Non-Invasive Brain-Machine Interface)
     Pierluca Borsò <pierluca.borso@epfl.ch>
 
     This program is free software: you can redistribute it and/or modify
