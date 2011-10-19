@@ -1,9 +1,52 @@
+2011-10-18 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* debian/changelog: Release 1.1-1 (debian package update)
+
+	* commit ab7859d377be7657f2e04fd6d70598e3f98a52b0
+
+2011-10-18 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* debian/rules: debian: disable build test when generating
+	the package
+
+	Since the tests programs are graphical and interactive, they
+	should be disabled for supporting autobuilder systems
+
+	* commit 1579dbd506a608da5a92018226098e0814e804ee
+
+2011-10-18 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* Makefile.am, debian/rules: debian: set the compilation flags
+	in debian/rules
+
+	Flag -O3 is added by default to make the package. As consequence,
+	compilation flags are no longer passed to dpkg-buildpackage when
+	invoked with 'make dist-deb'. Instead flags are passed with the
+	mean of DPKG_BUILDPACKAGE_FLAGS environment variable.
+
+	* commit 2e5634641324d1c6e111db4245e1d1a0461654f2
+
+2011-09-07 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* AUTHORS, lib/clock_gettime.c, lib/clock_gettime.h,
+	lib/clock_nanosleep.c, lib/clock_nanosleep.h, lib/convfiletime.h,
+	lib/timespec.h, src/colors.c, src/create_shape.c,
+	src/drawtk.h, src/dtk_colors.h, src/dtk_event.h,
+	src/dtk_time.h, src/dtk_video.h, src/events.c, src/fonttex.c,
+	src/fonttex.h, src/imagetex.c, src/shapes.c, src/shapes.h,
+	src/texmanager.c, src/texmanager.h, src/time.c, src/video.c,
+	src/vidpipe_creation.c, src/vidpipe_creation.h, src/window.c,
+	src/window.h, tests/test-events.c, tests/test-video-custom.c,
+	tests/test-video.c, tests/test1.c: Add CNBI to LGPL notice
+
+	* commit 0e114c2b81575d6ab4849b019e3b1af6efdd3385
+
 2011-08-08 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
 
-	* NEWS, configure.ac, debian/changelog, debian/control,
+	* ChangeLog, NEWS, configure.ac, debian/changelog, debian/control,
 	debian/symbols, m4/pkg-custom.m4: Release drawtk1.0
 
-	* commit 3c9f43d5a464cf979cc0d867092d30692a51dab1
+	* commit ceadb85f9859d2f88fb3abe9000fe88ae56208ea
 
 2011-08-13 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
 
