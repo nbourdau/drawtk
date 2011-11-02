@@ -91,16 +91,13 @@ int main(void)
         static char vidfilename[256];
         sprintf(vidfilename, "%s/test.ogv", getenv("srcdir"));
 
-        static char fontfilename[256];
-        sprintf(fontfilename, "%s/test.ttf", getenv("srcdir"));
-
         video1 = dtk_load_video_test(DTK_AUTOSTART | DTK_NOBLOCKING);
         video2 = dtk_load_video_file(DTK_AUTOSTART, vidfilename);
 
         shape1 = dtk_create_image(NULL, -0.5f, 0.3f, 0.5f, 0.5f, dtk_white, video1);
         shape2 = dtk_create_image(NULL,  0.5f, 0.3f, 0.5f, 0.5f, dtk_white, video2);
 
-        dtk_hfont font = dtk_load_font(fontfilename);
+        dtk_hfont font = dtk_load_font("arial");
         text = dtk_create_string(NULL,"ESC-Quit, S-Play, R-Rewind, P-Pause",0.1f,-0.9f,-0.5f,DTK_LEFT,dtk_white,font);
 
         // Main loop

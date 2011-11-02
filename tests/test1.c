@@ -27,7 +27,7 @@
 #include <dtk_time.h>
 #include <math.h>
 
-static char imgfilename[256], fontfilename[256];
+static char imgfilename[256];
 static char text[] = "This is a test string!!!";
 
 #define NUMVERT	4
@@ -78,7 +78,7 @@ static void setup_shapes(void)
 	unsigned int w, h;
 	tex = dtk_load_image(imgfilename, 4);
 	tex2 = dtk_load_image(imgfilename, 4);
-	font  = dtk_load_font(fontfilename);
+	font  = dtk_load_font("arial:style=bold italic");
 	dtk_texture_getsize(tex, &w, &h);
 	printf("texture size: %ux%u\n", w, h);
 
@@ -115,7 +115,6 @@ int main(int argc, char* argv[])
 	struct dtk_timespec tini, ts;
 
 	sprintf(imgfilename, "%s/navy.png", getenv("srcdir"));
-	sprintf(fontfilename, "%s/test.ttf", getenv("srcdir"));
 
 	wnd = dtk_create_window(640, 480, 0, 0, 16, "hello");
 	dtk_make_current_window(wnd);

@@ -1,5 +1,5 @@
 AM_CFLAGS = -I$(top_srcdir)/src
-EXTRA_DIST=navy.png test.ogv test.ttf
+EXTRA_DIST=navy.png test.ogv
 
 check_PROGRAMS = test1 test-events test-video test-video-custom
 
