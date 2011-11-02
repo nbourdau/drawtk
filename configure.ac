@@ -22,6 +22,7 @@ AC_CONFIG_HEADERS([config/config.h])
 
 # Initialize Automake
 AM_INIT_AUTOMAKE([subdir-objects no-dist-gzip dist-bzip2 color-tests])
+AM_MAINTAINER_MODE([enable])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AC_CANONICAL_HOST
