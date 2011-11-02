@@ -1,3 +1,47 @@
+2011-11-02 Nicolas Bourdaud <nicolas.bourdaud@gmail.com>
+
+	* tests/Makefile.am, tests/navy.png.license: Specify copyright
+	and license of navy.png
+
+	* commit 3d6d2332bc2cb2a5a937e7746ae420f327bd35da
+
+2011-11-02 Nicolas Bourdaud <nicolas.bourdaud@gmail.com>
+
+	* tests/Makefile.am, tests/test-video.c, tests/test.ttf,
+	tests/test1.c: Stop shipping test.ttf. Adapt tests accordingly
+
+	* commit a84e867b3b456d6701c03377e891d69e79b0eaa2
+
+2011-11-02 Nicolas Bourdaud <nicolas.bourdaud@gmail.com>
+
+	* tests/test.ogv: Use home made video for the tests
+
+	* commit 3ac4605a48161fa504e783294d50cb721887246b
+
+2011-11-02 Nicolas Bourdaud <nicolas.bourdaud@gmail.com>
+
+	* configure.ac: Add AM_MAINTAINER_MODE to facilitate downstream
+	distribution
+
+	* commit df0313220417bf7a1a6a389c342d45b52c873756
+
+2011-11-02 Nicolas Bourdaud <nicolas.bourdaud@gmail.com>
+
+	* Makefile.am, debian/changelog, debian/compat, debian/control,
+	debian/copyright, debian/libdrawtk0-dev.examples,
+	debian/libdrawtk0-dev.install, debian/libdrawtk0.install,
+	debian/rules, debian/shlibs.local, debian/symbols: Remove debian
+	packaging from main development branches
+
+	* commit 800fbfb734859a83ed854d36eab64858eb545c7f
+
+2011-10-19 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
+
+	* ChangeLog: erratum: previous commit was release 1.0-1 (Package
+	update)
+
+	* commit 7363cb8611cd175182787011572cfc6081b631bc
+
 2011-10-18 Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
 
 	* debian/changelog: Release 1.1-1 (debian package update)

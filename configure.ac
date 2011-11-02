@@ -11,9 +11,10 @@ m4_define([lib_current],1)
 m4_define([lib_revision],0)
 m4_define([lib_age],1)
 
+m4_define([packageversion], [lib_current.lib_revision[]b])
 
 # Setup Automake
-AC_INIT(drawtk,[lib_current.lib_revision],nicolas.bourdaud@epfl.ch)
+AC_INIT(drawtk,[packageversion],nicolas.bourdaud@epfl.ch)
 AC_CONFIG_SRCDIR([src/shapes.c])
 AC_CONFIG_LIBOBJ_DIR([lib])
 AC_CONFIG_AUX_DIR([build-aux])
