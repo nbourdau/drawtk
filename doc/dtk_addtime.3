@@ -13,13 +13,13 @@ The function \fBdtk_addtime\fP() adjusts the time pointed by \fIts\fP by
 adding \fIsec\fP seconds and \fInsec\fP nanoseconds. 
 .SH "RETURN VALUE"
 .LP
-On success, the function returns 0, otherwise -1.
+On success, the function returns 0, otherwise \-1.
 .SH ERRORS
 .LP
 \fBdtk_addtime\fP() will fail if:
 .TP
 .B EINVAL
-The value in the \fInsec\fP field was not in the range -999999999 to
+The value in the \fInsec\fP field was not in the range \-999999999 to
 999999999.
 .SH "SEE ALSO"
 .BR dtk_nanosleep (3),

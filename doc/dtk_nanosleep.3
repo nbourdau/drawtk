@@ -35,7 +35,7 @@ or a signal is delivered that causes a signal handler to be called or
 that terminates the process.
 .LP
 If the call is interrupted by a signal handler, \fBdtk_nanosleep\fP()
-returns -1, and sets \fIerrno\fP to \fBEINTR\fP. In addition, if \fIrem\fP
+returns \-1, and sets \fIerrno\fP to \fBEINTR\fP. In addition, if \fIrem\fP
 is not NULL, and \fIabs\fP is zero, it returns the remaining unslept time
 in \fIrem\fP. This value can then be used to call \fBdtk_nanosleep\fP()
 again and complete a (relative) sleep.
@@ -43,7 +43,7 @@ again and complete a (relative) sleep.
 .LP
 On successfully sleeping for the requested interval, \fBdtk_nanosleep\fP()
 returns 0. If the call is interrupted by a signal handler or encounters an
-error, then it returns -1 and \fIerrno\fP is set appropriately.
+error, then it returns \-1 and \fIerrno\fP is set appropriately.
 .SH ERRORS
 .LP
 \fBdtk_nanosleep\fP() will fail if:

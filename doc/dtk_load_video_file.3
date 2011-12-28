@@ -13,7 +13,7 @@ dtk_load_video_file - Load an video file as a texture
 This function loads the video file specified by \fIfilename\fP argument as a
 dynamic texture. The texture will then been tracked by an internal texture
 manager so that the next call using the same \fIfilename\fP argument will
-return the same texture handle, thus sparing the ressources of the system.
+return the same texture handle, thus sparing the resources of the system.
 If not specified by \fIflags\fP the video will not be played immediately and
 \fBdtk_video_exec\fP(3) should be called to do start playing.
 .LP
@@ -34,7 +34,7 @@ stream will be mapped on the shape.
 .LP
 There is no need for a valid window to create successfully a texture, i.e.
 creation of textures are completely decoupled from the creation of others
-ressources and can even be created in one thread to be used in another one.
+resources and can even be created in one thread to be used in another one.
 .LP
 Once a the texture is stopped being used, it should be destroyed by
 \fBdtk_destroy_texture\fP(3).
