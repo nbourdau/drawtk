@@ -1,0 +1,43 @@
+.\"Copyright 2010-2012 (c) EPFL
+.TH DTK_CREATE_CIRCLE_STR 3 2012 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_create_circle_str - Create and modify circular strip
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "dtk_hshape dtk_create_circle_str(dtk_hshape " shp ","
+.br
+.BI "                float " cx ", float " cy ", float " r ", float " thick ","
+.br
+.BI "                const float *" color ", unsigned int " numpoints ");"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_create_circle_str\fP() creates an approximation of a circular strip of radius
+\fIr\fP centered at (\fIcx\fP,\fIcy\fP) using \fInum_points\fP vertices. The
+radius \fIr\fP is always referred to the outer circle. 
+.LP
+\fIthick\fP represents the thickness of the strip. If \fIthick\fP is negative
+or greater than \fIr\fP, the call fails.
+.LP
+\fIshp\fP and \fIcolor\fP have the same usage and meaning as for
+other shape creation function:
+.IP " *" 3
+\fIshp\fP can be used to modify a previously created shape. If it is non-null,
+the handle will be used to modify the shape referenced by \fIshp\fP.  If
+\fIshp\fP is \fINULL\fP, the function will attempt to create a new shape.
+.LP
+.IP " *" 3
+\fIcolor\fP should point to a 4 float array containing a normalized RGBA value
+(i.e. each component is between 0.0 and 1.0).
+.SH "RETURN VALUE"
+.LP
+In case of success these functions return the handle to the newly created or
+modified shape. If the \fIshp\fP argument is non-null, the handle returned is
+the same value. In case of error, \fINULL\fP is returned. If \fIthick\fP is
+negative or greater than \fIr\fP, \fINULL\fP is returned.
+.SH "SEE ALSO"
+.BR dtk_create_circle (3), dtk_destroy_shape (3)
+
+

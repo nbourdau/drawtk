@@ -5,6 +5,7 @@ dist_man_MANS = dtk_move_shape.3 dtk_relmove_shape.3			\
 		dtk_create_complex_shape.3				\
 		dtk_create_rectangle_2p.3 dtk_create_rectangle_hw.3	\
 		dtk_create_triangle.3 dtk_create_circle.3		\
+		dtk_create_circle_str.3					\
 		dtk_create_line.3 dtk_create_arrow.3			\
 		dtk_create_cross.3 dtk_create_image.3			\
 		dtk_create_string.3					\

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009-2011  EPFL (Ecole Polytechnique Fédérale de Lausanne)
+    Copyright (C) 2009-2012  EPFL (Ecole Polytechnique Fédérale de Lausanne)
     Laboratory CNBI (Chair in Non-Invasive Brain-Machine Interface)
     Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
 
@@ -99,6 +99,40 @@ dtk_hshape dtk_create_circle(struct dtk_shape* shp, float cx, float cy, float r,
 	
 	return shp;
 } 
+
+API_EXPORTED
+dtk_hshape dtk_create_circle_str(struct dtk_shape* shp, float cx, float cy, float r, float thick, const float* color, unsigned int numpoints)
+{ 
+	float r1, r2, cr;
+	struct single_shape* sinshp;
+	GLuint numvert = 2*numpoints + 2;
+	GLuint numind =  2*numpoints + 2;
+	GLenum primtype = GL_TRIANGLE_STRIP;
+
+	r1 = r;
+	r2 = r - thick;
+
+	if (r2 <= 0 || thick < 0)
+		return NULL;
+
+	shp = create_generic_shape(shp, numvert, NULL, NULL, color,
+	                                numind, NULL, primtype,
+					NULL, DTKF_ALLOC | DTKF_UNICOLOR);
+	if (!shp)
+		return NULL;
+
+	sinshp = shp->data;
+
+	// Create the circle, radius is expressed in width relative coordinates
+	for (unsigned int i = 0; i<numvert; i++) {
+		cr = i % 2 ? r2 : r1;
+		sinshp->indices[i] = i;
+		sinshp->vertices[2*i]=cr*cos((float)i*TWO_PI/numpoints) +cx;
+		sinshp->vertices[2*(i)+1]=cr*sin((float)(i)*TWO_PI/numpoints) +cy;
+	}
+
+	return shp;
+}
 
 API_EXPORTED
 dtk_hshape dtk_create_cross(struct dtk_shape* shp, float cx, float cy, float width, const float* color) 

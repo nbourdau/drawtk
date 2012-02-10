@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009-2011  EPFL (Ecole Polytechnique Fédérale de Lausanne)
+    Copyright (C) 2009-2012  EPFL (Ecole Polytechnique Fédérale de Lausanne)
     Laboratory CNBI (Chair in Non-Invasive Brain-Machine Interface)
     Nicolas Bourdaud <nicolas.bourdaud@epfl.ch>
 
@@ -65,6 +65,7 @@ dtk_hshape dtk_create_rectangle_2p(dtk_hshape shp, float p1_x, float p1_y, float
 dtk_hshape dtk_create_rectangle_hw(dtk_hshape shp, float cx, float cy, float height, float width, int isfull, const float* color);
 dtk_hshape dtk_create_triangle(dtk_hshape shp, float x1, float y1, float x2, float y2, float x3, float y3, int isfull, const float* color);
 dtk_hshape dtk_create_circle(dtk_hshape shp, float cx, float cy, float r, int isfull, const float* color, unsigned int numpoints);
+dtk_hshape dtk_create_circle_str(dtk_hshape shp, float cx, float cy, float r, float thick, const float* color, unsigned int numpoints);
 dtk_hshape dtk_create_shape(dtk_hshape shp, unsigned int ind_num, const float* vertex_array, int isFull, const float* color);
 dtk_hshape dtk_create_line(dtk_hshape shp, float x1, float y1, float x2, float y2, const float *color);
 dtk_hshape dtk_create_arrow(dtk_hshape shp, float cx, float cy, float width, float height, int isfull, const float* color);

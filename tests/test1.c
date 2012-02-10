@@ -39,7 +39,7 @@ unsigned int indices[NUMIND];
 dtk_hwnd wnd;
 dtk_htex tex, tex2;
 dtk_hfont font;
-dtk_hshape tri, tri2, cir, arr, rec1, rec2,cro, img, img2, str, cshp;
+dtk_hshape tri, tri2, cir, cir2, arr, rec1, rec2, rec3, cro, img, img2, str, cshp;
 dtk_hshape comp;
 
 #define red	dtk_red
@@ -91,6 +91,8 @@ static void setup_shapes(void)
 		tri2 = dtk_create_triangle(NULL, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1, blue),
 		str = dtk_create_string(NULL, text ,0.1,-0.0,-0.9, DTK_HMID, white, font),
 		cir = dtk_create_circle(NULL, -0.4f, -0.4f, 0.3f, 1, dtk_orange_light, 60),
+		cir2 = dtk_create_circle_str(NULL, 0.6f, -0.4f, 0.3f, 0.15f, red, 60),
+		rec3 = dtk_create_rectangle_hw(NULL, 0.6f, -0.4f, 0.1f, 0.1f, 1, green),
 		arr = dtk_create_arrow(NULL, 0.0f, 0.0f, 1.0, 0.5, 1, red),
 		img2 = dtk_create_image(NULL, 0.0f,0.0f,0.5f,0.5f,white, tex2)
 	};
