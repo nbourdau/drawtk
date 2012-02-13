@@ -66,6 +66,16 @@ static void draw_single_shape(const struct dtk_shape* shp)
 }
 
 
+static void set_single_color(const struct dtk_shape* shp, const float* color)
+{
+	struct single_shape* sinshp;
+	unsigned int i;
+	sinshp = shp->data;
+
+	for (i=0; i<4*sinshp->num_vert; i+=4)
+		memcpy(sinshp->colors+i, color, 4*sizeof(*color));
+}
+
 static void destroy_single_shape(void* data)
 {
 	struct single_shape* sinshp = data;
@@ -164,6 +174,7 @@ static struct dtk_shape* alloc_generic_shape(struct dtk_shape* shp,
 
 	shp->data = sinshp;
 	shp->drawproc = draw_single_shape;
+	shp->setcolorproc = set_single_color;
 	shp->destroyproc = destroy_single_shape;
 	
 	return shp;
@@ -238,6 +249,21 @@ static void draw_composite_shape(const struct dtk_shape* shp)
 
 	for(i=0; i<compshp->num; i++)
 		dtk_draw_shape(compshp->array[i]);
+}
+
+static void set_composite_color(const struct dtk_shape* shp, const float* color)
+{
+	struct composite_shape* compshp;
+	struct dtk_shape** array;
+	unsigned int num, j;
+
+	compshp = shp->data;
+	num = compshp->num;
+	array = compshp->array;
+
+	for (j = 0; j<num; j++)
+		array[j]->setcolorproc(array[j], color);
+
 }
 
 static void destroy_composite_shape(void* data)
@@ -321,6 +347,7 @@ dtk_hshape dtk_create_composite_shape(struct dtk_shape* shp,
 	// Setup the structure
 	shp->data = compshp;
 	shp->drawproc = draw_composite_shape;
+	shp->setcolorproc = set_composite_color;
 	shp->destroyproc = destroy_composite_shape;
 	compshp->free_children = free_children;
 
@@ -390,5 +417,13 @@ void dtk_destroy_shape(dtk_hshape shp)
 	if (shp->destroyproc)
 		shp->destroyproc(shp->data);
 	free(shp);
+}
+
+API_EXPORTED
+void dtk_setcolor_shape(dtk_hshape shp, const float* color)
+{
+	
+	shp->setcolorproc(shp, color);
+
 }
 

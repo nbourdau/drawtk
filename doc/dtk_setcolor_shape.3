@@ -1,0 +1,25 @@
+.\"Copyright 2012 (c) EPFL
+.TH DTK_SET_COLOR 3 2012 "EPFL" "Draw Toolkit manual"
+.SH NAME
+dtk_setcolor_shape - Set the color of a shape
+.SH SYNOPSIS
+.LP
+.B #include <drawtk.h>
+.sp
+.BI "void dtk_setcolor_shape(const dtk_hshape " shp ", const float* color);"
+.br
+.SH DESCRIPTION
+.LP
+\fBdtk_setcolor_shape\fP() set the color \fIcolor\fP of a shape identified by the
+pointer \fIshp\fP. \fIcolor\fP should point to a 4 float array containing a
+normalized RGBA value (i.e. each component is between 0.0 and 1.0). If \fIshp\fP
+is a composite shape, \fIcolor\fP is applied to all the shapes in the list.
+Notice that \fIcolor\fP is applied uniformly to the whole shape.
+
+.SH "RETURN VALUE"
+.LP
+None.
+.SH "SEE ALSO"
+.BR dtk_create_shape (3),
+.BR dtk_create_composite_shape (3)
+

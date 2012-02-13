@@ -88,6 +88,7 @@ void dtk_move_shape(dtk_hshape shp, float x, float y);
 void dtk_relmove_shape(dtk_hshape shp, float dx, float dy);
 void dtk_rotate_shape(dtk_hshape shp, float deg);
 void dtk_relrotate_shape(dtk_hshape shp, float ddeg);
+void dtk_setcolor_shape(dtk_hshape shp, const float* color);
 
 /* Draw a shape */
 void dtk_draw_shape(const dtk_hshape shp);

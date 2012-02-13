@@ -22,6 +22,7 @@
 #include <GL/gl.h>
 
 typedef void (*DrawShapeFn)(const struct dtk_shape* shp);
+typedef void (*SetColorFn)(const struct dtk_shape* shp, const float* color);
 typedef void (*DestroyShapeFn)(void* data);
 
 struct dtk_shape
@@ -32,6 +33,7 @@ struct dtk_shape
 
 	// virtual functions
 	DrawShapeFn drawproc;
+	SetColorFn setcolorproc;
 	DestroyShapeFn destroyproc;
 
 	// virtual data

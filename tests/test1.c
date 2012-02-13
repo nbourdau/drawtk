@@ -39,7 +39,7 @@ unsigned int indices[NUMIND];
 dtk_hwnd wnd;
 dtk_htex tex, tex2;
 dtk_hfont font;
-dtk_hshape tri, tri2, cir, cir2, arr, rec1, rec2, rec3, cro, img, img2, str, cshp;
+dtk_hshape tri, tri2, cir, cir2, arr, rec1, rec2, rec3, rec4, cro, img, img2, str, cshp;
 dtk_hshape comp;
 
 #define red	dtk_red
@@ -93,6 +93,7 @@ static void setup_shapes(void)
 		cir = dtk_create_circle(NULL, -0.4f, -0.4f, 0.3f, 1, dtk_orange_light, 60),
 		cir2 = dtk_create_circle_str(NULL, 0.6f, -0.4f, 0.3f, 0.15f, red, 60),
 		rec3 = dtk_create_rectangle_hw(NULL, 0.6f, -0.4f, 0.1f, 0.1f, 1, green),
+		rec4 = dtk_create_rectangle_hw(NULL, -0.6f, 0.4f, 0.25f, 0.25f, 1, green),
 		arr = dtk_create_arrow(NULL, 0.0f, 0.0f, 1.0, 0.5, 1, red),
 		img2 = dtk_create_image(NULL, 0.0f,0.0f,0.5f,0.5f,white, tex2)
 	};
@@ -113,6 +114,7 @@ int main(int argc, char* argv[])
 	(void)argc;
 	(void)argv;
 	float angle = 0.0f;
+	float color[4] = {0.0, 0.0, 0.0, 1.0};
 	struct dtk_timespec delay = {1, 0};
 	struct dtk_timespec tini, ts;
 
@@ -139,15 +141,22 @@ int main(int argc, char* argv[])
 	delay.sec = 0;
 	delay.nsec = 5000000; // 5ms
 	dtk_gettime(&tini);
+	srand(tini.nsec);
 	do {
 		dtk_clear_screen(wnd);
 
 		dtk_gettime(&ts);
 		angle = dtk_difftime_ms(&ts, &tini)*ROTSPEED;
-
 		dtk_rotate_shape(arr,angle);
 		dtk_rotate_shape(img2,-angle);
 		dtk_rotate_shape(comp,angle/2.0f);
+
+		color[0] = (rand() % 101)/100.0f;
+		color[1] = (rand() % 101)/100.0f;
+		color[2] = (rand() % 101)/100.0f;
+		color[3] = (rand() % 101)/100.0f;
+		dtk_setcolor_shape(rec4, color);
+
 		dtk_draw_shape(comp);
 
 		vertpos[2] = -0.5f+0.2f*cos(4*3.14*angle/360.0f);
