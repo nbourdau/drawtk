@@ -66,14 +66,26 @@ static void draw_single_shape(const struct dtk_shape* shp)
 }
 
 
-static void set_single_color(const struct dtk_shape* shp, const float* color)
+static void set_single_color(const struct dtk_shape* shp, const float* color, unsigned int mask)
 {
 	struct single_shape* sinshp;
 	unsigned int i;
 	sinshp = shp->data;
 
-	for (i=0; i<4*sinshp->num_vert; i+=4)
-		memcpy(sinshp->colors+i, color, 4*sizeof(*color));
+	for (i=0; i<4*sinshp->num_vert; i+=4) {
+		if (!(mask & DTK_IGNR))
+			memcpy(&sinshp->colors[0]+i, &color[0], sizeof(float));
+
+		if (!(mask & DTK_IGNG))
+			memcpy(&sinshp->colors[1]+i, &color[1], sizeof(float));
+
+		if (!(mask & DTK_IGNB))
+			memcpy(&sinshp->colors[2]+i, &color[2], sizeof(float));
+
+		if (!(mask & DTK_IGNA))
+			memcpy(&sinshp->colors[3]+i, &color[3], sizeof(float));
+	}
+
 }
 
 static void destroy_single_shape(void* data)
@@ -251,7 +263,7 @@ static void draw_composite_shape(const struct dtk_shape* shp)
 		dtk_draw_shape(compshp->array[i]);
 }
 
-static void set_composite_color(const struct dtk_shape* shp, const float* color)
+static void set_composite_color(const struct dtk_shape* shp, const float* color, unsigned int mask)
 {
 	struct composite_shape* compshp;
 	struct dtk_shape** array;
@@ -262,7 +274,7 @@ static void set_composite_color(const struct dtk_shape* shp, const float* color)
 	array = compshp->array;
 
 	for (j = 0; j<num; j++)
-		array[j]->setcolorproc(array[j], color);
+		array[j]->setcolorproc(array[j], color, mask);
 
 }
 
@@ -420,10 +432,10 @@ void dtk_destroy_shape(dtk_hshape shp)
 }
 
 API_EXPORTED
-void dtk_setcolor_shape(dtk_hshape shp, const float* color)
+void dtk_setcolor_shape(dtk_hshape shp, const float* color, unsigned int mask)
 {
 	
-	shp->setcolorproc(shp, color);
+	shp->setcolorproc(shp, color, mask);
 
 }
 

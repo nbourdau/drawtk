@@ -60,6 +60,12 @@ typedef struct dtk_shape* dtk_hshape;
 #define DTK_LINES		3
 #define DTK_LINE_STRIP		4
 
+#define DTK_IGNR 	0x01 				//0000 0001
+#define DTK_IGNG 	0x02 				//0000 0010
+#define DTK_IGNB 	0x04 				//0000 0100
+#define DTK_IGNA 	0x08 				//0000 1000
+#define DTK_IGNRGB 	DTK_IGNR | DTK_IGNG | DTK_IGNB  //0000 0111
+
 /* Shape creation functions */
 dtk_hshape dtk_create_rectangle_2p(dtk_hshape shp, float p1_x, float p1_y, float p2_x, float p2_y, int isfull, const float* color);
 dtk_hshape dtk_create_rectangle_hw(dtk_hshape shp, float cx, float cy, float height, float width, int isfull, const float* color);
@@ -88,7 +94,7 @@ void dtk_move_shape(dtk_hshape shp, float x, float y);
 void dtk_relmove_shape(dtk_hshape shp, float dx, float dy);
 void dtk_rotate_shape(dtk_hshape shp, float deg);
 void dtk_relrotate_shape(dtk_hshape shp, float ddeg);
-void dtk_setcolor_shape(dtk_hshape shp, const float* color);
+void dtk_setcolor_shape(dtk_hshape shp, const float* color, unsigned int mask);
 
 /* Draw a shape */
 void dtk_draw_shape(const dtk_hshape shp);

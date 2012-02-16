@@ -22,7 +22,8 @@
 #include <GL/gl.h>
 
 typedef void (*DrawShapeFn)(const struct dtk_shape* shp);
-typedef void (*SetColorFn)(const struct dtk_shape* shp, const float* color);
+typedef void (*SetColorFn)(const struct dtk_shape* shp, 
+		const float* color, unsigned int mask);
 typedef void (*DestroyShapeFn)(void* data);
 
 struct dtk_shape
@@ -56,6 +57,7 @@ struct single_shape
 
 #define DTKF_ALLOC 	0x01
 #define DTKF_UNICOLOR	0x02
+
 
 LOCAL_FN
 struct dtk_shape* create_generic_shape(struct dtk_shape* shp,

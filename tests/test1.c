@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
 		color[1] = (rand() % 101)/100.0f;
 		color[2] = (rand() % 101)/100.0f;
 		color[3] = (rand() % 101)/100.0f;
-		dtk_setcolor_shape(rec4, color);
+		dtk_setcolor_shape(rec4, color, DTK_IGNRGB);
 
 		dtk_draw_shape(comp);
 
