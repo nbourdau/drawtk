@@ -69,23 +69,18 @@ static void draw_single_shape(const struct dtk_shape* shp)
 static void set_single_color(const struct dtk_shape* shp, const float* color, unsigned int mask)
 {
 	struct single_shape* sinshp;
-	unsigned int i;
+	unsigned int i, j, numc = 0, indc[4];
 	sinshp = shp->data;
 
-	for (i=0; i<4*sinshp->num_vert; i+=4) {
-		if (!(mask & DTK_IGNR))
-			memcpy(&sinshp->colors[0]+i, &color[0], sizeof(float));
+	// Determine which component to set
+	for (i=0; i<4; i++)
+		if (!(mask & (1<<i)))
+			indc[numc++] = i;
 
-		if (!(mask & DTK_IGNG))
-			memcpy(&sinshp->colors[1]+i, &color[1], sizeof(float));
-
-		if (!(mask & DTK_IGNB))
-			memcpy(&sinshp->colors[2]+i, &color[2], sizeof(float));
-
-		if (!(mask & DTK_IGNA))
-			memcpy(&sinshp->colors[3]+i, &color[3], sizeof(float));
-	}
-
+	// Set the color compoments not found in the mask
+	for (i=0; i<4*sinshp->num_vert; i+=4)
+		for (j=0; j<numc; j++)
+			sinshp->colors[i+indc[j]] = color[indc[j]];
 }
 
 static void destroy_single_shape(void* data)
