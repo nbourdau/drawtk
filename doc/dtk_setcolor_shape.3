@@ -6,15 +6,31 @@ dtk_setcolor_shape - Set the color of a shape
 .LP
 .B #include <drawtk.h>
 .sp
-.BI "void dtk_setcolor_shape(const dtk_hshape " shp ", const float* color);"
+.BI "void dtk_setcolor_shape(const dtk_hshape " shp ", const float* color, unsigned int mask);"
 .br
 .SH DESCRIPTION
 .LP
-\fBdtk_setcolor_shape\fP() set the color \fIcolor\fP of a shape identified by the
-pointer \fIshp\fP. \fIcolor\fP should point to a 4 float array containing a
+\fBdtk_setcolor_shape\fP() set the color \fIcolor\fP of a shape identified by
+the pointer \fIshp\fP. \fIcolor\fP should point to a 4 float array containing a
 normalized RGBA value (i.e. each component is between 0.0 and 1.0). If \fIshp\fP
 is a composite shape, \fIcolor\fP is applied to all the shapes in the list.
-Notice that \fIcolor\fP is applied uniformly to the whole shape.
+Notice that \fIcolor\fP is applied uniformly to the whole shape. Bits in
+\fImask\fP correspond to the color channels that will \fINOT\fP be set.
+
+If \fImask\fP is equal to 0 all the RGBA color channels will be set. Predefined
+values of mask: 
+.LP
+.IP " *" 3
+DTK_IGNR: ignore red color channel
+.IP " *" 3
+DTK_IGNG: ignore green color channel
+.IP " *" 3
+DTK_IGNB: ignore blue color channel
+.IP " *" 3
+DTK_IGNA: ignore alpha channel
+.IP " *" 3
+DTK_IGNRGB: ignore red, green and blue color channels
+
 
 .SH "RETURN VALUE"
 .LP
