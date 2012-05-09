@@ -7,14 +7,14 @@
 # - If any interfaces have been removed since the last public release, then
 # set age to 0.
 
-m4_define([lib_current],1)
+m4_define([lib_current],2)
 m4_define([lib_revision],0)
-m4_define([lib_age],1)
+m4_define([lib_age],2)
 
-m4_define([packageversion], [lib_current.lib_revision[]b])
+m4_define([packageversion], [lib_current.lib_revision])
 
 # Setup Automake
-AC_INIT(drawtk,[packageversion],nicolas.bourdaud@epfl.ch)
+AC_INIT(drawtk,[packageversion],nicolas.bourdaud@gmail.com)
 AC_CONFIG_SRCDIR([src/shapes.c])
 AC_CONFIG_LIBOBJ_DIR([lib])
 AC_CONFIG_AUX_DIR([build-aux])

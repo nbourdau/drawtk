@@ -1,3 +1,89 @@
+2012-03-16 Nicolas Bourdaud <nicolas.bourdaud@gmail.com>
+
+	* INSTALL: Remove INSTALL file from versioning
+
+	* commit cb19a69205aa3c2b429ab751abbde0337a90e7be
+
+2012-04-20 Luca Tonin <luca.tonin@epfl.ch>
+
+	* doc/dtk_setcolor_shape.3: Documentation for dtk_setcolor_shape
+	function
+
+	Updated the man page for this function. Explanation of the new
+	argument mask.
+
+	* commit 6cdd7974de752f371ecea381690a7c5faf30fc9d
+
+2012-02-18 Luca Tonin <luca.tonin@epfl.ch>
+
+	* src/drawtk.h, src/shapes.c: Code more efficient for set_color
+	with bitmask
+
+	* commit 6988e1e5aec5870e1dcfd70c3a5cead871a9b20b
+
+2012-02-16 Luca Tonin <luca.tonin@epfl.ch>
+
+	* src/drawtk.h, src/shapes.c, src/shapes.h, tests/test1.c:
+	Added bit maskto dtk_setcolor_shape.
+
+	With the bit mask it's possible to ignore color channels when
+	color is set
+
+	* commit 3c00790766ae17fef8d75f8bdc23b348bce603e9
+
+2012-02-13 Nicolas Bourdaud <nicolas.bourdaud@gmail.com>
+
+	* AUTHORS: Add Luca to AUTHORS
+
+	He should have been added earlier...
+
+	* commit b4c4c229ba6ef34ad8e8f865f85b1ee239b4b32a
+
+2012-02-13 Luca Tonin <luca.tonin@epfl.ch>
+
+	* doc/Makefile.am, doc/dtk_setcolor_shape.3, src/drawtk.h,
+	src/shapes.c, src/shapes.h, tests/test1.c: Add the function to
+	set the color of shapes.
+
+	This function set the color shape by modifying only the color
+	parameter of a given dtk_hshape. Manpage for this function
+	is provided.
+
+	* commit 52e2433ce280c68414ca632f74b60aaf24bc92eb
+
+2012-02-10 Luca Tonin <luca.tonin@epfl.ch>
+
+	* doc/Makefile.am, doc/dtk_create_circle_str.3,
+	src/create_shape.c, src/drawtk.h, tests/test1.c: Add function
+	to create a circular strip and manpage.
+
+	Added funtion to create a shape with a circular strip. The
+	proposed function has the same behaviour as dtk_create_*
+	shapes. Manpage for this function has been provided as well. The
+	copyright date has been changed accordingly.
+
+	* commit 3db881f0a6785da23d049de6e0f4081362ed791a
+
+2011-12-28 Nicolas Bourdaud <nicolas.bourdaud@gmail.com>
+
+	* doc/dtk_addtime.3, doc/dtk_create_arrow.3,
+	doc/dtk_create_circle.3, doc/dtk_create_complex_shape.3,
+	doc/dtk_create_rectangle_2p.3, doc/dtk_create_shape.3,
+	doc/dtk_create_triangle.3, doc/dtk_create_window.3,
+	doc/dtk_load_image.3, doc/dtk_load_video_file.3,
+	doc/dtk_load_video_gst.3, doc/dtk_load_video_tcp.3,
+	doc/dtk_load_video_test.3, doc/dtk_load_video_udp.3,
+	doc/dtk_nanosleep.3, doc/dtk_video_exec.3,
+	doc/dtk_video_getstate.3: Fix spelling and groff code in manpages
+
+	* commit 0325c51f2f9eacb28fbc6d5141567f2aea1c9524
+
+2011-11-02 Nicolas Bourdaud <nicolas.bourdaud@gmail.com>
+
+	* ChangeLog, NEWS, configure.ac: Release drawtk-1.0b
+
+	* commit c11ec6d33432d8bf70495dcad9284890efcff02a
+
 2011-11-02 Nicolas Bourdaud <nicolas.bourdaud@gmail.com>
 
 	* tests/Makefile.am, tests/navy.png.license: Specify copyright

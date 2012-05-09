@@ -1,3 +1,10 @@
+Overview of Changes from drawtk1.Ob to drawtk2.0
+================================================
+
+* New shape: circular strip
+* New property modifier: dtk_setcolor_shape
+* Few documentation fixes
+
 Overview of Changes from drawtk1.0 to drawtk1.0b
 ================================================
 
