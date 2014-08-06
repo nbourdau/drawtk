@@ -20,16 +20,12 @@
 # include <config.h>
 #endif
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
 #include "drawtk.h"
 #include "window.h" 
 #include "texmanager.h"
 #include "dtk_event.h"
-
-
-LOCAL_FN
-struct dtk_window* current_window = NULL;
 
 
 /*************************************************************************
@@ -83,37 +79,55 @@ int init_opengl_state(struct dtk_window* wnd)
 }
 
 
+static
+int create_window(struct dtk_window* wnd, int x, int y, int width, int height)
+{
+	int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+	SDL_Window* win;
+
+	// Init parameters of the frame buffers
+	SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
+	SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
+	SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 8 );
+	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 0 );
+	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+
+	// Determine fullscreen or not
+	if (!width || !height) {
+		width = height = 0;
+		flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+	}
+
+	// Create resizable window using OpenGL
+	win = SDL_CreateWindow(wnd->caption, x, y, width, height, flags);
+	if (!win) {
+		fprintf(stderr, "Window could not be created!\n");
+		return -1;
+	}
+
+	wnd->x = x;
+	wnd->y = y;
+	wnd->window = win;
+	wnd->context = SDL_GL_CreateContext(win);
+	SDL_GetWindowSize(win, &wnd->width, &wnd->height);
+
+	return 0;
+}
+
+
 LOCAL_FN
 int resize_window(struct dtk_window* wnd, int width, int height, int fs)
 {
-	int flags = SDL_OPENGL | SDL_RESIZABLE | SDL_ANYFORMAT;
-	const SDL_VideoInfo* info = NULL;
-	SDL_Surface* surf;
+	int flags = fs ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0;
 
-	info = SDL_GetVideoInfo();
-	if(info == NULL) {
-		fprintf(stderr, "SDL_GetVideoInfo was kicked by Chuck Norris.\n");
-		return 1;
+	if (fs) {
+		SDL_SetWindowFullscreen(wnd->window, flags);
+	} else {
+		SDL_SetWindowFullscreen(wnd->window, 0);
+		SDL_SetWindowSize(wnd->window, width, height);
 	}
-
-	// Set window settings
-	width  = (width > 0) ? width : info->current_w;
-	height = (height > 0) ? height : info->current_h;  
-
-	if (fs)
-		flags |= SDL_FULLSCREEN;
-
-	// Create resizable window using OpenGL
-	surf = SDL_SetVideoMode(width, height, wnd->bpp, flags);
-	if (!surf) {
-		fprintf(stderr, "Window could not be loaded!\n");
-		return 1;
-	}
-
-	wnd->window = surf;
-	wnd->width = surf->w;
-	wnd->height = surf->h;
 	
+	SDL_GetWindowSize(wnd->window, &wnd->width, &wnd->height);
 	return 0;
 }
 
@@ -121,7 +135,7 @@ int resize_window(struct dtk_window* wnd, int width, int height, int fs)
 API_EXPORTED
 dtk_hwnd dtk_create_window(unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int bpp, const char* caption)
 {
-	int is_init = 0, fs = 0;
+	int is_init = 0;
 	char* wndstr = malloc(strlen(caption)+1);
 	struct dtk_window* wnd = malloc(sizeof(struct dtk_window));
 	
@@ -137,28 +151,12 @@ dtk_hwnd dtk_create_window(unsigned int width, unsigned int height, unsigned int
 	}
 	is_init = 1;
 
-	wnd->x = x;
-	wnd->y = y;
-	wnd->bpp = bpp;
 	strcpy(wndstr, caption);
 	wnd->caption = wndstr;
 	wnd->evthandler = NULL;
 
-	// Init parameters of the frame buffers
-	SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
-	SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
-	SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 8 );
-	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 0 );
-	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+	create_window(wnd, x, y, width, height);
 	
-
-	// Create resizable window using OpenGL
-	if (!width || !height)
-		fs = 1;
-	resize_window(wnd, width, height, fs);
-	
-	// Set caption
-	SDL_WM_SetCaption(wnd->caption,NULL);
 	atexit(SDL_Quit);
 
 	if (init_opengl_state(wnd))
@@ -189,10 +187,8 @@ void dtk_clear_screen(dtk_hwnd wnd)
 API_EXPORTED
 void dtk_update_screen(dtk_hwnd wnd)  
 {                         
-	(void)wnd;
-	                
 	// Update screen
-	SDL_GL_SwapBuffers();			
+	SDL_GL_SwapWindow(wnd->window);
 }
 
 
@@ -213,14 +209,12 @@ void dtk_close(dtk_hwnd wnd)
 	if (!wnd) 
 		return;
 	
-	// Unbind the window if current
-	if (current_window == wnd)
-		current_window = NULL;
-
 	// Assume there is only one window so destroy all texture in it.
 	// This assumption might be wrong in case of multiple windows
 	// support
 	release_texture_manager();
+	SDL_GL_DeleteContext(wnd->context);
+	SDL_DestroyWindow(wnd->window);
 
 	free(wnd->caption);
 	free(wnd);
@@ -234,7 +228,7 @@ void dtk_close(dtk_hwnd wnd)
 API_EXPORTED
 void dtk_make_current_window(dtk_hwnd wnd)
 {
-	current_window = wnd;	
+	SDL_GL_MakeCurrent(wnd->window, wnd->context);
 }
 
 API_EXPORTED

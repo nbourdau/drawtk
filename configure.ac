@@ -55,7 +55,7 @@ PKG_CHECK_CUSTOM(GSTAPP, [gstreamer-app-0.10])
 AC_SEARCH_LIBS([pthread_create], [pthread posix4], 
                [], AC_MSG_ERROR([The pthread library has not been found]))
 AC_SEARCH_LIBS([cos], [m], [], AC_MSG_ERROR([The libm cannot be found.]))
-AC_SEARCH_LIBS([SDL_Init], [SDL SDL-1.2], [], AC_MSG_ERROR([The SDL library must be installed.]))
+AC_SEARCH_LIBS([SDL_Init], [SDL2-2.0], [], AC_MSG_ERROR([The SDL2 library must be installed.]))
 AC_SEARCH_LIBS_FNARG([FreeImage_Load], [freeimage],
         [0,0,0], [#include <FreeImage.h>],
         [], AC_MSG_ERROR([The FreeImage library must be installed.]))
