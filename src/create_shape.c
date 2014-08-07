@@ -20,7 +20,7 @@
 # include <config.h>
 #endif
 
-#include <SDL/SDL_opengl.h>
+#include <SDL.h>
 #include <math.h>
 #include <float.h>
 #include <string.h>
