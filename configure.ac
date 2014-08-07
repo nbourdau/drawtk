@@ -59,9 +59,13 @@ AC_SEARCH_LIBS([cos], [m], [], AC_MSG_ERROR([The libm cannot be found.]))
 AC_SEARCH_LIBS_FNARG([FreeImage_Load], [freeimage],
         [0,0,0], [#include <FreeImage.h>],
         [], AC_MSG_ERROR([The FreeImage library must be installed.]))
+
+save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $SDL2_CFLAGS"
 AC_SEARCH_LIBS_FNARG([glEnable], [GL opengl32], 
         [0], [#include <SDL_opengl.h>],
 	[], AC_MSG_ERROR([The openGL library cannot be found.]))
+CPPFLAGS="$save_CPPFLAGS"
 
 
 LIBS="$LIBS $FREETYPE2_LIBS $FONTCONFIG_LIBS $SDL2_LIBS -lgstapp-0.10 -lgstreamer-0.10 -lgobject-2.0 -lglib-2.0"
