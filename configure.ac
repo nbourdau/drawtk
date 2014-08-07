@@ -51,22 +51,22 @@ AC_REPLACE_FUNCS([clock_gettime clock_nanosleep])
 PKG_CHECK_CUSTOM(FREETYPE2, freetype2)
 PKG_CHECK_CUSTOM(FONTCONFIG, fontconfig)
 PKG_CHECK_CUSTOM(GSTAPP, [gstreamer-app-0.10])
+PKG_CHECK_CUSTOM(SDL2, [sdl2])
 
 AC_SEARCH_LIBS([pthread_create], [pthread posix4], 
                [], AC_MSG_ERROR([The pthread library has not been found]))
 AC_SEARCH_LIBS([cos], [m], [], AC_MSG_ERROR([The libm cannot be found.]))
-AC_SEARCH_LIBS([SDL_Init], [SDL2-2.0], [], AC_MSG_ERROR([The SDL2 library must be installed.]))
 AC_SEARCH_LIBS_FNARG([FreeImage_Load], [freeimage],
         [0,0,0], [#include <FreeImage.h>],
         [], AC_MSG_ERROR([The FreeImage library must be installed.]))
 AC_SEARCH_LIBS_FNARG([glEnable], [GL opengl32], 
-        [0], [#include <SDL/SDL_opengl.h>],
+        [0], [#include <SDL_opengl.h>],
 	[], AC_MSG_ERROR([The openGL library cannot be found.]))
 
 
-LIBS="$LIBS $FREETYPE2_LIBS $FONTCONFIG_LIBS -lgstapp-0.10 -lgstreamer-0.10 -lgobject-2.0 -lglib-2.0"
-AC_SUBST(AM_CPPFLAGS, "$CPPFLAGS $FREETYPE2_CFLAGS $GSTAPP_CFLAGS $FONTCONFIG_FLAGS")
-AC_SUBST(AM_LDFLAGS, "$LDFLAGS $FREETYPE2_LDFLAGS $GSTAPP_LDFLAGS $FONTCONFIG_FLAGS")
+LIBS="$LIBS $FREETYPE2_LIBS $FONTCONFIG_LIBS $SDL2_LIBS -lgstapp-0.10 -lgstreamer-0.10 -lgobject-2.0 -lglib-2.0"
+AC_SUBST(AM_CPPFLAGS, "$CPPFLAGS $FREETYPE2_CFLAGS $SDL2_CFLAGS $GSTAPP_CFLAGS $FONTCONFIG_FLAGS")
+AC_SUBST(AM_LDFLAGS, "$LDFLAGS $FREETYPE2_LDFLAGS $SDL2_LDFLAGS $GSTAPP_LDFLAGS $FONTCONFIG_FLAGS")
 
 AC_SUBST([CURRENT],[lib_current])
 AC_SUBST([REVISION],[lib_revision])

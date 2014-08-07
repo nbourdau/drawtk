@@ -19,7 +19,7 @@
 #ifndef TEXMANAGER_H
 #define TEXMANAGER_H
 
-#include <SDL2/SDL_opengl.h>
+#include <SDL_opengl.h>
 #include <pthread.h>
 #include <stdbool.h>
 #include <stdint.h>

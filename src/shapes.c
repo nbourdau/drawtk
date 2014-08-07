@@ -20,7 +20,7 @@
 # include <config.h>
 #endif
 
-#include <SDL2/SDL_opengl.h>
+#include <SDL_opengl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
