@@ -41,14 +41,13 @@
 struct dtk_pipe_element {
 	GstElement *gstelt;
 
-	// previous & next element in doubly-linked list
+	// previous element in linked list
 	struct dtk_pipe_element *prev;
-	struct dtk_pipe_element *next;
 };
 
 struct pipeline {
 	GstElement* pipe;
-	// doubly linked list of elements in the pipeline
+	// linked list of elements in the pipeline
 	struct dtk_pipe_element* elt;
 };
 
@@ -126,11 +125,7 @@ bool pipe_add_element_full_valist(struct pipeline* pl,
 	elem = malloc(sizeof(struct dtk_pipe_element));
 	elem->gstelt = gstelem;
 	elem->prev = pl->elt;
-	elem->next = NULL;
 
-	// fill previous dtk_pipe_element.next field
-	if (pl->elt != NULL)
-		pl->elt->next = elem;
 	// put element on top
 	pl->elt = elem;
 
